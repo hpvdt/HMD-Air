@@ -93,8 +93,8 @@ def BuildIl2Cpp(String workingDir, String configuration, String architecture, St
 android {
     task BuildIl2CppTask {
         doLast {
-              BuildIl2Cpp(projectDir.toString().replaceAll('\\\\', '/'), 'Release', 'armv7', 'armeabi-v7a', [  ] as String[]);
-              BuildIl2Cpp(projectDir.toString().replaceAll('\\\\', '/'), 'Release', 'arm64', 'arm64-v8a', [  ] as String[]);
+            BuildIl2Cpp(projectDir.toString().replaceAll('\\\\', '/'), 'Release', 'armv7', 'armeabi-v7a', [  ] as String[]);
+            BuildIl2Cpp(projectDir.toString().replaceAll('\\\\', '/'), 'Release', 'arm64', 'arm64-v8a', [  ] as String[]);
         }
     }
     afterEvaluate {
@@ -111,7 +111,7 @@ android {
 }
 
 
-    android.sourceSets.main.java.srcDirs += [
-        'K:/Code/Nreal-Unity-Demos/Assets/NRSDK/Demos/RGBCamera/Scripts/GalleryDataProvider.java'
-    ]
+android.sourceSets.main.java.srcDirs += [
+        '../Assets/NRSDK/Demos/RGBCamera/Scripts/GalleryDataProvider.java'
+]
 
