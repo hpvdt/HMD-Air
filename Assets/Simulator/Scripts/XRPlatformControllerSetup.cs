@@ -1,3 +1,5 @@
+using UnityEngine;
+
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.XR.Management;
@@ -7,7 +9,6 @@ using UnityEngine.XR.Management;
 
 namespace Unity.Template.VR
 {
-    using UnityEngine;
     internal class XRPlatformControllerSetup : MonoBehaviour
     {
         [SerializeField]
@@ -15,7 +16,7 @@ namespace Unity.Template.VR
 
         [SerializeField]
         GameObject m_RightController;
-
+        
         [SerializeField]
         GameObject m_LeftControllerOculusPackage;
 
@@ -29,7 +30,7 @@ namespace Unity.Template.VR
 #else
             var loaders = XRGeneralSettings.Instance.Manager.activeLoaders;
 #endif
-
+            
             foreach (var loader in loaders)
             {
                 if (loader.name.Equals("Oculus Loader"))

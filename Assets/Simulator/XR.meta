@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Simulator/XR.meta
 guid: 22baeac49dfd54025859cd02808b06f8
+========
+guid: 04278548d30bb8d4ea34774822bcd2b7
+>>>>>>>> d8315a1 (Finished camera position select):Assets/XR.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
