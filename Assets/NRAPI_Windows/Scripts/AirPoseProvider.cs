@@ -22,8 +22,9 @@ public class AirPoseProvider : BasePoseProvider
     protected int ConnectionStatus = 0;
     
     protected Quaternion FromGlasses = Quaternion.identity;
-    protected float FromMouseX = 0.0f;
-    protected float FromMouseY = 0.0f;
+
+    protected Vector2 FromMouseXY = Vector2.zero;
+    
     protected Quaternion FromMouse = Quaternion.identity;
 
     // Start is called before the first frame update
@@ -54,10 +55,9 @@ public class AirPoseProvider : BasePoseProvider
         
             // Debug.Log("mouse pressed" + mouseX + ";" + mouseY);
 
-            FromMouseX += deltaX;
-            FromMouseY += deltaY;
+            FromMouseXY += new Vector2(deltaX, deltaY);
         
-            FromMouse = Quaternion.Euler(- FromMouseY, - FromMouseX, 0.0f);
+            FromMouse = Quaternion.Euler(- FromMouseXY[1], - FromMouseXY[0], 0.0f);
         }
         
         Quaternion compound = FromGlasses * FromMouse;
