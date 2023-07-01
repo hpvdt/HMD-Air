@@ -1,8 +1,9 @@
-Shader "JakeDowns/180SphereShader2D"
+Shader "HMD/SBSRightEye"
 {
     Properties
     {
         _MainTex ("Texture", 2D) = "black" {}
+        _AspectRatio ("Aspect Ratio", Range(0, 100)) = 1
     }
     SubShader
     {
@@ -20,7 +21,7 @@ Shader "JakeDowns/180SphereShader2D"
             #pragma vertex vert
             #pragma fragment frag
             // make fog work
-            // #pragma multi_compile_fog
+            #pragma multi_compile_fog
 
             #include "UnityCG.cginc"
 
@@ -33,43 +34,47 @@ Shader "JakeDowns/180SphereShader2D"
             struct v2f
             {
                 float2 uv : TEXCOORD0;
-                //UNITY_FOG_COORDS(1)
+                UNITY_FOG_COORDS(1)
                 float4 vertex : SV_POSITION;
             };
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
+            float2 _AspectRatio;
 
             v2f vert (appdata v)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                //UNITY_TRANSFER_FOG(o,o.vertex);
+                UNITY_TRANSFER_FOG(o,o.vertex);
                 return o;
             }
 
-            float minA = 0.0;
-            float maxA = 1.0;
-            float minB = 0.25;
-            float maxB = 0.75;
-
             fixed4 frag(v2f i) : SV_Target
             {
-                float2 remapped_uv = float2(i.uv);
-                
-                // Map the input value from the input range to the output range
-                //remapped_uv.x = (i.uv.x - minA) / (maxA - minA) * (maxB - minB) + minB;
-                
-                // sample the texture
-                fixed4 col = tex2D(_MainTex, remapped_uv);
+                float2 coord = i.uv;
+                // adjust coord.x to sample just the right half of the texture
+                coord.x = (coord.x * 0.5) + 0.5;
 
-                if (i.uv.x < .25 || i.uv.x > .75) {
-                    col = fixed4(0.0, 0.0, 0.0, 1.0); // black
+                // Calculate the UV offset based on the aspect ratio difference
+                float2 uvOffset = float2(0.0, 0.0);
+
+                float inputAspectRatio = _AspectRatio;
+                float outputAspectRatio = _ScreenParams.x / _ScreenParams.y;
+                if (inputAspectRatio < 1.75)
+                {
+                    //uvOffset.x -= (inputAspectRatio - outputAspectRatio) * 0.25;
                 }
 
-                // apply fog
-                //UNITY_APPLY_FOG(i.fogCoord, col);
+                // Sample the input texture using the adjusted UV coordinates
+                coord = coord + uvOffset;
+
+                //
+
+                // sample the texture
+                fixed4 col = tex2D(_MainTex, coord.xy);
+
                 return col;
             }
             ENDCG

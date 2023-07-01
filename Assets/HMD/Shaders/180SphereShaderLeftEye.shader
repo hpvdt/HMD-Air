@@ -1,4 +1,4 @@
-Shader "JakeDowns/180SphereShaderLeftEye"
+Shader "HMD/180SphereShaderLeftEye"
 {
     Properties
     {

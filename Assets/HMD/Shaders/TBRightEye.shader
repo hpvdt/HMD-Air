@@ -1,4 +1,4 @@
-Shader "JakeDowns/360SphereShader2D"
+Shader "HMD/TBRightEye"
 {
     Properties
     {
@@ -20,7 +20,7 @@ Shader "JakeDowns/360SphereShader2D"
             #pragma vertex vert
             #pragma fragment frag
             // make fog work
-            //#pragma multi_compile_fog
+            #pragma multi_compile_fog
 
             #include "UnityCG.cginc"
 
@@ -33,7 +33,7 @@ Shader "JakeDowns/360SphereShader2D"
             struct v2f
             {
                 float2 uv : TEXCOORD0;
-                //UNITY_FOG_COORDS(1)
+                UNITY_FOG_COORDS(1)
                 float4 vertex : SV_POSITION;
             };
 
@@ -45,16 +45,20 @@ Shader "JakeDowns/360SphereShader2D"
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                //UNITY_TRANSFER_FOG(o,o.vertex);
+                UNITY_TRANSFER_FOG(o,o.vertex);
                 return o;
             }
 
-            fixed4 frag (v2f i) : SV_Target
+            fixed4 frag(v2f i) : SV_Target
             {
+                float2 coord = i.uv;
+                // adjust coord.x to sample just the bottom half of the texture
+                coord.y = (coord.y * 0.5) + 0.5;
+            
                 // sample the texture
-                fixed4 col = tex2D(_MainTex, i.uv);
+                fixed4 col = tex2D(_MainTex, coord.xy);
                 // apply fog
-                //UNITY_APPLY_FOG(i.fogCoord, col);
+                UNITY_APPLY_FOG(i.fogCoord, col);
                 return col;
             }
             ENDCG
