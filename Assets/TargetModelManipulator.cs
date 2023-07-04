@@ -12,6 +12,7 @@ public class TargetModelManipulator : MonoBehaviour
     //public MeshRenderer modelRenderer;
     /// <summary> The minimum scale. </summary>
     private float minScale = 0.1f;
+
     /// <summary> The maximum scale. </summary>
     private float maxScale = 10f;
 
@@ -28,16 +29,16 @@ public class TargetModelManipulator : MonoBehaviour
     private float maxY = 2f;
 
     /// <summary> The NRInput. </summary>
-    [SerializeField]
-    private NRInput m_NRInput;
+    [SerializeField] private NRInput m_NRInput;
 
     /// <summary> The touch scroll speed. </summary>
     private float m_TouchScrollSpeed = 10f;
+
     /// <summary> The previous position. </summary>
     private Vector2 m_PreviousPos;
-    
+
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         currentScale = transform.localScale.x;
         currentX = transform.position.x;
@@ -46,20 +47,13 @@ public class TargetModelManipulator : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (NRInput.GetButtonDown(ControllerButton.TRIGGER))
-        {
             m_PreviousPos = NRInput.GetTouch();
-        }
         else if (NRInput.GetButton(ControllerButton.TRIGGER))
-        {
             UpdateScroll();
-        }
-        else if (NRInput.GetButtonUp(ControllerButton.TRIGGER))
-        {
-            m_PreviousPos = Vector2.zero;
-        }
+        else if (NRInput.GetButtonUp(ControllerButton.TRIGGER)) m_PreviousPos = Vector2.zero;
     }
 
     /// <summary> Updates the scroll. </summary>
@@ -67,8 +61,8 @@ public class TargetModelManipulator : MonoBehaviour
     {
         if (m_PreviousPos == Vector2.zero)
             return;
-        
-        Vector2 deltaMove = NRInput.GetTouch() - m_PreviousPos;
+
+        var deltaMove = NRInput.GetTouch() - m_PreviousPos;
         m_PreviousPos = NRInput.GetTouch();
         //modelTarget.Rotate(m_AroundLocalAxis, deltaMove.x * m_TouchScrollSpeed * Time.deltaTime, Space.Self);
 
@@ -82,16 +76,12 @@ public class TargetModelManipulator : MonoBehaviour
 
         // clamp scale
         if (currentScale < minScale)
-        {
             currentScale = minScale;
-        }
-        else if (currentScale > maxScale)
-        {
-            currentScale = maxScale;
-        }
+        else if (currentScale > maxScale) currentScale = maxScale;
 
         Debug.Log(deltaMove.x + ", " + currentScale);
 
-        transform.localScale = Vector3.one * currentScale; // Vector3.one * Mathf.SmoothStep(minScale, maxScale, currentScale);
+        transform.localScale =
+            Vector3.one * currentScale; // Vector3.one * Mathf.SmoothStep(minScale, maxScale, currentScale);
     }
 }

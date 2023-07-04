@@ -2,19 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Serialization;
 
 public class IntentHandler : MonoBehaviour
 {
-    public JakesSBSVLC jakesSBSVLC;
+    [FormerlySerializedAs("jakesSBSVLC")] public VLCMainDisplay vlcMainDisplay;
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         OnIntent();
     }
 
     // OnApplicationFocus
-    void OnApplicationFocus(bool hasFocus)
+    private void OnApplicationFocus(bool hasFocus)
     {
         if (hasFocus)
         {
@@ -27,39 +28,35 @@ public class IntentHandler : MonoBehaviour
     }
 
     // OnIntent
-    void OnIntent()
+    private void OnIntent()
     {
-        if (Application.isEditor)
-        {
-            return;
-        }
-        
-        AndroidJavaClass UnityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-        AndroidJavaObject currentActivity = UnityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+        if (Application.isEditor) return;
 
-        AndroidJavaObject intent = currentActivity.Call<AndroidJavaObject>("getIntent");
+        var UnityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+        var currentActivity = UnityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+
+        var intent = currentActivity.Call<AndroidJavaObject>("getIntent");
         Debug.Log("On Intent" + intent.Call<string>("getAction"));
 
-        string result = intent.Call<string>("getDataString");
+        var result = intent.Call<string>("getDataString");
 
         if (result != null)
         {
             result = UnityWebRequest.UnEscapeURL(result);
             Debug.Log("On Intent" + result);
-            jakesSBSVLC.Open(result);
+            vlcMainDisplay.Open(result);
         }
 
-        AndroidJavaObject extras = intent.Call<AndroidJavaObject>("getExtras");
+        var extras = intent.Call<AndroidJavaObject>("getExtras");
         if (extras != null)
         {
-            string data = extras.Call<string>("getString", "data");
+            var data = extras.Call<string>("getString", "data");
             Debug.Log("Data: " + data);
         }
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        
     }
 }

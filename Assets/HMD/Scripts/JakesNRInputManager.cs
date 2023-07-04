@@ -1,11 +1,11 @@
 /****************************************************************************
-* Copyright 2019 Nreal Techonology Limited. All rights reserved.
-*                                                                                                                                                          
-* This file is part of NRSDK.                                                                                                          
-*                                                                                                                                                           
-* https://www.nreal.ai/        
-* 
-*****************************************************************************/
+ * Copyright 2019 Nreal Techonology Limited. All rights reserved.
+ *
+ * This file is part of NRSDK.
+ *
+ * https://www.nreal.ai/
+ *
+ *****************************************************************************/
 
 namespace NRKernal
 {
@@ -21,20 +21,24 @@ namespace NRKernal
     {
         /// <summary> The processed frame. </summary>
         private int m_processedFrame;
+
         /// <summary> The raycasters. </summary>
-        private static readonly List<NRPointerRaycaster> raycasters = new List<NRPointerRaycaster>();
+        private static readonly List<NRPointerRaycaster> raycasters = new();
 
         /// <summary> Gets a value indicating whether the active. </summary>
         /// <value> True if active, false if not. </value>
-        public static bool Active { get { return m_Instance != null; } }
+        public static bool Active => m_Instance != null;
+
         /// <summary> Gets the screen center point. </summary>
         /// <value> The screen center point. </value>
-        public static Vector2 ScreenCenterPoint { get { return new Vector2(Screen.width * 0.5f, Screen.height * 0.5f); } }
+        public static Vector2 ScreenCenterPoint => new(Screen.width * 0.5f, Screen.height * 0.5f);
+
         /// <summary> True if is application quitting, false if not. </summary>
         private static bool isApplicationQuitting = false;
 
         /// <summary> The instance. </summary>
         private static NRInputModule m_Instance;
+
         /// <summary> Gets the instance. </summary>
         /// <value> The instance. </value>
         public static NRInputModule Instance
@@ -50,10 +54,7 @@ namespace NRKernal
         public override void UpdateModule()
         {
             Initialize();
-            if (isActiveAndEnabled && EventSystem.current.currentInputModule != this)
-            {
-                ProcessRaycast();
-            }
+            if (isActiveAndEnabled && EventSystem.current.currentInputModule != this) ProcessRaycast();
         }
 
         /// <summary> Process the raycast. </summary>
@@ -69,7 +70,7 @@ namespace NRKernal
         /// <summary> Raycast all. </summary>
         private void RaycastAll()
         {
-            for (int i = 0; i < raycasters.Count; i++)
+            for (var i = 0; i < raycasters.Count; i++)
             {
                 var raycaster = raycasters[i];
                 if (raycaster == null)
@@ -141,23 +142,14 @@ namespace NRKernal
             if (instances.Length > 0)
             {
                 m_Instance = instances[0];
-                if (instances.Length > 1)
-                {
-                    NRDebugger.Warning("Multiple NRInputModule not supported!");
-                }
+                if (instances.Length > 1) NRDebugger.Warning("Multiple NRInputModule not supported!");
             }
 
             if (!Active)
             {
-                EventSystem eventSystem = EventSystem.current;
-                if (eventSystem == null)
-                {
-                    eventSystem = FindObjectOfType<EventSystem>();
-                }
-                if (eventSystem == null)
-                {
-                    eventSystem = new GameObject("[EventSystem]").AddComponent<EventSystem>();
-                }
+                var eventSystem = EventSystem.current;
+                if (eventSystem == null) eventSystem = FindObjectOfType<EventSystem>();
+                if (eventSystem == null) eventSystem = new GameObject("[EventSystem]").AddComponent<EventSystem>();
                 if (eventSystem == null)
                 {
                     NRDebugger.Warning("EventSystem not found or create fail!");
@@ -173,10 +165,7 @@ namespace NRKernal
         public override void Process()
         {
             Initialize();
-            if (isActiveAndEnabled)
-            {
-                ProcessRaycast();
-            }
+            if (isActiveAndEnabled) ProcessRaycast();
         }
 
         /// <summary> Executes the 'application quit' action. </summary>
@@ -199,15 +188,13 @@ namespace NRKernal
         /// <param name="raycaster"> The raycaster.</param>
         public static void RemoveRaycaster(NRPointerRaycaster raycaster)
         {
-            if (m_Instance)
-            {
-                m_Instance.ProcessRaycast();
-            }
+            if (m_Instance) m_Instance.ProcessRaycast();
             raycasters.Remove(raycaster);
         }
 
         /// <summary> The default raycast comparer. </summary>
         public static readonly Comparison<RaycastResult> defaultRaycastComparer = RaycastComparer;
+
         /// <summary> Raycast comparer. </summary>
         /// <param name="lhs"> The left hand side.</param>
         /// <param name="rhs"> The right hand side.</param>
@@ -216,22 +203,19 @@ namespace NRKernal
         {
             if (lhs.module != rhs.module)
             {
-                if (lhs.module.eventCamera != null && rhs.module.eventCamera != null && lhs.module.eventCamera.depth != rhs.module.eventCamera.depth)
+                if (lhs.module.eventCamera != null && rhs.module.eventCamera != null &&
+                    lhs.module.eventCamera.depth != rhs.module.eventCamera.depth)
                 {
-                    if (lhs.module.eventCamera.depth < rhs.module.eventCamera.depth) { return 1; }
-                    if (lhs.module.eventCamera.depth == rhs.module.eventCamera.depth) { return 0; }
+                    if (lhs.module.eventCamera.depth < rhs.module.eventCamera.depth) return 1;
+                    if (lhs.module.eventCamera.depth == rhs.module.eventCamera.depth) return 0;
                     return -1;
                 }
 
                 if (lhs.module.sortOrderPriority != rhs.module.sortOrderPriority)
-                {
                     return rhs.module.sortOrderPriority.CompareTo(lhs.module.sortOrderPriority);
-                }
 
                 if (lhs.module.renderOrderPriority != rhs.module.renderOrderPriority)
-                {
                     return rhs.module.renderOrderPriority.CompareTo(lhs.module.renderOrderPriority);
-                }
             }
 
             if (lhs.sortingLayer != rhs.sortingLayer)
@@ -241,20 +225,11 @@ namespace NRKernal
                 return rid.CompareTo(lid);
             }
 
-            if (lhs.sortingOrder != rhs.sortingOrder)
-            {
-                return rhs.sortingOrder.CompareTo(lhs.sortingOrder);
-            }
+            if (lhs.sortingOrder != rhs.sortingOrder) return rhs.sortingOrder.CompareTo(lhs.sortingOrder);
 
-            if (!Mathf.Approximately(lhs.distance, rhs.distance))
-            {
-                return lhs.distance.CompareTo(rhs.distance);
-            }
+            if (!Mathf.Approximately(lhs.distance, rhs.distance)) return lhs.distance.CompareTo(rhs.distance);
 
-            if (lhs.depth != rhs.depth)
-            {
-                return rhs.depth.CompareTo(lhs.depth);
-            }
+            if (lhs.depth != rhs.depth) return rhs.depth.CompareTo(lhs.depth);
 
             return lhs.index.CompareTo(rhs.index);
         }
@@ -264,10 +239,7 @@ namespace NRKernal
         protected virtual void ProcessMove(PointerEventData eventData)
         {
             var hoverGO = eventData.pointerCurrentRaycast.gameObject;
-            if (eventData.pointerEnter != hoverGO)
-            {
-                HandlePointerExitAndEnter(eventData, hoverGO);
-            }
+            if (eventData.pointerEnter != hoverGO) HandlePointerExitAndEnter(eventData, hoverGO);
         }
 
         /// <summary> Process the press described by eventData. </summary>
@@ -276,10 +248,7 @@ namespace NRKernal
         {
             if (eventData.GetPress())
             {
-                if (!eventData.pressPrecessed)
-                {
-                    ProcessPressDown(eventData);
-                }
+                if (!eventData.pressPrecessed) ProcessPressDown(eventData);
 
                 HandlePressExitAndEnter(eventData, eventData.pointerCurrentRaycast.gameObject);
             }
@@ -311,23 +280,16 @@ namespace NRKernal
 
             var newPressed = ExecuteEvents.ExecuteHierarchy(currentOverGo, eventData, ExecuteEvents.pointerDownHandler);
 
-            if (newPressed == null)
-            {
-                newPressed = ExecuteEvents.GetEventHandler<IPointerClickHandler>(currentOverGo);
-            }
+            if (newPressed == null) newPressed = ExecuteEvents.GetEventHandler<IPointerClickHandler>(currentOverGo);
 
             var time = Time.unscaledTime;
 
             if (newPressed == eventData.lastPress)
             {
-                if (eventData.raycaster != null && time < (eventData.clickTime + NRInput.ClickInterval))
-                {
+                if (eventData.raycaster != null && time < eventData.clickTime + NRInput.ClickInterval)
                     ++eventData.clickCount;
-                }
                 else
-                {
                     eventData.clickCount = 1;
-                }
 
                 eventData.clickTime = time;
             }
@@ -342,9 +304,7 @@ namespace NRKernal
             eventData.pointerDrag = ExecuteEvents.GetEventHandler<IDragHandler>(currentOverGo);
 
             if (eventData.pointerDrag != null)
-            {
                 ExecuteEvents.Execute(eventData.pointerDrag, eventData, ExecuteEvents.initializePotentialDrag);
-            }
         }
 
         /// <summary> Process the press up described by eventData. </summary>
@@ -358,13 +318,9 @@ namespace NRKernal
             var pointerUpHandler = ExecuteEvents.GetEventHandler<IPointerClickHandler>(currentOverGo);
 
             if (eventData.pointerPress == pointerUpHandler && eventData.eligibleForClick)
-            {
                 ExecuteEvents.Execute(eventData.pointerPress, eventData, ExecuteEvents.pointerClickHandler);
-            }
             else if (eventData.pointerDrag != null && eventData.dragging)
-            {
                 ExecuteEvents.ExecuteHierarchy(currentOverGo, eventData, ExecuteEvents.dropHandler);
-            }
 
             eventData.pressPrecessed = false;
             eventData.eligibleForClick = false;
@@ -372,9 +328,7 @@ namespace NRKernal
             eventData.rawPointerPress = null;
 
             if (eventData.pointerDrag != null && eventData.dragging)
-            {
                 ExecuteEvents.Execute(eventData.pointerDrag, eventData, ExecuteEvents.endDragHandler);
-            }
 
             eventData.dragging = false;
             eventData.pointerDrag = null;
@@ -391,12 +345,10 @@ namespace NRKernal
         /// <returns> True if it succeeds, false if it fails. </returns>
         protected bool ShouldStartDrag(NRPointerEventData eventData)
         {
-            if (!eventData.useDragThreshold || eventData.raycaster == null)
-            {
-                return true;
-            }
-            var currentPos = eventData.position3D + (eventData.rotation * Vector3.forward) * eventData.pressDistance;
-            var pressPos = eventData.pressPosition3D + (eventData.pressRotation * Vector3.forward) * eventData.pressDistance;
+            if (!eventData.useDragThreshold || eventData.raycaster == null) return true;
+            var currentPos = eventData.position3D + eventData.rotation * Vector3.forward * eventData.pressDistance;
+            var pressPos = eventData.pressPosition3D +
+                           eventData.pressRotation * Vector3.forward * eventData.pressDistance;
             var threshold = NRInput.DragThreshold;
             return (currentPos - pressPos).sqrMagnitude >= threshold * threshold;
         }
@@ -405,7 +357,8 @@ namespace NRKernal
         /// <param name="eventData"> Information describing the event.</param>
         protected void ProcessDrag(NRPointerEventData eventData)
         {
-            var moving = !Mathf.Approximately(eventData.position3DDelta.sqrMagnitude, 0f) || !Mathf.Approximately(Quaternion.Angle(Quaternion.identity, eventData.rotationDelta), 0f);
+            var moving = !Mathf.Approximately(eventData.position3DDelta.sqrMagnitude, 0f) ||
+                         !Mathf.Approximately(Quaternion.Angle(Quaternion.identity, eventData.rotationDelta), 0f);
 
             if (moving && eventData.pointerDrag != null && !eventData.dragging && ShouldStartDrag(eventData))
             {
@@ -423,6 +376,7 @@ namespace NRKernal
                     eventData.pointerPress = null;
                     eventData.rawPointerPress = null;
                 }
+
                 ExecuteEvents.Execute(eventData.pointerDrag, eventData, ExecuteEvents.dragHandler);
             }
         }
@@ -440,7 +394,6 @@ namespace NRKernal
             var commonRoot = default(Transform);
 
             for (var t = oldTarget; t != null; t = t.parent)
-            {
                 if (newTarget != null && newTarget.IsChildOf(t))
                 {
                     commonRoot = t;
@@ -450,14 +403,11 @@ namespace NRKernal
                 {
                     ExecuteEvents.Execute(t.gameObject, eventData, NRExecutePointerEvents.PressExitHandler);
                 }
-            }
 
             eventData.pressEnter = newEnterTarget;
 
             for (var t = newTarget; t != commonRoot; t = t.parent)
-            {
                 ExecuteEvents.Execute(t.gameObject, eventData, NRExecutePointerEvents.PressEnterHandler);
-            }
         }
 
         /// <summary> Deselect if selection changed. </summary>
@@ -467,11 +417,7 @@ namespace NRKernal
         {
             var selectHandlerGO = ExecuteEvents.GetEventHandler<ISelectHandler>(currentOverGo);
             if (eventSystem != null && selectHandlerGO != eventSystem.currentSelectedGameObject)
-            {
                 eventSystem.SetSelectedGameObject(null, pointerEvent);
-            }
         }
     }
-
 }
-

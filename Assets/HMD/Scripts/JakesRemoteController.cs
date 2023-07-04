@@ -11,25 +11,27 @@ public class JakesRemoteController : MonoBehaviour
 {
     /*bool _menu_visible = false;*/
 
-    JakesSBSVLC jakesSBSVLC;
+    private VLCMainDisplay _vlcMainDisplay;
 
-    GameObject _menuPanel = null;
-    GameObject _og_menu = null;
-    GameObject _app_menu = null;
+    private GameObject _menuPanel = null;
+    private GameObject _og_menu = null;
+
+    private GameObject _app_menu = null;
+
     // GameObject _unlock_3d_sphere_mode_prompt_popup = null;
-    GameObject _menu_toggle_button = null;
-    GameObject _options_button = null;
-    GameObject _custom_popup = null;
-    GameObject _aspect_popup;
-    GameObject _lockScreenNotice = null;
-    GameObject _display_popup = null;
-    GameObject _format_popup = null;
-    GameObject _whats_new_popup = null;
-    GameObject _picture_settings_popup = null;
+    private GameObject _menu_toggle_button = null;
+    private GameObject _options_button = null;
+    private GameObject _custom_popup = null;
+    private GameObject _aspect_popup;
+    private GameObject _lockScreenNotice = null;
+    private GameObject _display_popup = null;
+    private GameObject _format_popup = null;
+    private GameObject _whats_new_popup = null;
+    private GameObject _picture_settings_popup = null;
 
-    bool _og_menu_visible = true;
+    private bool _og_menu_visible = true;
 
-    MenuID _visible_menu_id;
+    private MenuID _visible_menu_id;
 
     public UIStateBeforeCustomPopup stateBeforePopup;
 
@@ -38,13 +40,14 @@ public class JakesRemoteController : MonoBehaviour
     {
         OG_MENU,
         CONTROLLER_MENU,
-        APP_MENU,
+        APP_MENU
     };
 
     [SerializeField]
     public enum PopupID
     {
         CUSTOM_AR_POPUP,
+
         // MODE_LOCKED,
         CUSTOM_POPUP,
         PICTURE_SETTINGS_POPUP,
@@ -54,24 +57,25 @@ public class JakesRemoteController : MonoBehaviour
         WHATS_NEW_POPUP
     }
 
-    PopupID[] popupStack;
+    private PopupID[] popupStack;
 
     public class UIStateBeforeCustomPopup
     {
         public UIStateBeforeCustomPopup(MenuID _visible_menu_id)
         {
-            this.VisibleMenuID = _visible_menu_id;
+            VisibleMenuID = _visible_menu_id;
         }
+
         public MenuID VisibleMenuID;
     }
 
-    public void SetJakesSBSVLC(JakesSBSVLC instance)
+    public void SetVLC(VLCMainDisplay instance)
     {
-        jakesSBSVLC = instance;
+        _vlcMainDisplay = instance;
     }
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         UpdateReferences();
 
@@ -79,12 +83,10 @@ public class JakesRemoteController : MonoBehaviour
 
         // hide 6dof button if not supported
         if (NRDevice.Subsystem.GetDeviceType() != NRDeviceType.NrealLight)
-        {
             GameObject.Find("ChangeTo6Dof").SetActive(false);
-        }
 
-        string versionName = Application.version;
-        string versionCode = Application.buildGUID;
+        var versionName = Application.version;
+        var versionCode = Application.buildGUID;
         GameObject.Find("AppMenu/AppMenuInner/Subtitle").GetComponent<Text>().text = $"{versionName} ({versionCode})";
 
         // center UI things that i had spread out in Editor
@@ -114,20 +116,20 @@ public class JakesRemoteController : MonoBehaviour
         }
     }
 
-    void CenterPopupLocations()
+    private void CenterPopupLocations()
     {
         // Get the "Popups" game object, then loop over each of it's top-level children
         // and center them on the screen
-        GameObject popups = GameObject.Find("Canvas/Popups");
-        for (int i = 0; i < popups.transform.childCount; i++)
+        var popups = GameObject.Find("Canvas/Popups");
+        for (var i = 0; i < popups.transform.childCount; i++)
         {
-            GameObject childGameObject = popups.transform.GetChild(i).gameObject;
+            var childGameObject = popups.transform.GetChild(i).gameObject;
             //Debug.Log("centering " + childGameObject.name);
             CenterXY(childGameObject);
         }
     }
 
-    void CenterXY(GameObject o)
+    private void CenterXY(GameObject o)
     {
         o.transform.localPosition = new Vector3(
             0.0f,
@@ -140,23 +142,20 @@ public class JakesRemoteController : MonoBehaviour
     {
         try
         {
-            List<GameObject> Found = new List<GameObject>();
-            GameObject[] All = Resources.FindObjectsOfTypeAll<GameObject>();
-            foreach (GameObject entry in All)
-            {
+            var Found = new List<GameObject>();
+            var All = Resources.FindObjectsOfTypeAll<GameObject>();
+            foreach (var entry in All)
                 if (entry.name == name)
-                {
                     Found.Add(entry);
-                }
-            }
             return Found.ToArray();
-
         }
         catch (System.Exception e)
         {
             Debug.LogWarning("Error finding " + name + " " + e);
             return null;
-        };
+        }
+
+        ;
     }
 
     public static GameObject FindGameObjectsAllFirst(string name)
@@ -169,16 +168,14 @@ public class JakesRemoteController : MonoBehaviour
         {
             Debug.LogWarning("Error finding " + name + " " + e);
             return null;
-        };
+        }
+
+        ;
     }
 
-    void OnApplicationFocus(bool hasFocus)
+    private void OnApplicationFocus(bool hasFocus)
     {
-        if (hasFocus)
-        {
-
-            UpdateReferences();
-        }
+        if (hasFocus) UpdateReferences();
     }
 
     public void UpdateReferences()
@@ -219,7 +216,8 @@ public class JakesRemoteController : MonoBehaviour
         _og_menu_visible = false;
     }
 
-    public void ShowAppMenu() {
+    public void ShowAppMenu()
+    {
         UpdateReferences();
 
         _app_menu.SetActive(true);
@@ -227,7 +225,6 @@ public class JakesRemoteController : MonoBehaviour
 
         _menu_toggle_button.SetActive(false);
     }
-
 
 
     public void HideAppMenu()
@@ -246,10 +243,7 @@ public class JakesRemoteController : MonoBehaviour
 
     public void RestoreStateBeforePopup()
     {
-        if (stateBeforePopup == null)
-        {
-            return;
-        }
+        if (stateBeforePopup == null) return;
         ShowMenuByID(stateBeforePopup.VisibleMenuID);
         stateBeforePopup = null;
     }
@@ -279,7 +273,7 @@ public class JakesRemoteController : MonoBehaviour
     // Update is called once per frame
     /*void Update()
     {
-        
+
     }*/
 
     public void ShowControllerMenu()
@@ -298,19 +292,16 @@ public class JakesRemoteController : MonoBehaviour
     public void UIToggleControllerMenu()
     {
         if (_visible_menu_id == MenuID.CONTROLLER_MENU)
-        {
             ShowMenuByID(MenuID.OG_MENU);
-        }
         else
-        {
             ShowMenuByID(MenuID.CONTROLLER_MENU);
-        }
     }
 
     public void UIShowControllerMenu()
     {
         ShowMenuByID(MenuID.CONTROLLER_MENU);
     }
+
     public void UIShowOptionsMenu()
     {
         ShowMenuByID(MenuID.APP_MENU);
@@ -408,6 +399,7 @@ public class JakesRemoteController : MonoBehaviour
                 HidePictureSettingsPopup();
                 break;
         }
+
         RestoreStateBeforePopup();
     }
 
@@ -418,11 +410,11 @@ public class JakesRemoteController : MonoBehaviour
         UpdateCustomARPopupValuePreviewText();
 
         // split and parse float
-        string[] split = jakesSBSVLC.GetCurrentAR().Split(':');
-        float ar_width = float.Parse(split[0]);
-        float ar_height = float.Parse(split[1]);
+        var split = _vlcMainDisplay.GetCurrentAR().Split(':');
+        var ar_width = float.Parse(split[0]);
+        var ar_height = float.Parse(split[1]);
 
-        float ar_combo = ar_width / ar_height;
+        var ar_combo = ar_width / ar_height;
 
         // set sliders to current value
         _aspect_popup.transform.Find("ARWidthBar").GetComponent<Slider>().value = ar_width;
@@ -432,14 +424,14 @@ public class JakesRemoteController : MonoBehaviour
 
     public void UpdateCustomARPopupValuePreviewText()
     {
-        GameObject.Find("ARValuePreview").GetComponent<Text>().text = jakesSBSVLC.GetCurrentAR();
+        GameObject.Find("ARValuePreview").GetComponent<Text>().text = _vlcMainDisplay.GetCurrentAR();
 
         // split and parse float
-        string[] split = jakesSBSVLC.GetCurrentAR().Split(':');
-        float ar_width = float.Parse(split[0]);
-        float ar_height = float.Parse(split[1]);
+        var split = _vlcMainDisplay.GetCurrentAR().Split(':');
+        var ar_width = float.Parse(split[0]);
+        var ar_height = float.Parse(split[1]);
 
-        float ar_combo = ar_width / ar_height;
+        var ar_combo = ar_width / ar_height;
         ar_combo = Mathf.Round(ar_combo * 100f) / 100f;
 
         GameObject.Find("ARValuePreviewDecimal").GetComponent<Text>().text = ar_combo.ToString();
@@ -448,8 +440,8 @@ public class JakesRemoteController : MonoBehaviour
     public void ApplyCustomARPopup()
     {
         HidePopupByID(PopupID.CUSTOM_AR_POPUP);
-        string requested_value = _aspect_popup.transform.Find("ARTextInput").GetComponent<InputField>().text;
-        jakesSBSVLC.SetAspectRatio(requested_value);
+        var requested_value = _aspect_popup.transform.Find("ARTextInput").GetComponent<InputField>().text;
+        _vlcMainDisplay.SetAspectRatio(requested_value);
     }
 
     public void HideCustomARPopup()
@@ -496,6 +488,7 @@ public class JakesRemoteController : MonoBehaviour
     {
         _format_popup.SetActive(false);
     }
+
     public void ShowWhatsNewPopup()
     {
         _whats_new_popup.SetActive(true);
@@ -503,7 +496,7 @@ public class JakesRemoteController : MonoBehaviour
 
     public void HideWhatsNewPopup()
     {
-       _whats_new_popup.SetActive(false);
+        _whats_new_popup.SetActive(false);
     }
 
     public void ShowPictureSettingsPopup()
