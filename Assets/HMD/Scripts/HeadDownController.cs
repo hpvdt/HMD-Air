@@ -7,7 +7,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class JakesRemoteController : MonoBehaviour
+public class HeadDownController : MonoBehaviour
 {
     /*bool _menu_visible = false;*/
 
@@ -20,8 +20,10 @@ public class JakesRemoteController : MonoBehaviour
 
     // GameObject _unlock_3d_sphere_mode_prompt_popup = null;
     private GameObject _menu_toggle_button = null;
+
     private GameObject _options_button = null;
-    private GameObject _custom_popup = null;
+
+    // private GameObject _custom_popup = null;
     private GameObject _aspect_popup;
     private GameObject _lockScreenNotice = null;
     private GameObject _display_popup = null;
@@ -188,7 +190,7 @@ public class JakesRemoteController : MonoBehaviour
 
         // _unlock_3d_sphere_mode_prompt_popup = FindGameObjectsAllFirst("Unlock3DSphereModePopup");
 
-        _custom_popup = FindGameObjectsAllFirst("CustomPopup");
+        // _custom_popup = FindGameObjectsAllFirst("CustomPopup");
         _aspect_popup = FindGameObjectsAllFirst("AspectRatioPopup");
         _options_button = FindGameObjectsAllFirst("OptionsButton");
         _display_popup = FindGameObjectsAllFirst("DisplayPopup");
@@ -355,7 +357,7 @@ public class JakesRemoteController : MonoBehaviour
     {
         // TODO: just loop
         // HideUnlock3DSphereModePropmptPopup();
-        HideCustomPopup();
+        // HideCustomPopup();
         HideCustomARPopup();
         HideDisplayPopup();
         HideFormatPopup();
@@ -449,25 +451,25 @@ public class JakesRemoteController : MonoBehaviour
         _aspect_popup.SetActive(false);
     }
 
-    public void ShowCustomPopup(string title, string body)
-    {
-        stateBeforePopup = new UIStateBeforeCustomPopup(_visible_menu_id);
-        UpdateReferences();
-        _custom_popup.SetActive(true);
-        _custom_popup.transform.position = new Vector3(
-            _custom_popup.transform.position.x,
-            _custom_popup.transform.position.y,
-            _custom_popup.transform.position.z - 1.0f // TODO: make this dynamic based on popup stack index
-        );
-        GameObject.Find("CustomPopup/PopupInner/GameObject/Title").GetComponent<Text>().text = title;
-        GameObject.Find("CustomPopup/PopupInner/GameObject/Body").GetComponent<Text>().text = body;
-    }
+    // public void ShowCustomPopup(string title, string body)
+    // {
+    //     stateBeforePopup = new UIStateBeforeCustomPopup(_visible_menu_id);
+    //     UpdateReferences();
+    //     _custom_popup.SetActive(true);
+    //     _custom_popup.transform.position = new Vector3(
+    //         _custom_popup.transform.position.x,
+    //         _custom_popup.transform.position.y,
+    //         _custom_popup.transform.position.z - 1.0f // TODO: make this dynamic based on popup stack index
+    //     );
+    //     GameObject.Find("CustomPopup/PopupInner/GameObject/Title").GetComponent<Text>().text = title;
+    //     GameObject.Find("CustomPopup/PopupInner/GameObject/Body").GetComponent<Text>().text = body;
+    // }
 
-    public void HideCustomPopup()
-    {
-        _custom_popup.SetActive(false);
-        RestoreStateBeforePopup();
-    }
+    // public void HideCustomPopup()
+    // {
+    //     _custom_popup.SetActive(false);
+    //     RestoreStateBeforePopup();
+    // }
 
     public void ShowDisplayPopup()
     {

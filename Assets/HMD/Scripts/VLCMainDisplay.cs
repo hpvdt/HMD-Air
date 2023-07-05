@@ -9,6 +9,10 @@ using UnityEngine.UI;
 using Application = UnityEngine.Device.Application;
 using NRKernal;
 using System.Collections;
+using UnityEngine.Serialization;
+using Quaternion = UnityEngine.Quaternion;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 public class VLCMainDisplay : MonoBehaviour
 {
@@ -29,21 +33,99 @@ public class VLCMainDisplay : MonoBehaviour
     private float nextActionTime = 0.0f;
     public float period = 1.0f;
 
-    public JakesRemoteController jakesRemoteController;
+    [FormerlySerializedAs("jakesRemoteController")]
+    public HeadDownController headDownController;
 
 
-    private LibVLC libVLC;
-    public MediaPlayer mediaPlayer;
+    private LibVLC _libVLC;
+
+    //Create a new static LibVLC instance and dispose of the old one. You should only ever have one LibVLC instance.
+    private void RefreshLibVLC()
+    {
+        Log("VLCPlayerExample CreateLibVLC");
+        //Dispose of the old libVLC if necessary
+        if (_libVLC != null)
+        {
+            _libVLC.Dispose();
+            _libVLC = null;
+        }
+
+        Core.Initialize(Application.dataPath); //Load VLC dlls
+        _libVLC = new LibVLC(
+            true); //You can customize LibVLC with advanced CLI options here https://wiki.videolan.org/VLC_command-line_help/
+
+        //Setup Error Logging
+        Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
+        _libVLC.Log += (s, e) =>
+        {
+            //Always use try/catch in LibVLC events.
+            //LibVLC can freeze Unity if an exception goes unhandled inside an event handler.
+            try
+            {
+                if (logToConsole) Log(e.FormattedLog);
+            }
+            catch (Exception ex)
+            {
+                Log("Exception caught in libVLC.Log: \n" + ex.ToString());
+            }
+        };
+    }
+
+    private LibVLC libVLC
+    {
+        get
+        {
+            if (_libVLC == null) RefreshLibVLC();
+            return _libVLC;
+        }
+        set => _libVLC = value;
+    }
+
+    private MediaPlayer _mediaPlayer;
+
+    //Create a new MediaPlayer object and dispose of the old one. 
+    private void RefreshMediaPlayer()
+    {
+        Log("VLCPlayerExample CreateMediaPlayer");
+        if (_mediaPlayer != null) DestroyMediaPlayer();
+        _mediaPlayer = new MediaPlayer(libVLC);
+        Log("Media Player SET!");
+    }
+
+    public MediaPlayer mediaPlayer
+    {
+        get
+        {
+            if (_mediaPlayer == null) RefreshMediaPlayer();
+            return _mediaPlayer;
+        }
+        set => _mediaPlayer = value;
+    }
 
     private AndroidJavaClass _brightnessHelper;
 
-    [SerializeField] private GameObject NRCameraRig;
+    [SerializeField] private GameObject NRCameraRig; // TODO: remove
+    [SerializeField] private GameObject XRRig;
+
     [SerializeField] private Camera LeftCamera;
     [SerializeField] private Camera CenterCamera;
     [SerializeField] private Camera RightCamera;
 
-    [SerializeField] private GameObject XRRig;
-    private Camera XRCamera;
+    [SerializeField] private Camera XRMainCamera;
+
+    private List<Camera> MainCameras()
+    {
+        return new List<Camera> { CenterCamera, XRMainCamera };
+    }
+
+    private List<Camera> AllCameras()
+    {
+        var result = MainCameras();
+        result.Add(LeftCamera);
+        result.Add(RightCamera);
+
+        return result;
+    }
 
     private float leftCameraXOnStart;
     private float rightCameraXOnStart;
@@ -57,9 +139,15 @@ public class VLCMainDisplay : MonoBehaviour
 
     private GameObject _logo;
 
-    private GameObject _plane2SphereSet;
-    private GameObject _plane2SphereLeftEye;
-    private GameObject _plane2SphereRightEye;
+    [SerializeField] private GameObject mainDisplay;
+
+    [SerializeField] private GameObject leftEyeScreen;
+    [SerializeField] private GameObject rightEyeScreen;
+
+    private List<GameObject> AllScreens()
+    {
+        return new List<GameObject> { leftEyeScreen, rightEyeScreen };
+    }
 
     private Vector3 _startPosition;
 
@@ -67,9 +155,8 @@ public class VLCMainDisplay : MonoBehaviour
     private Renderer _morphDisplayRightRenderer;
 
     [SerializeField] public Slider fovBar;
-    [SerializeField] public Slider nrealFOVBar;
 
-    [SerializeField] public Slider scaleBar;
+    // [SerializeField] public Slider scaleBar;
 
     [SerializeField] public Slider distanceBar;
 
@@ -170,8 +257,14 @@ public class VLCMainDisplay : MonoBehaviour
     /// <summary> The previous position. </summary>
     private Vector2 m_PreviousPos;
 
-    private float fov = 20.0f; // 20 for 2D 140 for spherical
-    private float nreal_fov = 20.0f;
+    private float fov // 20 for 2D 140 for spherical
+    {
+        get => CenterCamera.fieldOfView;
+        set
+        {
+            foreach (var c in AllCameras()) c.fieldOfView = value;
+        }
+    }
 
     //public string path = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"; //Can be a web path or a local path
     public string
@@ -196,12 +289,8 @@ public class VLCMainDisplay : MonoBehaviour
 
     private void Awake()
     {
-        //Setup LibVLC
-        if (libVLC == null)
-            CreateLibVLC();
-
         //Setup Media Player
-        CreateMediaPlayer();
+        RefreshMediaPlayer();
 
 #if UNITY_ANDROID
         if (!Application.isEditor)
@@ -223,30 +312,23 @@ public class VLCMainDisplay : MonoBehaviour
 
         if (fovBar is not null) fovBar.value = fov;
 
-        if (nrealFOVBar is not null) nrealFOVBar.value = nreal_fov;
-
         if (deformBar is not null) deformBar.value = 0.0f;
 
-        _plane2SphereSet = GameObject.Find("MainDisplay");
-        _plane2SphereLeftEye = GameObject.Find("plane2sphereLeftEye");
-        _plane2SphereRightEye = GameObject.Find("plane2sphereRightEye");
-
         _startPosition = new Vector3(
-            _plane2SphereSet.transform.position.x,
-            _plane2SphereSet.transform.position.y,
-            _plane2SphereSet.transform.position.z
+            mainDisplay.transform.position.x,
+            mainDisplay.transform.position.y,
+            mainDisplay.transform.position.z
         );
 
-        jakesRemoteController.SetVLC(this);
+        headDownController.SetVLC(this);
 
-        UpdateCameraReferences();
+        // UpdateCameraReferences();
 
         leftCameraXOnStart = LeftCamera.transform.position.x;
         rightCameraXOnStart = RightCamera.transform.position.x;
 
         // init
         OnFOVSliderUpdated();
-        OnSplitFOVSliderUpdated();
 
         _cone = GameObject.Find("CONE_PARENT");
         _pointLight = GameObject.Find("Point Light");
@@ -263,8 +345,8 @@ public class VLCMainDisplay : MonoBehaviour
         if (canvasScreen == null)
             canvasScreen = GetComponent<RawImage>();*/
 
-        _morphDisplayLeftRenderer = _plane2SphereLeftEye.GetComponent<Renderer>();
-        _morphDisplayRightRenderer = _plane2SphereRightEye.GetComponent<Renderer>();
+        _morphDisplayLeftRenderer = leftEyeScreen.GetComponent<Renderer>();
+        _morphDisplayRightRenderer = rightEyeScreen.GetComponent<Renderer>();
 
         //Automatically flip on android
         if (automaticallyFlipOnAndroid && UnityEngine.Application.platform == RuntimePlatform.Android)
@@ -359,36 +441,35 @@ public class VLCMainDisplay : MonoBehaviour
         SetVideoMode3602D();
     }
 
-    public void OnScaleSliderUpdated()
-    {
-        var newScale = (float)scaleBar.value;
-        //_2DDisplaySet.transform.localScale = new Vector3(newScale, newScale, 1.0f);
+    // public void OnScaleSliderUpdated()
+    // {
+    //     var fromBar = (float)scaleBar.value;
+    //     var fromDeform = deformBar.value;
+    //
+    //     mainDisplay.transform.localScale = new Vector3(fromBar, fromBar, fromBar);
+    // }
 
-        _plane2SphereSet.transform.localScale = new Vector3(newScale, newScale, newScale);
-
-        /*_sphereScale = (float)scaleBar.value;
-        _360Sphere = GameObject.Find("SphereDisplay");
-        Debug.Log("sphere scale " + _sphereScale);
-        _360Sphere.transform.localScale = new Vector3(_sphereScale, _sphereScale, _sphereScale);*/
-    }
+    private static Vector2 SCALE_RANGE = new(1f, 4.702173720867682f);
 
     public void OnDeformSliderUpdated()
     {
-        if (deformBar is null) return;
+        // if (deformBar is null) return;
 
-        var value = (float)deformBar.value;
+        var value = deformBar.value;
 
-        if (_plane2SphereLeftEye is not null)
-        {
-            _plane2SphereLeftEye.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(0, value);
-            _plane2SphereLeftEye.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(1, value);
-        }
+        var scale = Mathf.Lerp(SCALE_RANGE.x, SCALE_RANGE.y, value / 100);
 
-        if (_plane2SphereRightEye is not null)
-        {
-            _plane2SphereRightEye.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(0, value);
-            _plane2SphereRightEye.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(1, value);
-        }
+        // Debug.Log("value set to " + value);
+
+        var screens = AllScreens();
+        foreach (var screen in screens)
+            if (screen is not null)
+            {
+                screen.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(0, value);
+                screen.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(1, value);
+            }
+
+        mainDisplay.transform.localScale = new Vector3(scale, scale, scale);
     }
 
     private float lerpDuration = 1; // TODO: dynamic duration based on startValue
@@ -401,9 +482,9 @@ public class VLCMainDisplay : MonoBehaviour
     private IEnumerator lerpROne;
     //float valueToLerp;
 
-    public void TogglePlaneToSphere()
+    public void TogglePlaneToSphere() // TODO: cleanup
     {
-        var current = _plane2SphereLeftEye.GetComponent<SkinnedMeshRenderer>().GetBlendShapeWeight(0);
+        var current = leftEyeScreen.GetComponent<SkinnedMeshRenderer>().GetBlendShapeWeight(0);
         if (current < 50)
             AnimatePlaneToSphere();
         else
@@ -436,14 +517,14 @@ public class VLCMainDisplay : MonoBehaviour
 
         endValue = _endValue;
 
-        lerpLZero = LerpPlaneToSphere(_plane2SphereLeftEye.GetComponent<SkinnedMeshRenderer>(), 0);
-        lerpLOne = LerpPlaneToSphere(_plane2SphereLeftEye.GetComponent<SkinnedMeshRenderer>(), 1);
+        lerpLZero = LerpPlaneToSphere(leftEyeScreen.GetComponent<SkinnedMeshRenderer>(), 0);
+        lerpLOne = LerpPlaneToSphere(leftEyeScreen.GetComponent<SkinnedMeshRenderer>(), 1);
 
         StartCoroutine(lerpLZero);
         StartCoroutine(lerpLOne);
 
-        lerpRZero = LerpPlaneToSphere(_plane2SphereRightEye.GetComponent<SkinnedMeshRenderer>(), 0);
-        lerpROne = LerpPlaneToSphere(_plane2SphereRightEye.GetComponent<SkinnedMeshRenderer>(), 1);
+        lerpRZero = LerpPlaneToSphere(rightEyeScreen.GetComponent<SkinnedMeshRenderer>(), 0);
+        lerpROne = LerpPlaneToSphere(rightEyeScreen.GetComponent<SkinnedMeshRenderer>(), 1);
 
         StartCoroutine(lerpRZero);
         StartCoroutine(lerpROne);
@@ -478,9 +559,9 @@ public class VLCMainDisplay : MonoBehaviour
     public void OnDistanceSliderUpdated()
     {
         var newDistance = (float)distanceBar.value;
-        _plane2SphereSet.transform.localPosition = new Vector3(
-            _plane2SphereSet.transform.localPosition.x,
-            _plane2SphereSet.transform.localPosition.y,
+        mainDisplay.transform.localPosition = new Vector3(
+            mainDisplay.transform.localPosition.x,
+            mainDisplay.transform.localPosition.y,
             newDistance
         );
     }
@@ -489,10 +570,10 @@ public class VLCMainDisplay : MonoBehaviour
     public void OnHorizontalSliderUpdated()
     {
         var newOffset = (float)horizontalBar.value;
-        _plane2SphereSet.transform.localPosition = new Vector3(
+        mainDisplay.transform.localPosition = new Vector3(
             newOffset,
-            _plane2SphereSet.transform.localPosition.y,
-            _plane2SphereSet.transform.localPosition.z
+            mainDisplay.transform.localPosition.y,
+            mainDisplay.transform.localPosition.z
         );
     }
 
@@ -500,17 +581,17 @@ public class VLCMainDisplay : MonoBehaviour
     public void OnVerticalSliderUpdated()
     {
         var newOffset = (float)verticalBar.value;
-        _plane2SphereSet.transform.localPosition = new Vector3(
-            _plane2SphereSet.transform.localPosition.x,
+        mainDisplay.transform.localPosition = new Vector3(
+            mainDisplay.transform.localPosition.x,
             newOffset,
-            _plane2SphereSet.transform.localPosition.z
+            mainDisplay.transform.localPosition.z
         );
     }
 
     public void ResetDisplayAdjustments()
     {
-        _plane2SphereSet.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
-        _plane2SphereSet.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+        mainDisplay.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+        mainDisplay.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
     }
 
     private float leftCameraMinX = -1.5f;
@@ -529,10 +610,10 @@ public class VLCMainDisplay : MonoBehaviour
 
         Debug.Log($"{newDepth} , {leftCameraX} , {rightCameraX}");
 
-        LeftCamera.transform.localPosition = new Vector3(leftCameraX, LeftCamera.transform.localPosition.y,
-            LeftCamera.transform.localPosition.z);
-        RightCamera.transform.localPosition = new Vector3(rightCameraX, RightCamera.transform.localPosition.y,
-            RightCamera.transform.localPosition.z);
+        LeftCamera.transform.localPosition =
+            new Vector3(leftCameraX, LeftCamera.transform.localPosition.y, LeftCamera.transform.localPosition.z);
+        RightCamera.transform.localPosition =
+            new Vector3(rightCameraX, RightCamera.transform.localPosition.y, RightCamera.transform.localPosition.z);
     }
 
     private static float maxFocal = 15.0f;
@@ -548,60 +629,22 @@ public class VLCMainDisplay : MonoBehaviour
         RightCamera.transform.localRotation = Quaternion.Euler(0.0f, -focal, 0.0f);
     }
 
+    // public void UpdateCameraReferences()
+    // {
+    //     LeftCamera = GameObject.Find("LeftCamera")?.GetComponent<Camera>();
+    //     CenterCamera = GameObject.Find("CenterCamera")?.GetComponent<Camera>();
+    //     RightCamera = GameObject.Find("RightCamera")?.GetComponent<Camera>();
+    // }
+
     public void OnFOVSliderUpdated()
     {
-        if (fovBar is null)
-        {
-            Debug.LogWarning("fovBar null");
-            return;
-        }
+        // NOTE: NRSDK doesn't support custom FOV on cameras
+        // NOTE: TESTING COMMENTING OUT camera.projectionMatrix = statements in NRHMDPoseTracker
 
         fov = (float)fovBar.value;
         Debug.Log("fov " + fov);
 
         Do360Navigation();
-        //}
-    }
-
-    public void UpdateCameraReferences()
-    {
-        LeftCamera = GameObject.Find("LeftCamera")?.GetComponent<Camera>();
-        CenterCamera = GameObject.Find("CenterCamera")?.GetComponent<Camera>();
-        RightCamera = GameObject.Find("RightCamera")?.GetComponent<Camera>();
-    }
-
-    public void OnSplitFOVSliderUpdated()
-    {
-        // NOTE: NRSDK doesn't support custom FOV on cameras
-        // NOTE: TESTING COMMENTING OUT camera.projectionMatrix = statements in NRHMDPoseTracker
-        //return;
-
-
-        UpdateCameraReferences();
-        if (nrealFOVBar is null)
-        {
-            Debug.LogWarning("nrealFOVBar null");
-            return;
-        }
-
-        if (LeftCamera is null || CenterCamera is null || RightCamera is null)
-        {
-            Debug.LogWarning("camera null " + $" {LeftCamera}, {CenterCamera}, {RightCamera}");
-            return;
-        }
-        //Debug.Log("fov before: " + LeftCamera.fieldOfView + ", " + CenterCamera.fieldOfView + ", " + RightCamera.fieldOfView);
-
-        nreal_fov = (float)nrealFOVBar.value;
-
-        LeftCamera.fieldOfView = nreal_fov;
-        CenterCamera.fieldOfView = nreal_fov;
-        RightCamera.fieldOfView = nreal_fov;
-
-        //Debug.Log("fov after: " + LeftCamera.fieldOfView + ", " + CenterCamera.fieldOfView + ", " + RightCamera.fieldOfView);
-
-        Do360Navigation();
-
-        //Debug.Log("fov after 360 nav" + LeftCamera.fieldOfView + ", " + CenterCamera.fieldOfView + ", " + RightCamera.fieldOfView);
     }
 
     public void SetVideoMode1802D()
@@ -661,7 +704,7 @@ public class VLCMainDisplay : MonoBehaviour
 
     private void OnGUI()
     {
-        if (!jakesRemoteController.OGMenuVisible()) return;
+        if (!headDownController.OGMenuVisible()) return;
         if (NRInput.GetButtonDown(ControllerButton.TRIGGER))
         {
             m_PreviousPos = NRInput.GetTouch();
@@ -797,7 +840,7 @@ public class VLCMainDisplay : MonoBehaviour
         _cone?.SetActive(false); // hide cone logo
         _pointLight?.SetActive(false);
 
-        _plane2SphereSet?.SetActive(true);
+        mainDisplay?.SetActive(true);
 
         mediaPlayer.Play();
     }
@@ -813,7 +856,7 @@ public class VLCMainDisplay : MonoBehaviour
         Log("VLCPlayerExample Stop");
         mediaPlayer?.Stop();
 
-        _plane2SphereSet.SetActive(false);
+        mainDisplay.SetActive(false);
 
         // TODO: encapsulate this
         if (m_lRenderer?.material is not null)
@@ -956,46 +999,6 @@ public class VLCMainDisplay : MonoBehaviour
 
     #region internal
 
-    //Create a new static LibVLC instance and dispose of the old one. You should only ever have one LibVLC instance.
-    private void CreateLibVLC()
-    {
-        Log("VLCPlayerExample CreateLibVLC");
-        //Dispose of the old libVLC if necessary
-        if (libVLC != null)
-        {
-            libVLC.Dispose();
-            libVLC = null;
-        }
-
-        Core.Initialize(Application.dataPath); //Load VLC dlls
-        libVLC = new LibVLC(true); //You can customize LibVLC with advanced CLI options here https://wiki.videolan.org/VLC_command-line_help/
-
-        //Setup Error Logging
-        Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
-        libVLC.Log += (s, e) =>
-        {
-            //Always use try/catch in LibVLC events.
-            //LibVLC can freeze Unity if an exception goes unhandled inside an event handler.
-            try
-            {
-                if (logToConsole) Log(e.FormattedLog);
-            }
-            catch (Exception ex)
-            {
-                Log("Exception caught in libVLC.Log: \n" + ex.ToString());
-            }
-        };
-    }
-
-    //Create a new MediaPlayer object and dispose of the old one. 
-    private void CreateMediaPlayer()
-    {
-        Log("VLCPlayerExample CreateMediaPlayer");
-        if (mediaPlayer != null) DestroyMediaPlayer();
-        mediaPlayer = new MediaPlayer(libVLC);
-        Log("Media Player SET!");
-    }
-
     //Dispose of the MediaPlayer object. 
     private void DestroyMediaPlayer()
     {
@@ -1029,7 +1032,6 @@ public class VLCMainDisplay : MonoBehaviour
     //Resize the output textures to the size of the video
     private void ResizeOutputTextures(uint px, uint py)
     {
-        if (mediaPlayer is null) return;
         var texptr = mediaPlayer.GetTexture(px, py, out var updated);
         if (px != 0 && py != 0 && updated && texptr != IntPtr.Zero)
         {
@@ -1141,8 +1143,8 @@ public class VLCMainDisplay : MonoBehaviour
         if (mode == VideoMode.Mono || mode == VideoMode._360_2D || mode == VideoMode._180_2D)
         {
             // 2D
-            _plane2SphereLeftEye.layer = LayerMask.NameToLayer("Default");
-            _plane2SphereRightEye.SetActive(false);
+            leftEyeScreen.layer = LayerMask.NameToLayer("Default");
+            rightEyeScreen.SetActive(false);
 
             _morphDisplayLeftRenderer.material = m_monoMaterial; // m_lMaterial;
             _morphDisplayLeftRenderer.material.mainTexture = texture;
@@ -1151,10 +1153,10 @@ public class VLCMainDisplay : MonoBehaviour
         {
             // 3D
 
-            _plane2SphereLeftEye.layer = LayerMask.NameToLayer("LeftEyeOnly");
+            leftEyeScreen.layer = LayerMask.NameToLayer("LeftEyeOnly");
 
-            _plane2SphereRightEye.SetActive(true);
-            _plane2SphereRightEye.layer = LayerMask.NameToLayer("RightEyeOnly");
+            rightEyeScreen.SetActive(true);
+            rightEyeScreen.layer = LayerMask.NameToLayer("RightEyeOnly");
 
             if (mode is VideoMode.TB)
             {
@@ -1174,13 +1176,12 @@ public class VLCMainDisplay : MonoBehaviour
 
     public void ShowCustomARPopup()
     {
-        jakesRemoteController.ShowPopupByID(JakesRemoteController.PopupID.CUSTOM_AR_POPUP);
+        headDownController.ShowPopupByID(HeadDownController.PopupID.CUSTOM_AR_POPUP);
     }
 
     public void SetAspectRatio(string value)
     {
-        if (mediaPlayer is not null)
-            mediaPlayer.AspectRatio = value;
+        mediaPlayer.AspectRatio = value;
     }
 
     // https://answers.unity.com/questions/1549639/enum-as-a-function-param-in-a-button-onclick.html?page=2&pageSize=5&sort=votes
@@ -1207,13 +1208,13 @@ public class VLCMainDisplay : MonoBehaviour
 
     public void ResetScreen() // TODO: bind it to button
     {
-        _plane2SphereLeftEye.transform.localPosition = _startPosition;
-        _plane2SphereLeftEye.transform.localRotation = Quaternion.identity;
-        _plane2SphereLeftEye.transform.localScale = new Vector3(1, 1, 1);
+        leftEyeScreen.transform.localPosition = _startPosition;
+        leftEyeScreen.transform.localRotation = Quaternion.identity;
+        leftEyeScreen.transform.localScale = new Vector3(1, 1, 1);
 
-        _plane2SphereRightEye.transform.localPosition = _startPosition;
-        _plane2SphereRightEye.transform.localRotation = Quaternion.identity;
-        _plane2SphereRightEye.transform.localScale = new Vector3(1, 1, 1);
+        rightEyeScreen.transform.localPosition = _startPosition;
+        rightEyeScreen.transform.localRotation = Quaternion.identity;
+        rightEyeScreen.transform.localScale = new Vector3(1, 1, 1);
     }
 
     public void promptUserFilePicker()

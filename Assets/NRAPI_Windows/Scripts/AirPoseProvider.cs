@@ -31,7 +31,7 @@ public class AirPoseProvider : BasePoseProvider
         if (code == 1)
             connectionState = ConnectionStates.StandBy;
         else
-            Debug.Log("Connection error: return code " + code);
+            Debug.LogError("Connection error: return code " + code);
     }
 
     [DllImport("AirAPI_Windows", CallingConvention = CallingConvention.Cdecl)]
@@ -39,15 +39,18 @@ public class AirPoseProvider : BasePoseProvider
 
     public void TryDisconnect()
     {
-        var code = StopConnection();
-        if (code == 1)
+        if (!IsConnecting())
         {
-            connectionState = ConnectionStates.Disconnected;
-        }
-        else
-        {
-            connectionState = ConnectionStates.Offline;
-            Debug.LogError("Disconnection error: return code " + code);
+            var code = StopConnection();
+            if (code == 1)
+            {
+                connectionState = ConnectionStates.Disconnected;
+            }
+            else
+            {
+                connectionState = ConnectionStates.Offline;
+                Debug.LogError("Disconnection error: return code " + code);
+            }
         }
     }
 

@@ -10,7 +10,7 @@ using UnityEditor;
 ///This script controls all the GUI for the VLC Unity Canvas Example
 ///It sets up event handlers and updates the GUI every frame
 ///This example shows how to safely set up LibVLC events and a simple way to call Unity functions from them
-public class JakesVLCPlayerExampleGui : MonoBehaviour
+public class VLCController : MonoBehaviour
 {
     public VLCMainDisplay vlcPlayer;
 
@@ -19,8 +19,10 @@ public class JakesVLCPlayerExampleGui : MonoBehaviour
     //public AspectRatioFitter screenAspectRatioFitter;
     public Button Rewind10Button;
     public Button FFW10Button;
+
     public Slider seekBar;
-    public Slider scaleBar;
+
+    // public Slider scaleBar;
     public Button playButton;
     public Button pauseButton;
     public Button stopButton;
@@ -57,7 +59,7 @@ public class JakesVLCPlayerExampleGui : MonoBehaviour
 
     private bool _isDraggingSeekBar = false; //We advance the seek bar every frame, unless the user is dragging it
 
-    private bool _isDraggingScaleBar = false;
+    // private bool _isDraggingScaleBar = false;
 
     ///Unity wants to do everything on the main thread, but VLC events use their own thread.
     ///These variables can be set to true in a VLC event handler indicate that a function should be called next Update.
@@ -302,7 +304,7 @@ public class JakesVLCPlayerExampleGui : MonoBehaviour
         var ar_combo = Mathf.Round(width / height * 100f) / 100f;
         ARComboBar.value = ar_combo;
 
-        vlcPlayer.jakesRemoteController.UpdateCustomARPopupValuePreviewText();
+        vlcPlayer.headDownController.UpdateCustomARPopupValuePreviewText();
     }
 
     private void UpdateARWidthAndHeightFromCombo()
@@ -317,7 +319,7 @@ public class JakesVLCPlayerExampleGui : MonoBehaviour
 
         vlcPlayer.SetCurrentAR($"{fraction[0]}:{fraction[1]}");
 
-        vlcPlayer.jakesRemoteController.UpdateCustomARPopupValuePreviewText();
+        vlcPlayer.headDownController.UpdateCustomARPopupValuePreviewText();
     }
 
     private int GCD(int a, int b)
@@ -343,12 +345,12 @@ public class JakesVLCPlayerExampleGui : MonoBehaviour
 
         UpdateSeekBar();
 
-        if (_isDraggingScaleBar)
-        {
-            /*GameObject _sphere = GameObject.Find("SphereDisplay");
-            if(_sphere is not null)
-                _sphere.transform.localScale = new Vector3(scaleBar.value, scaleBar.value, scaleBar.value);*/
-        }
+        // if (_isDraggingScaleBar)
+        // {
+        //     /*GameObject _sphere = GameObject.Find("SphereDisplay");
+        //     if(_sphere is not null)
+        //         _sphere.transform.localScale = new Vector3(scaleBar.value, scaleBar.value, scaleBar.value);*/
+        // }
 
         if (_shouldUpdateTracks)
         {
