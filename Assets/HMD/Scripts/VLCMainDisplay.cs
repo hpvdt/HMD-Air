@@ -13,6 +13,7 @@ using UnityEngine.Serialization;
 using Quaternion = UnityEngine.Quaternion;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
+using System.IO;
 
 public class VLCMainDisplay : MonoBehaviour
 {
@@ -771,7 +772,33 @@ public class VLCMainDisplay : MonoBehaviour
     public void Open(string path)
     {
         Log("VLCPlayerExample Open " + path);
-        this.path = path;
+        if (path.ToLower().EndsWith(".url"))
+        {
+            string urlContent = File.ReadAllText(path);
+            string[] lines = urlContent.Split('\n');
+            Debug.Log("Error opening url");
+           
+            foreach (string line in lines)
+            {
+                if (line.StartsWith("https://"))
+                {
+                    this.path = line.Substring(4).Trim();
+                    //Debug.Log("https://www.youtube.com/watch?v=zra4S6-O1Qc");
+                   
+                    break;
+                }
+
+                else
+                {
+                    Debug.Log("Error");
+                }
+            }
+        }
+        else
+        {
+            this.path = path;
+        }
+
         Open();
     }
 
@@ -1226,8 +1253,8 @@ public class VLCMainDisplay : MonoBehaviour
         // Use MIMEs on Android
         string[] fileTypes = new string[] { "video/*" };
 #else
-        // Use UTIs on iOS
-        var fileTypes = new string[] { "public.mp4", "public.movie" };
+        // Use UTIs on iOS or Windows
+        var fileTypes = new string[] { "public.mp4", "public.movie", "public.url" };
 #endif
 
         // Pick image(s) and/or video(s)
