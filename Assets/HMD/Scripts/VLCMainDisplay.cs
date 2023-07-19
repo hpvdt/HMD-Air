@@ -13,6 +13,7 @@ using UnityEngine.Serialization;
 using Quaternion = UnityEngine.Quaternion;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
+using System.IO;
 
 public class VLCMainDisplay : MonoBehaviour
 {
@@ -20,15 +21,12 @@ public class VLCMainDisplay : MonoBehaviour
     public enum VideoMode
     {
         Mono,
-        SBSHalf,
-        SBSFull,
-        TB,
-        _360_2D,
-        _180_2D,
-        _360_3D,
-        _180_3D
-    }
 
+        _3D, // Side-By-Side/SBS
+
+        _3D_OU // Over-Under
+        // TODO: there is no Mono_OU?
+    }
 
     private float nextActionTime = 0.0f;
     public float period = 1.0f;
@@ -441,14 +439,6 @@ public class VLCMainDisplay : MonoBehaviour
     //     SetVideoMode3602D();
     // }
 
-    // public void OnScaleSliderUpdated()
-    // {
-    //     var fromBar = (float)scaleBar.value;
-    //     var fromDeform = deformBar.value;
-    //
-    //     mainDisplay.transform.localScale = new Vector3(fromBar, fromBar, fromBar);
-    // }
-
     private static Vector2 SCALE_RANGE = new(1f, 4.702173720867682f);
 
     public void OnDeformSliderUpdated()
@@ -647,26 +637,6 @@ public class VLCMainDisplay : MonoBehaviour
         Do360Navigation();
     }
 
-    public void SetVideoMode1802D()
-    {
-        SetVideoMode(VideoMode._180_2D);
-    }
-
-    public void SetVideoMode3602D()
-    {
-        SetVideoMode(VideoMode._360_2D);
-    }
-
-    public void SetVideoMode1803D()
-    {
-        SetVideoMode(VideoMode._180_3D);
-    }
-
-    public void SetVideoMode3603D()
-    {
-        SetVideoMode(VideoMode._360_3D);
-    }
-
     public void SetAR4_3()
     {
         if (mediaPlayer is not null)
@@ -696,9 +666,6 @@ public class VLCMainDisplay : MonoBehaviour
         if (mediaPlayer is not null)
             mediaPlayer.AspectRatio = null;
     }
-
-    private VideoMode[] _SphericalModes = new VideoMode[4]
-        { VideoMode._180_2D, VideoMode._360_2D, VideoMode._180_3D, VideoMode._360_3D };
 
     private float _sphereScale;
 
@@ -771,7 +738,30 @@ public class VLCMainDisplay : MonoBehaviour
     public void Open(string path)
     {
         Log("VLCPlayerExample Open " + path);
-        this.path = path;
+        if (path.ToLower().EndsWith(".url") || path.ToLower().EndsWith(".txt"))
+        {
+            var urlContent = File.ReadAllText(path);
+            var lines = urlContent.Split('\n');
+
+            var foundURL = false;
+            foreach (var line in lines)
+            {
+                var _line = line.ToLower();
+                if (_line.StartsWith("url="))
+                {
+                    this.path = _line.Substring(4).Trim();
+                    foundURL = true;
+                    break;
+                }
+            }
+
+            if (foundURL == false) throw new Exception("No URL= line found in .url file");
+        }
+        else
+        {
+            this.path = path;
+        }
+
         Open();
     }
 
@@ -807,7 +797,7 @@ public class VLCMainDisplay : MonoBehaviour
             // else
             // {
             //     Debug.Log("The video was not identified as a 360 video by VLC");
-            //     SetVideoMode(VideoMode.Mono);
+            // SetVideoMode(VideoMode.Mono);
             // }
 
             trackList.Dispose();
@@ -1143,7 +1133,7 @@ public class VLCMainDisplay : MonoBehaviour
 
         if (texture == null) Debug.LogWarning("[SetVideoMode] texture is null!");
 
-        if (mode == VideoMode.Mono || mode == VideoMode._360_2D || mode == VideoMode._180_2D)
+        if (mode == VideoMode.Mono)
         {
             // 2D
             leftEyeScreen.layer = LayerMask.NameToLayer("Default");
@@ -1161,7 +1151,7 @@ public class VLCMainDisplay : MonoBehaviour
             rightEyeScreen.SetActive(true);
             rightEyeScreen.layer = LayerMask.NameToLayer("RightEyeOnly");
 
-            if (mode is VideoMode.TB)
+            if (mode is VideoMode._3D_OU)
             {
                 _morphDisplayLeftRenderer.material = _flipStereo ? m_rightEyeTBMaterial : m_leftEyeTBMaterial;
                 _morphDisplayRightRenderer.material = _flipStereo ? m_leftEyeTBMaterial : m_rightEyeTBMaterial;
@@ -1177,11 +1167,6 @@ public class VLCMainDisplay : MonoBehaviour
         }
     }
 
-    // public void ShowCustomARPopup()
-    // {
-    //     headDownController.ShowPopupByID(HeadDownController.PopupID.CUSTOM_AR_POPUP);
-    // }
-
     public void SetAspectRatio(string value)
     {
         mediaPlayer.AspectRatio = value;
@@ -1194,19 +1179,14 @@ public class VLCMainDisplay : MonoBehaviour
         SetVideoMode(VideoMode.Mono);
     }
 
-    public void SetVideoModeSBSHalf()
+    public void SetVideoMode3D()
     {
-        SetVideoMode(VideoMode.SBSHalf);
+        SetVideoMode(VideoMode._3D);
     }
 
-    public void SetVideoModeSBSFull()
+    public void SetVideoModeOU()
     {
-        SetVideoMode(VideoMode.SBSFull);
-    }
-
-    public void SetVideoModeTB()
-    {
-        SetVideoMode(VideoMode.TB);
+        SetVideoMode(VideoMode._3D_OU);
     }
 
     public void ResetScreen() // TODO: bind it to button
@@ -1226,8 +1206,8 @@ public class VLCMainDisplay : MonoBehaviour
         // Use MIMEs on Android
         string[] fileTypes = new string[] { "video/*" };
 #else
-        // Use UTIs on iOS
-        var fileTypes = new string[] { "public.mp4", "public.movie" };
+        // Use UTIs on iOS or Windows
+        var fileTypes = new string[] { "video/*", "video/movie", "text/url", "text/txt", "*" };
 #endif
 
         // Pick image(s) and/or video(s)
@@ -1402,9 +1382,4 @@ public class VLCMainDisplay : MonoBehaviour
     }
 
     #endregion
-
-    // public void Unlock3DMode()
-    // {
-    //     _3DModeLocked = false;
-    // }
 }
