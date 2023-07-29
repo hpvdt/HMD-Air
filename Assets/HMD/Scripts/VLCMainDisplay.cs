@@ -768,31 +768,28 @@ public class VLCMainDisplay : MonoBehaviour
     //Public functions that expose VLC MediaPlayer functions in a Unity-friendly way. You may want to add more of these.
 
     #region vlc
-
+    
     public void Open(string path)
     {
         Log("VLCPlayerExample Open " + path);
-        if (path.ToLower().EndsWith(".url"))
+        if (path.ToLower().EndsWith(".url") || path.ToLower().EndsWith(".txt"))
         {
             string urlContent = File.ReadAllText(path);
             string[] lines = urlContent.Split('\n');
-            Debug.Log("Error opening url");
-           
+
+            var foundURL = false;
             foreach (string line in lines)
             {
-                if (line.StartsWith("https://"))
+                var _line = line.ToLower();
+                if (_line.StartsWith("url="))
                 {
-                    this.path = line.Substring(4).Trim();
-                    //Debug.Log("https://www.youtube.com/watch?v=zra4S6-O1Qc");
-                   
+                    this.path = _line.Substring(4).Trim();
+                    foundURL = true;
                     break;
                 }
-
-                else
-                {
-                    Debug.Log("Error");
-                }
             }
+            
+            if (foundURL == false) throw new Exception("No URL= line found in .url file");
         }
         else
         {
@@ -1254,7 +1251,7 @@ public class VLCMainDisplay : MonoBehaviour
         string[] fileTypes = new string[] { "video/*" };
 #else
         // Use UTIs on iOS or Windows
-        var fileTypes = new string[] { "public.mp4", "public.movie", "public.url" };
+        var fileTypes = new string[] { "public.mp4", "public.movie", "public.url", "public.txt" };
 #endif
 
         // Pick image(s) and/or video(s)
@@ -1429,9 +1426,4 @@ public class VLCMainDisplay : MonoBehaviour
     }
 
     #endregion
-
-    // public void Unlock3DMode()
-    // {
-    //     _3DModeLocked = false;
-    // }
 }
