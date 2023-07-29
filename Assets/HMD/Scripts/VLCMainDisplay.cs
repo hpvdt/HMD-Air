@@ -434,12 +434,12 @@ public class VLCMainDisplay : MonoBehaviour
         DestroyMediaPlayer();
     }
 
-    public void Demo3602D()
-    {
-        //Open("https://streams.videolan.org/streams/360/eagle_360.mp4");
-        Open("https://streams.videolan.org/streams/360/kolor-balloon-icare-full-hd.mp4");
-        SetVideoMode3602D();
-    }
+    // public void Demo3602D()
+    // {
+    //     //Open("https://streams.videolan.org/streams/360/eagle_360.mp4");
+    //     Open("https://streams.videolan.org/streams/360/kolor-balloon-icare-full-hd.mp4");
+    //     SetVideoMode3602D();
+    // }
 
     // public void OnScaleSliderUpdated()
     // {
@@ -798,17 +798,17 @@ public class VLCMainDisplay : MonoBehaviour
 
             // TODO: add SBS / OU / TB filename recognition
 
-            if (_is360)
-            {
-                Debug.Log("The video is a 360 video");
-                SetVideoMode(VideoMode._360_2D);
-            }
-
-            else
-            {
-                Debug.Log("The video was not identified as a 360 video by VLC");
-                SetVideoMode(VideoMode.Mono);
-            }
+            // if (_is360)
+            // {
+            //     Debug.Log("The video is a 360 video");
+            //     SetVideoMode(VideoMode._360_2D);
+            // }
+            //
+            // else
+            // {
+            //     Debug.Log("The video was not identified as a 360 video by VLC");
+            //     SetVideoMode(VideoMode.Mono);
+            // }
 
             trackList.Dispose();
         });
@@ -818,7 +818,10 @@ public class VLCMainDisplay : MonoBehaviour
 
         Play();
 
-        StartCoroutine(SetVideoModeDelayed(1));
+        // TODO: If removed or set the delay too short, will cause the VLC screen to blackout.
+        //  How did this happen?
+        //  Is it because the texture is not ready yet?
+        StartCoroutine(SetVideoModeDelayed(3));
     }
 
     private IEnumerator SetVideoModeDelayed(int secs)
@@ -828,10 +831,10 @@ public class VLCMainDisplay : MonoBehaviour
         SetVideoModeMono();
     }
 
-    public void OpenExternal()
-    {
-        // TODO: Prompt user for path
-    }
+    // public void OpenExternal()
+    // {
+    //     // TODO: Prompt user for path
+    // }
 
     public void Play()
     {
@@ -1174,10 +1177,10 @@ public class VLCMainDisplay : MonoBehaviour
         }
     }
 
-    public void ShowCustomARPopup()
-    {
-        headDownController.ShowPopupByID(HeadDownController.PopupID.CUSTOM_AR_POPUP);
-    }
+    // public void ShowCustomARPopup()
+    // {
+    //     headDownController.ShowPopupByID(HeadDownController.PopupID.CUSTOM_AR_POPUP);
+    // }
 
     public void SetAspectRatio(string value)
     {
