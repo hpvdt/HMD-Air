@@ -1207,7 +1207,7 @@ public class VLCMainDisplay : MonoBehaviour
         string[] fileTypes = new string[] { "video/*" };
 #else
         // Use UTIs on iOS or Windows
-        var fileTypes = new string[] { "public.mp4", "public.movie", "public.url", "public.txt" };
+        var fileTypes = new string[] { "video/*", "video/movie", "text/url", "text/txt", "*" };
 #endif
 
         // Pick image(s) and/or video(s)
