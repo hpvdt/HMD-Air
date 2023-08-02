@@ -811,7 +811,7 @@ public class VLCMainDisplay : MonoBehaviour
         // TODO: If removed or set the delay too short, will cause the VLC screen to blackout.
         //  How did this happen?
         //  Is it because the texture is not ready yet?
-        StartCoroutine(SetVideoModeDelayed(3));
+        StartCoroutine(SetVideoModeDelayed(6));
     }
 
     private IEnumerator SetVideoModeDelayed(int secs)
