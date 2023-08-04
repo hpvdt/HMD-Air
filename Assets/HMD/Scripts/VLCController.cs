@@ -260,7 +260,7 @@ public class VLCController : MonoBehaviour
         ARComboBar.onValueChanged.AddListener((value) => { UpdateARWidthAndHeightFromCombo(); });
 
         //Path Input
-        pathInputField.text = vlcPlayer.path;
+        pathInputField.text = vlcPlayer.PathUri.AbsoluteUri;
         pathGroup.SetActive(false);
 
         //Track Selection Buttons

@@ -1,19 +1,16 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using LibVLCSharp;
-//using NRKernal;
-using System.Collections.Generic;
-//using UnityEngine.Device;
+using NRKernal;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Application = UnityEngine.Device.Application;
-using NRKernal;
-using System.Collections;
-using UnityEngine.Serialization;
-using Quaternion = UnityEngine.Quaternion;
-using Vector2 = UnityEngine.Vector2;
-using Vector3 = UnityEngine.Vector3;
-using System.IO;
 
 public class VLCMainDisplay : MonoBehaviour
 {
@@ -64,7 +61,7 @@ public class VLCMainDisplay : MonoBehaviour
             }
             catch (Exception ex)
             {
-                Log("Exception caught in libVLC.Log: \n" + ex.ToString());
+                Log("Exception caught in libVLC.Log: \n" + ex);
             }
         };
     }
@@ -231,11 +228,10 @@ public class VLCMainDisplay : MonoBehaviour
     /// <summary> The NRInput. </summary>
     [SerializeField] private NRInput m_NRInput;
 
-    private Texture2D _vlcTexture = null; //This is the texture libVLC writes to directly. It's private.
-    public RenderTexture texture = null; //We copy it into this texture which we actually use in unity.
+    private Texture2D _vlcTexture; //This is the texture libVLC writes to directly. It's private.
+    public RenderTexture texture; //We copy it into this texture which we actually use in unity.
 
     private bool _is360 = false;
-    private bool _is180 = false;
 
     private float Yaw;
     private float Pitch;
@@ -264,11 +260,38 @@ public class VLCMainDisplay : MonoBehaviour
         }
     }
 
-    //public string path = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"; //Can be a web path or a local path
-    public string
-        path = "https://jakedowns.com/media/sbs2.mp4"; // Render a nice lil SBS and 180 and 360 video that can play when you switch modes
+    private List<string> _args;
 
-    public bool flipTextureX = false; //No particular reason you'd need this but it is sometimes useful
+    public List<string> args
+    {
+        get
+        {
+            if (_args == null) _args = new List<string> { "https://jakedowns.com/media/sbs2.mp4" };
+            return _args;
+        }
+        set => _args = value;
+    }
+    
+    public Uri PathUri
+    {
+        get
+        {
+            var str = args[0];
+            var trimmedPath = str.Trim(new[] { '"' }); //Windows likes to copy paths with quotes but Uri does not like to open them
+
+            return new Uri(trimmedPath);
+        }
+    }
+
+    public string[] Parameters
+    {
+        get
+        {
+            return args.Skip(1).ToArray();
+        }
+    }
+    
+    public bool flipTextureX; //No particular reason you'd need this but it is sometimes useful
     public bool flipTextureY = true; //Set to false on Android, to true on Windows
 
     public bool automaticallyFlipOnAndroid = true; //Automatically invert Y on Android
@@ -393,7 +416,7 @@ public class VLCMainDisplay : MonoBehaviour
 
 #if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.F1))
-            UnityEditor.EditorWindow.focusedWindow.maximized = !UnityEditor.EditorWindow.focusedWindow.maximized;
+            EditorWindow.focusedWindow.maximized = !EditorWindow.focusedWindow.maximized;
 #endif
         //Get size every frame
         uint height = 0;
@@ -548,7 +571,7 @@ public class VLCMainDisplay : MonoBehaviour
 
     public void OnDistanceSliderUpdated()
     {
-        var newDistance = (float)distanceBar.value;
+        var newDistance = distanceBar.value;
         mainDisplay.transform.localPosition = new Vector3(
             mainDisplay.transform.localPosition.x,
             mainDisplay.transform.localPosition.y,
@@ -559,7 +582,7 @@ public class VLCMainDisplay : MonoBehaviour
     /* Horizontal (X) axis offset for screen */
     public void OnHorizontalSliderUpdated()
     {
-        var newOffset = (float)horizontalBar.value;
+        var newOffset = horizontalBar.value;
         mainDisplay.transform.localPosition = new Vector3(
             newOffset,
             mainDisplay.transform.localPosition.y,
@@ -570,7 +593,7 @@ public class VLCMainDisplay : MonoBehaviour
     /* Vertical (Y) axis offset for screen */
     public void OnVerticalSliderUpdated()
     {
-        var newOffset = (float)verticalBar.value;
+        var newOffset = verticalBar.value;
         mainDisplay.transform.localPosition = new Vector3(
             mainDisplay.transform.localPosition.x,
             newOffset,
@@ -589,7 +612,7 @@ public class VLCMainDisplay : MonoBehaviour
 
     public void OnDepthBarUpdated()
     {
-        var newDepth = (float)depthBar.value;
+        var newDepth = depthBar.value;
 
         // move left and right camera closer or further to each other depending on the depthbar value
         // if the value is 0, the cameras are the min distance apart from each other on their local x axis (leftCameraXOnStart / rightCameraXOnStart)
@@ -611,7 +634,7 @@ public class VLCMainDisplay : MonoBehaviour
 
     public void OnFocusBarUpdated()
     {
-        var focus = (float)focusBar.value; // percentage 0-100
+        var focus = focusBar.value; // percentage 0-100
 
         /* rotate the left and right camera ever so slightly so that the convergence plane / focus plane changes */
         var focal = Mathf.Lerp(minFocal, maxFocal, focus / 100.0f);
@@ -631,7 +654,7 @@ public class VLCMainDisplay : MonoBehaviour
         // NOTE: NRSDK doesn't support custom FOV on cameras
         // NOTE: TESTING COMMENTING OUT camera.projectionMatrix = statements in NRHMDPoseTracker
 
-        fov = (float)fovBar.value;
+        fov = fovBar.value;
         Debug.Log("fov " + fov);
 
         Do360Navigation();
@@ -711,17 +734,13 @@ public class VLCMainDisplay : MonoBehaviour
         try
         {
             if (Input.GetKey(KeyCode.RightArrow) || deltaMove.x > 0)
-                result = mediaPlayer.UpdateViewpoint(Yaw + (float)(eighty_or_delta_x * +40 / range), Pitch, Roll, fov,
-                    true);
+                result = mediaPlayer.UpdateViewpoint(Yaw + eighty_or_delta_x * +40 / range, Pitch, Roll, fov);
             else if (Input.GetKey(KeyCode.LeftArrow) || deltaMove.x < 0)
-                result = mediaPlayer.UpdateViewpoint(Yaw - (float)(eighty_or_delta_x * +40 / range), Pitch, Roll, fov,
-                    true);
+                result = mediaPlayer.UpdateViewpoint(Yaw - eighty_or_delta_x * +40 / range, Pitch, Roll, fov);
             else if (Input.GetKey(KeyCode.DownArrow) || deltaMove.y < 0)
-                result = mediaPlayer.UpdateViewpoint(Yaw, Pitch + (float)(eighty_or_delta_y * +20 / range), Roll, fov,
-                    true);
+                result = mediaPlayer.UpdateViewpoint(Yaw, Pitch + eighty_or_delta_y * +20 / range, Roll, fov);
             else if (Input.GetKey(KeyCode.UpArrow) || deltaMove.y > 0)
-                result = mediaPlayer.UpdateViewpoint(Yaw, Pitch - (float)(eighty_or_delta_y * +20 / range), Roll, fov,
-                    true);
+                result = mediaPlayer.UpdateViewpoint(Yaw, Pitch - eighty_or_delta_y * +20 / range, Roll, fov);
         }
         catch (Exception e)
         {
@@ -743,23 +762,14 @@ public class VLCMainDisplay : MonoBehaviour
             var urlContent = File.ReadAllText(path);
             var lines = urlContent.Split('\n');
 
-            var foundURL = false;
-            foreach (var line in lines)
-            {
-                var _line = line.ToLower();
-                if (_line.StartsWith("url="))
-                {
-                    this.path = _line.Substring(4).Trim();
-                    foundURL = true;
-                    break;
-                }
-            }
+            if (lines.Length <= 0) throw new Exception($"No line defined in file `${path}`");
 
-            if (foundURL == false) throw new Exception("No URL= line found in .url file");
+            args = lines.ToList();
+
         }
         else
         {
-            this.path = path;
+            args = new List<string> { path };
         }
 
         Open();
@@ -774,9 +784,7 @@ public class VLCMainDisplay : MonoBehaviour
 
         SetVideoModeMono();
 
-        var trimmedPath = path.Trim(new char[]
-            { '"' }); //Windows likes to copy paths with quotes but Uri does not like to open them
-        mediaPlayer.Media = new Media(new Uri(trimmedPath));
+        mediaPlayer.Media = new Media(PathUri, Parameters);
 
         Task.Run(async () =>
         {
@@ -877,12 +885,12 @@ public class VLCMainDisplay : MonoBehaviour
 
     public void SeekForward10()
     {
-        SeekSeconds((float)10);
+        SeekSeconds(10);
     }
 
     public void SeekBack10()
     {
-        SeekSeconds((float)-10);
+        SeekSeconds(-10);
     }
 
     public void SeekSeconds(float seconds)
@@ -1047,7 +1055,7 @@ public class VLCMainDisplay : MonoBehaviour
             if (!m_updatedARSinceOpen)
             {
                 m_updatedARSinceOpen = true;
-                _aspectRatio = (float)texture.width / (float)texture.height;
+                _aspectRatio = texture.width / (float)texture.height;
                 Debug.Log($"[SBSVLC] aspect ratio {_aspectRatio}");
                 _currentARString = $"{texture.width}:{texture.height}";
                 mediaPlayer.AspectRatio = _currentARString;
@@ -1202,16 +1210,10 @@ public class VLCMainDisplay : MonoBehaviour
 
     public void promptUserFilePicker()
     {
-#if UNITY_ANDROID
-        // Use MIMEs on Android
-        string[] fileTypes = new string[] { "video/*" };
-#else
-        // Use UTIs on iOS or Windows
-        var fileTypes = new string[] { "video/*", "video/movie", "text/url", "text/txt", "*" };
-#endif
+        var fileTypes = new[] { "video/*", "video/movie", "text/url", "text/txt", "*" };
 
         // Pick image(s) and/or video(s)
-        var permission = NativeFilePicker.PickFile((path) =>
+        var permission = NativeFilePicker.PickFile(path =>
         {
             if (path == null)
             {
@@ -1275,7 +1277,7 @@ public class VLCMainDisplay : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.Log("error getting context " + e.ToString());
+            Debug.Log("error getting context " + e);
         }
     }
 
