@@ -29,7 +29,10 @@ public class AirPoseProvider : BasePoseProvider
         // Start the connection
         var code = StartConnection();
         if (code == 1)
+        {
             connectionState = ConnectionStates.StandBy;
+            Debug.Log("Glasses standing by");
+        }
         else
             Debug.LogError("Connection error: return code " + code);
     }
@@ -39,18 +42,23 @@ public class AirPoseProvider : BasePoseProvider
 
     public void TryDisconnect()
     {
-        if (!IsConnecting())
+        if (IsConnecting())
         {
             var code = StopConnection();
             if (code == 1)
             {
                 connectionState = ConnectionStates.Disconnected;
+                Debug.Log("Glass disconnected");
             }
             else
             {
                 connectionState = ConnectionStates.Offline;
-                Debug.LogError("Disconnection error: return code " + code);
+                Debug.LogError("Glass disconnected with error: return code " + code);
             }
+        }
+        else
+        {
+            Debug.Log("Glass not connected, no need to disconnect");
         }
     }
 
@@ -66,9 +74,11 @@ public class AirPoseProvider : BasePoseProvider
 
     protected static Quaternion NO_READING_Q = Quaternion.Euler(90f, 0, 0);
 
-    protected Vector2 FromMouseXY = Vector2.zero;
-
+    protected Vector3 FromMouse_Euler = Vector3.zero;
     protected Quaternion FromMouse = Quaternion.identity;
+    
+    protected Vector3 FromZeroing_Euler = Vector3.zero;
+    protected Quaternion FromZeroing = Quaternion.identity;
 
     // Start is called before the first frame update
     private void Start()
@@ -88,7 +98,7 @@ public class AirPoseProvider : BasePoseProvider
 
         if (Input.GetMouseButton(1)) UpdateFromMouse();
 
-        var compound = FromGlasses * FromMouse;
+        var compound = FromGlasses * FromMouse * FromZeroing;
 
         output = new Pose(new Vector3(0, 0, 0), compound);
         return true;
@@ -108,6 +118,7 @@ public class AirPoseProvider : BasePoseProvider
             if (!reading.Equals(NO_READING_Q))
             {
                 connectionState = ConnectionStates.Connected;
+                Debug.Log("Glasses connected, start reading");
                 FromGlasses = reading;
             }
         }
@@ -119,13 +130,21 @@ public class AirPoseProvider : BasePoseProvider
 
     private void UpdateFromMouse()
     {
-        var deltaX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-        var deltaY = -Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+        var deltaY = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
+        var deltaX = -Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+        // Mouse & Unity XY axis are opposite
 
-        FromMouseXY += new Vector2(deltaX, deltaY);
+        FromMouse_Euler += new Vector3(deltaX, deltaY, 0.0f);
 
         // Debug.Log("mouse pressed:" + FromMouseXY);
+        
+        FromMouse = Quaternion.Euler(-FromMouse_Euler);
+    }
 
-        FromMouse = Quaternion.Euler(-FromMouseXY[1], -FromMouseXY[0], 0.0f);
+    public void ZeroY()
+    {
+        var fromGlassesY = (FromGlasses * FromMouse).eulerAngles.y;
+        FromZeroing_Euler.y = -fromGlassesY;
+        FromZeroing = Quaternion.Euler(FromZeroing_Euler);
     }
 }
