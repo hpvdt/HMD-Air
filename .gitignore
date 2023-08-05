@@ -140,9 +140,7 @@ ExportedObj/
 # Unity3D generated file on crash reports
 sysinfo.txt
 
-# Builds
-*.apk
-*.aab
+# Package
 *.unitypackage
 
 # Crashlytics generated file
@@ -163,3 +161,6 @@ UserSettings
 
 # Document
 **/.obsidian
+
+# MacOS
+**/.DS_Store
