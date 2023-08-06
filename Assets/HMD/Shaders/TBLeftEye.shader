@@ -6,16 +6,19 @@ Shader "HMD/TBLeftEye"
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        Tags
+        {
+            "RenderType"="Opaque"
+        }
         LOD 100
-        
+
 
         Pass
         {
             // Disable culling for this Pass.
             // You would typically do this for special effects, such as transparent objects or double-sided walls.
             Cull Off
-            
+
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -40,12 +43,12 @@ Shader "HMD/TBLeftEye"
             sampler2D _MainTex;
             float4 _MainTex_ST;
 
-            v2f vert (appdata v)
+            v2f vert(appdata v)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                UNITY_TRANSFER_FOG(o,o.vertex);
+                UNITY_TRANSFER_FOG(o, o.vertex);
                 return o;
             }
 
@@ -54,7 +57,7 @@ Shader "HMD/TBLeftEye"
                 float2 coord = i.uv;
                 // adjust coord.x to sample just the top half of the texture
                 coord.y = (coord.y * 0.5);
-            
+
                 // sample the texture
                 fixed4 col = tex2D(_MainTex, coord.xy);
                 // apply fog

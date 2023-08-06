@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using LibVLCSharp;
-using UnityEditor;
-
-
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 ///This script controls all the GUI for the VLC Unity Canvas Example
 ///It sets up event handlers and updates the GUI every frame
 ///This example shows how to safely set up LibVLC events and a simple way to call Unity functions from them

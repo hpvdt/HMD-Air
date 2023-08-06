@@ -11,7 +11,6 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Application = UnityEngine.Device.Application;
-
 public class VLCMainDisplay : MonoBehaviour
 {
     [SerializeField]
@@ -271,7 +270,7 @@ public class VLCMainDisplay : MonoBehaviour
         }
         set => _args = value;
     }
-    
+
     public Uri PathUri
     {
         get
@@ -290,7 +289,7 @@ public class VLCMainDisplay : MonoBehaviour
             return args.Skip(1).ToArray();
         }
     }
-    
+
     public bool flipTextureX; //No particular reason you'd need this but it is sometimes useful
     public bool flipTextureY = true; //Set to false on Android, to true on Windows
 
@@ -307,7 +306,6 @@ public class VLCMainDisplay : MonoBehaviour
     //Unity Awake, OnDestroy, and Update functions
 
     #region unity
-
     private void Awake()
     {
         //Setup Media Player
@@ -442,7 +440,6 @@ public class VLCMainDisplay : MonoBehaviour
             }
         }
     }
-
     #endregion
 
     private void OnDisable()
@@ -753,7 +750,6 @@ public class VLCMainDisplay : MonoBehaviour
     //Public functions that expose VLC MediaPlayer functions in a Unity-friendly way. You may want to add more of these.
 
     #region vlc
-
     public void Open(string path)
     {
         Log("VLCPlayerExample Open " + path);
@@ -993,13 +989,11 @@ public class VLCMainDisplay : MonoBehaviour
 
         return orientation;
     }
-
     #endregion
 
     //Private functions create and destroy VLC objects and textures
 
     #region internal
-
     //Dispose of the MediaPlayer object. 
     private void DestroyMediaPlayer()
     {
@@ -1382,6 +1376,5 @@ public class VLCMainDisplay : MonoBehaviour
         if (logToConsole)
             Debug.Log($"[VLC] {message}");
     }
-
     #endregion
 }

@@ -10,7 +10,6 @@
 namespace NRKernal
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using UnityEngine;
     using UnityEngine.EventSystems;
@@ -348,7 +347,7 @@ namespace NRKernal
             if (!eventData.useDragThreshold || eventData.raycaster == null) return true;
             var currentPos = eventData.position3D + eventData.rotation * Vector3.forward * eventData.pressDistance;
             var pressPos = eventData.pressPosition3D +
-                           eventData.pressRotation * Vector3.forward * eventData.pressDistance;
+                eventData.pressRotation * Vector3.forward * eventData.pressDistance;
             var threshold = NRInput.DragThreshold;
             return (currentPos - pressPos).sqrMagnitude >= threshold * threshold;
         }
@@ -358,7 +357,7 @@ namespace NRKernal
         protected void ProcessDrag(NRPointerEventData eventData)
         {
             var moving = !Mathf.Approximately(eventData.position3DDelta.sqrMagnitude, 0f) ||
-                         !Mathf.Approximately(Quaternion.Angle(Quaternion.identity, eventData.rotationDelta), 0f);
+                !Mathf.Approximately(Quaternion.Angle(Quaternion.identity, eventData.rotationDelta), 0f);
 
             if (moving && eventData.pointerDrag != null && !eventData.dragging && ShouldStartDrag(eventData))
             {

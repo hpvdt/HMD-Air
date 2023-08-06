@@ -1,6 +1,5 @@
 using TMPro;
 using UnityEngine;
-
 public class BackgroundService : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI stepsText;

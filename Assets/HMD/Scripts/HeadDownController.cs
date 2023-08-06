@@ -1,12 +1,9 @@
-using LibVLCSharp;
-using NRKernal;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
+using NRKernal;
 using UnityEngine;
 using UnityEngine.UI;
-
 public class HeadDownController : MonoBehaviour
 {
     /*bool _menu_visible = false;*/
@@ -151,7 +148,7 @@ public class HeadDownController : MonoBehaviour
                     Found.Add(entry);
             return Found.ToArray();
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             Debug.LogWarning("Error finding " + name + " " + e);
             return null;
@@ -166,7 +163,7 @@ public class HeadDownController : MonoBehaviour
         {
             return FindGameObjectsAll(name)?.First();
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             Debug.LogWarning("Error finding " + name + " " + e);
             return null;

@@ -4,9 +4,12 @@ Shader "HMD/180SphereShaderLeftEye"
     {
         _MainTex("Texture", 2D) = "black" {}
     }
-        SubShader
+    SubShader
     {
-        Tags { "RenderType" = "Opaque" }
+        Tags
+        {
+            "RenderType" = "Opaque"
+        }
         LOD 100
 
 
@@ -55,7 +58,7 @@ Shader "HMD/180SphereShaderLeftEye"
             float maxB = 0.75;
 
             fixed4 frag(v2f i) : SV_Target
-            {                
+            {
                 float2 remapped_uv = float2(i.uv);
 
                 //shift lookup x coordinate to sample just the left half of the texture
@@ -70,7 +73,8 @@ Shader "HMD/180SphereShaderLeftEye"
                 // sample the texture
                 fixed4 col = tex2D(_MainTex, remapped_uv);
 
-                if (i.uv.x < .25 || i.uv.x > .75) {
+                if (i.uv.x < .25 || i.uv.x > .75)
+                {
                     col = fixed4(0.0, 0.0, 0.0, 1.0); // black
                 }
 

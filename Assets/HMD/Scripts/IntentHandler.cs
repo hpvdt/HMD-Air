@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Serialization;
-
 public class IntentHandler : MonoBehaviour
 {
     [FormerlySerializedAs("jakesSBSVLC")] public VLCMainDisplay vlcMainDisplay;

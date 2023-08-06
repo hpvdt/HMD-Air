@@ -1,8 +1,7 @@
-using UnityEngine;
-using System.Runtime.InteropServices;
 using System;
+using System.Runtime.InteropServices;
+using UnityEngine;
 using UnityEngine.Experimental.XR.Interaction;
-
 public class AirPoseProvider : BasePoseProvider
 {
     [DllImport("AirAPI_Windows", CallingConvention = CallingConvention.Cdecl)]
@@ -76,7 +75,7 @@ public class AirPoseProvider : BasePoseProvider
 
     protected Vector3 FromMouse_Euler = Vector3.zero;
     protected Quaternion FromMouse = Quaternion.identity;
-    
+
     protected Vector3 FromZeroing_Euler = Vector3.zero;
     protected Quaternion FromZeroing = Quaternion.identity;
 
@@ -137,7 +136,7 @@ public class AirPoseProvider : BasePoseProvider
         FromMouse_Euler += new Vector3(deltaX, deltaY, 0.0f);
 
         // Debug.Log("mouse pressed:" + FromMouseXY);
-        
+
         FromMouse = Quaternion.Euler(-FromMouse_Euler);
     }
 

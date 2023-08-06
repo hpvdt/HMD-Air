@@ -1,9 +1,8 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using LibVLCSharp;
 using NRKernal;
-
+using UnityEngine;
 public class JakesVLCThreeSixty : MonoBehaviour
 {
     private LibVLC _libVLC;

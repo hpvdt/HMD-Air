@@ -4,9 +4,12 @@ Shader "HMD/180SphereShaderRightEye"
     {
         _MainTex("Texture", 2D) = "black" {}
     }
-        SubShader
+    SubShader
     {
-        Tags { "RenderType" = "Opaque" }
+        Tags
+        {
+            "RenderType" = "Opaque"
+        }
         LOD 100
 
 
@@ -70,10 +73,11 @@ Shader "HMD/180SphereShaderRightEye"
                 // sample the texture
                 fixed4 col = tex2D(_MainTex, remapped_uv);
 
-                if (i.uv.x < .25 || i.uv.x > .75) {
+                if (i.uv.x < .25 || i.uv.x > .75)
+                {
                     col = fixed4(0.0, 0.0, 0.0, 1.0); // black
                 }
-                
+
                 return col;
             }
             ENDCG

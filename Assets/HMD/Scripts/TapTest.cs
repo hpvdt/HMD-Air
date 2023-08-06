@@ -1,7 +1,6 @@
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
 using UnityEngine.EventSystems;
-
 public class TapTest : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
 {
     private int tap;
