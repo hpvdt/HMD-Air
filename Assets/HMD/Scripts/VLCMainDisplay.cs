@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Application = UnityEngine.Device.Application;
+
 public class VLCMainDisplay : MonoBehaviour
 {
     [SerializeField]
@@ -23,6 +24,8 @@ public class VLCMainDisplay : MonoBehaviour
         _3D_OU // Over-Under
         // TODO: there is no Mono_OU?
     }
+
+    [SerializeField] public VideoMode _videoMode = VideoMode.Mono; // 2d by default
 
     private float nextActionTime = 0.0f;
     public float period = 1.0f;
@@ -184,8 +187,6 @@ public class VLCMainDisplay : MonoBehaviour
     private int _brightnessModeOnLock = 0;
 
     private bool _flipStereo = false;
-
-    [SerializeField] public VideoMode _videoMode = VideoMode.Mono; // 2d by default
 
     // // Flat Left
     // [SerializeField] public GameObject leftEye;
@@ -758,7 +759,7 @@ public class VLCMainDisplay : MonoBehaviour
             var urlContent = File.ReadAllText(path);
             var lines = urlContent.Split('\n');
 
-            if (lines.Length <= 0) throw new Exception($"No line defined in file `${path}`");
+            if (lines.Length <= 0) throw new IOException($"No line defined in file `${path}`");
 
             args = lines.ToList();
 
@@ -811,18 +812,6 @@ public class VLCMainDisplay : MonoBehaviour
         m_updatedARSinceOpen = false;
 
         Play();
-
-        // TODO: If removed or set the delay too short, will cause the VLC screen to blackout.
-        //  How did this happen?
-        //  Is it because the texture is not ready yet?
-        StartCoroutine(SetVideoModeDelayed(6));
-    }
-
-    private IEnumerator SetVideoModeDelayed(int secs)
-    {
-        Debug.Log("[JakeDowns] SetVideoModeDelayed " + secs);
-        yield return new WaitForSeconds(secs);
-        SetVideoModeMono();
     }
 
     // public void OpenExternal()
@@ -1043,6 +1032,7 @@ public class VLCMainDisplay : MonoBehaviour
                     texptr); //Make a texture of the proper size for the video to output to
             texture = new RenderTexture(_vlcTexture.width, _vlcTexture.height, 0,
                 RenderTextureFormat.ARGB32); //Make a renderTexture the same size as vlctex
+            SetVideoModeASAP();
 
             Debug.Log($"texture size {px} {py} | {_vlcTexture.width} {_vlcTexture.height}");
 
@@ -1127,13 +1117,22 @@ public class VLCMainDisplay : MonoBehaviour
     public void SetVideoMode(VideoMode mode)
     {
         _videoMode = mode;
+        if (texture != null)
+        {
+            SetVideoModeASAP();
+        }
+    }
+
+    private void SetVideoModeASAP()
+    {
+        if (texture == null) throw new VLCException("[SetVideoMode] texture is null!");
+
+        var mode = _videoMode;
         Debug.Log($"[JakeDowns] set video mode {mode}");
 
         //flipTextureX = false;
 
         ClearMaterialTextureLinks();
-
-        if (texture == null) Debug.LogWarning("[SetVideoMode] texture is null!");
 
         if (mode == VideoMode.Mono)
         {
