@@ -1,1 +1,1 @@
-﻿dotnet format HMD-Air.sln  --exclude Assets/NRSDK --exclude Assets/VLCUnity HMD-Air.sln
+dotnet format HMD-Air.sln  --exclude Assets/NRSDK --exclude Assets/VLCUnity HMD-Air.sln

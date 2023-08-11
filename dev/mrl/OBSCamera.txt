@@ -1,0 +1,4 @@
+dshow://
+:dshow-vdev="OBS Virtual Camera"
+:dshow-adev=none
+:dshow-sdev=none

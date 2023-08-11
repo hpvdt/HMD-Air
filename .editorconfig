@@ -1,11 +1,11 @@
-﻿[*]
+[*]
 
 # Microsoft .NET properties
 csharp_new_line_before_members_in_object_initializers = false
 csharp_new_line_before_open_brace = all
 csharp_preferred_modifier_order = public, async, protected, internal, file, new, override, private, sealed, static, extern, virtual, abstract, unsafe, volatile, readonly, required:suggestion
 csharp_preserve_single_line_blocks = true
-csharp_style_var_for_built_in_types = false:suggestion
+# csharp_style_var_for_built_in_types = false:suggestion
 csharp_using_directive_placement = inside_namespace:silent
 dotnet_style_parentheses_in_arithmetic_binary_operators = never_if_unnecessary:none
 dotnet_style_parentheses_in_other_binary_operators = always_for_clarity:none
@@ -47,7 +47,7 @@ resharper_keep_existing_attribute_arrangement = true
 resharper_keep_existing_enum_arrangement = false
 resharper_object_creation_when_type_evident = explicitly_typed
 resharper_parentheses_redundancy_style = remove
-resharper_parentheses_same_type_operations = true
+# resharper_parentheses_same_type_operations = true
 resharper_place_accessorholder_attribute_on_same_line = false
 resharper_place_expr_accessor_on_single_line = true
 resharper_place_expr_method_on_single_line = true

@@ -1,0 +1,2 @@
+dshow://
+:dshow-fps=15
