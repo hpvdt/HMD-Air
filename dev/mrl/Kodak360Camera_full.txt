@@ -1,0 +1,3 @@
+﻿dshow://
+:dshow-vdev="PIXPRO ORBIT360 4K"
+:dshow-size="640x480"

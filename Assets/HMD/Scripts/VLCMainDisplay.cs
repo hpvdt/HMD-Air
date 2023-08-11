@@ -8,6 +8,7 @@ using LibVLCSharp;
 using NRKernal;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Application = UnityEngine.Device.Application;
@@ -260,36 +261,39 @@ public class VLCMainDisplay : MonoBehaviour
         }
     }
 
-    private List<string> _args;
-
-    public List<string> args
+    public class VLCArgs
     {
-        get
+        public List<string> Lines;
+        public FromType FromType;
+
+        public VLCArgs(List<string> lines, FromType fromType)
         {
-            if (_args == null) _args = new List<string> { "https://jakedowns.com/media/sbs2.mp4" };
-            return _args;
+            this.Lines = lines;
+            this.FromType = fromType;
         }
-        set => _args = value;
+
+        public string Location
+        {
+            get
+            {
+                var str = Lines[0];
+                var trimmedPath = str.Trim(new[] { '"' });
+                //Windows likes to copy paths with quotes but Uri does not like to open them
+
+                return trimmedPath;
+            }
+        }
+
+        public string[] Parameters
+        {
+            get
+            {
+                return Lines.Skip(1).Select(v => v.Trim()).ToArray();
+            }
+        }
     }
 
-    public Uri PathUri
-    {
-        get
-        {
-            var str = args[0];
-            var trimmedPath = str.Trim(new[] { '"' }); //Windows likes to copy paths with quotes but Uri does not like to open them
-
-            return new Uri(trimmedPath);
-        }
-    }
-
-    public string[] Parameters
-    {
-        get
-        {
-            return args.Skip(1).ToArray();
-        }
-    }
+    public VLCArgs Args = new VLCArgs(new List<string> { "https://jakedowns.com/media/sbs2.mp4" }, FromType.FromPath);
 
     public bool flipTextureX; //No particular reason you'd need this but it is sometimes useful
     public bool flipTextureY = true; //Set to false on Android, to true on Windows
@@ -417,6 +421,7 @@ public class VLCMainDisplay : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F1))
             EditorWindow.focusedWindow.maximized = !EditorWindow.focusedWindow.maximized;
 #endif
+
         //Get size every frame
         uint height = 0;
         uint width = 0;
@@ -761,12 +766,12 @@ public class VLCMainDisplay : MonoBehaviour
 
             if (lines.Length <= 0) throw new IOException($"No line defined in file `${path}`");
 
-            args = lines.ToList();
+            Args = new VLCArgs(lines.ToList(), FromType.FromLocation);
 
         }
         else
         {
-            args = new List<string> { path };
+            Args = new VLCArgs(new List<string> { path }, FromType.FromPath);
         }
 
         Open();
@@ -781,32 +786,42 @@ public class VLCMainDisplay : MonoBehaviour
 
         SetVideoModeMono();
 
-        mediaPlayer.Media = new Media(PathUri, Parameters);
+        var parameters = Args.Parameters;
+        Debug.Log($"Opening `{Args.Location}` with {parameters.Length} parameter(s) {string.Join(" ", parameters)}");
 
-        Task.Run(async () =>
+        // mediaPlayer.Media = new Media(new Uri(Args.Location), parameters);
+        // mediaPlayer.Media = new Media(Args.Location, Args.FromType, parameters);
+        mediaPlayer.Media = new Media(Args.Location, Args.FromType);
+        foreach (var parameter in parameters)
         {
-            var result = await mediaPlayer.Media.ParseAsync(libVLC, MediaParseOptions.ParseNetwork);
-            var trackList = mediaPlayer.Media.TrackList(TrackType.Video);
-            _is360 = trackList[0].Data.Video.Projection == VideoProjection.Equirectangular;
+            mediaPlayer.Media.AddOption(parameter);
+        }
 
-            Debug.Log($"projection {trackList[0].Data.Video.Projection}");
+        // Task.Run(async () =>
+        // {
+        //     var result = await mediaPlayer.Media.ParseAsync(libVLC, MediaParseOptions.FetchNetwork);
+        //     // _is360 = trackList[0].Data.Video.Projection == VideoProjection.Equirectangular;
+        //     //
+        //     // Debug.Log($"projection {trackList[0].Data.Video.Projection}");
+        //
+        //     // TODO: add SBS / OU / TB filename recognition
+        //
+        //     // if (_is360)
+        //     // {
+        //     //     Debug.Log("The video is a 360 video");
+        //     //     SetVideoMode(VideoMode._360_2D);
+        //     // }
+        //     //
+        //     // else
+        //     // {
+        //     //     Debug.Log("The video was not identified as a 360 video by VLC");
+        //     // SetVideoMode(VideoMode.Mono);
+        //     // }
+        // });
 
-            // TODO: add SBS / OU / TB filename recognition
-
-            // if (_is360)
-            // {
-            //     Debug.Log("The video is a 360 video");
-            //     SetVideoMode(VideoMode._360_2D);
-            // }
-            //
-            // else
-            // {
-            //     Debug.Log("The video was not identified as a 360 video by VLC");
-            // SetVideoMode(VideoMode.Mono);
-            // }
-
-            trackList.Dispose();
-        });
+        // var trackList = mediaPlayer.Media.TrackList(TrackType.Video);
+        // Debug.Log($"discarding {trackList.Count} track(s)");
+        // trackList.Dispose();
 
         // flag to read and store the texture aspect ratio
         m_updatedARSinceOpen = false;
@@ -814,21 +829,30 @@ public class VLCMainDisplay : MonoBehaviour
         Play();
     }
 
-    // public void OpenExternal()
-    // {
-    //     // TODO: Prompt user for path
-    // }
-
     public void Play()
     {
-        Log("VLCPlayerExample Play");
-
         _cone?.SetActive(false); // hide cone logo
         _pointLight?.SetActive(false);
 
         mainDisplay?.SetActive(true);
 
-        mediaPlayer.Play();
+        Task.Run(async () =>
+            {
+                var isSuccessful = await mediaPlayer.PlayAsync();
+                var isPlaying = mediaPlayer.IsPlaying;
+
+                Assert.IsTrue(isSuccessful && isPlaying, "should be playing");
+
+                uint height = 0;
+                uint width = 0;
+                mediaPlayer?.Size(0, ref width, ref height);
+
+                Assert.AreNotEqual(height, 0, "height should not be 0");
+                Assert.AreNotEqual(width, 0, "width should not be 0");
+
+                Debug.Log("Playing ...");
+            }
+        );
     }
 
     public void Pause()
@@ -1203,7 +1227,7 @@ public class VLCMainDisplay : MonoBehaviour
 
     public void promptUserFilePicker()
     {
-        var fileTypes = new[] { "video/*", "video/movie", "text/url", "text/txt", "*" };
+        var fileTypes = new[] { "Media resource locator/mrl,url,txt", "video/*", "Video(others)/movie", "*" };
 
         // Pick image(s) and/or video(s)
         var permission = NativeFilePicker.PickFile(path =>

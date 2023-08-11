@@ -69,7 +69,6 @@ public class VLCController : MonoBehaviour
     private List<Button> _audioTracksButtons = new();
     private List<Button> _textTracksButtons = new();
 
-
     private void Start()
     {
         if (vlcPlayer is null)
@@ -257,7 +256,7 @@ public class VLCController : MonoBehaviour
         ARComboBar.onValueChanged.AddListener((value) => { UpdateARWidthAndHeightFromCombo(); });
 
         //Path Input
-        pathInputField.text = vlcPlayer.PathUri.AbsoluteUri;
+        pathInputField.text = vlcPlayer.Args.Location;
         pathGroup.SetActive(false);
 
         //Track Selection Buttons

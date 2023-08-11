@@ -97,7 +97,7 @@ public class AirPoseProvider : BasePoseProvider
 
         if (Input.GetMouseButton(1)) UpdateFromMouse();
 
-        var compound = FromGlasses * FromMouse * FromZeroing;
+        var compound = FromMouse * FromZeroing * FromGlasses;
 
         output = new Pose(new Vector3(0, 0, 0), compound);
         return true;
