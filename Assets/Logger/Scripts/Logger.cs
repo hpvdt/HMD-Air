@@ -17,7 +17,7 @@ public class Logger : MonoBehaviour
     public float waitTime = 10.0f;
     public bool append = true;
     float timer = 0f;
-    float totalTimeElapsed = 0f;
+    float totalTime = 0f;
 
     string filePath = "C:\\Users\\Andrew\\Documents\\GitHub\\HMD-Air\\Assets\\Logger\\Log.csv";
     static StreamWriter writer;
@@ -26,7 +26,7 @@ public class Logger : MonoBehaviour
     void Start()
     {
         writer = new StreamWriter(filePath, append: append);
-        writer.WriteLine("Time,X_axis,Y_axis,Z_axis,delta_X,delta_Y,delta_Z");
+        writer.WriteLine("Computer_Time,Seconds,X_axis,Y_axis,Z_axis,delta_X,delta_Y,delta_Z");
 
     }
 
@@ -34,7 +34,6 @@ public class Logger : MonoBehaviour
     void Update()
     {
         timer += Time.deltaTime;
-        totalTimeElapsed += Time.deltaTime;
 
         if (timer > waitTime)
         {
@@ -42,19 +41,22 @@ public class Logger : MonoBehaviour
             orientation = AirPoseProvider.getQuaternion();
             euler = orientation.eulerAngles;
             difference = euler - lastLog;
+            totalTime += waitTime;
 
             //Write the information to the path name csv file.
             Debug.Log(euler);
             Debug.Log(System.DateTime.Now);
 
-            writer.WriteLine((System.DateTime.Now).ToString() + "," + (euler.x).ToString() + "," + (euler.y).ToString() + "," + (euler.z).ToString() + "," + (difference.x).ToString() + "," + (difference.y).ToString() + "," + (difference.z).ToString());
+            writer.WriteLine((System.DateTime.Now).ToString() + "," + totalTime.ToString() + "," + (euler.x).ToString() + "," + (euler.y).ToString() + "," + (euler.z).ToString() + "," + (difference.x).ToString() + "," + (difference.y).ToString() + "," + (difference.z).ToString());
 
             // Subtracting wait time is more accurate over time than resetting to zero.
-            timer = timer - waitTime;
+            //timer = timer - waitTime;
+            timer = 0;
             lastLog = euler;
         }
     }
-
+    
+    
     void OnDestroy()
     {
         Debug.Log("Closed");

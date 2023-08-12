@@ -146,4 +146,6 @@ public class AirPoseProvider : BasePoseProvider
         FromZeroing_Euler.y = -fromGlassesY;
         FromZeroing = Quaternion.Euler(FromZeroing_Euler);
     }
+
+    public Quaternion getQuaternion() { return FromGlasses; }
 }
