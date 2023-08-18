@@ -196,18 +196,23 @@ namespace HMD.Scripts.Streaming
                 Player.AspectRatio = "4:3";
         }
 
-        public void SetAR169()
+        public void SetAR16_10()
+        {
+            if (Player is not null)
+                Player.AspectRatio = "16:10";
+        }
+
+        public void SetAR16_9()
         {
             if (Player is not null)
                 Player.AspectRatio = "16:9";
         }
 
-        // public void SetAR16_10()
-        // {
-        //     if (mediaPlayer is not null)
-        //         mediaPlayer.AspectRatio = "16:10";
-        // }
-
+        public void SetAR2_1()
+        {
+            if (Player is not null)
+                Player.AspectRatio = "2:1";
+        }
         // public void SetAR_2_35_to_1()
         // {
         //     if (mediaPlayer is not null)
@@ -217,7 +222,9 @@ namespace HMD.Scripts.Streaming
         public void Open(string path)
         {
             Log("Open " + path);
-            if (path.ToLower().EndsWith(".url") || path.ToLower().EndsWith(".txt"))
+            var _path = path.ToLower();
+
+            if (_path.EndsWith(".url") || _path.EndsWith(".txt") || _path.EndsWith(".mrl"))
             {
                 var urlContent = File.ReadAllText(path);
                 var lines = urlContent.Split('\n').ToList();

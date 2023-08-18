@@ -363,24 +363,24 @@ public class DashPanel : MonoBehaviour
         HidePopupByID(PopupID.PICTURE_SETTINGS_POPUP);
     }
 
-    public void ShowPopupByID(PopupID popupID)
-    {
-        stateBeforePopup = new UIStateBeforeCustomPopup(_visible_menu_id);
-        UpdateReferences();
-
-        switch (popupID)
-        {
-            // case PopupID.MODE_LOCKED:
-            //     ShowUnlock3DSphereModePropmptPopup();
-            //     break;
-            /*case PopupID.CUSTOM:
-                ShowCustomPopup();
-                break;*/
-            case PopupID.CUSTOM_AR_POPUP:
-                ShowCustomARPopup();
-                break;
-        }
-    }
+    // public void ShowPopupByID(PopupID popupID)
+    // {
+    //     stateBeforePopup = new UIStateBeforeCustomPopup(_visible_menu_id);
+    //     UpdateReferences();
+    //
+    //     switch (popupID)
+    //     {
+    //         // case PopupID.MODE_LOCKED:
+    //         //     ShowUnlock3DSphereModePropmptPopup();
+    //         //     break;
+    //         /*case PopupID.CUSTOM:
+    //             ShowCustomPopup();
+    //             break;*/
+    //         case PopupID.CUSTOM_AR_POPUP:
+    //             ShowCustomARPopup();
+    //             break;
+    //     }
+    // }
 
     private void HidePopupByID(PopupID popupID)
     {
@@ -407,10 +407,11 @@ public class DashPanel : MonoBehaviour
     {
         _aspect_popup.SetActive(true);
 
-        UpdateCustomARPopupValuePreviewText();
+        // UpdateCustomARPopupValuePreviewText();
 
         // split and parse float
-        var split = _mainDisplay.GetCurrentAR().Split(':');
+        var ar = _mainDisplay.GetCurrentAR();
+        var split = ar.Split(':');
         var ar_width = float.Parse(split[0]);
         var ar_height = float.Parse(split[1]);
 
@@ -422,27 +423,27 @@ public class DashPanel : MonoBehaviour
         _aspect_popup.transform.Find("ARComboBar").GetComponent<Slider>().value = ar_combo;
     }
 
-    public void UpdateCustomARPopupValuePreviewText()
-    {
-        GameObject.Find("ARValuePreview").GetComponent<Text>().text = _mainDisplay.GetCurrentAR();
+    // public void UpdateCustomARPopupValuePreviewText()
+    // {
+    //     GameObject.Find("ARValuePreview").GetComponent<Text>().text = _mainDisplay.GetCurrentAR();
+    //
+    //     // split and parse float
+    //     var split = _mainDisplay.GetCurrentAR().Split(':');
+    //     var ar_width = float.Parse(split[0]);
+    //     var ar_height = float.Parse(split[1]);
+    //
+    //     var ar_combo = ar_width / ar_height;
+    //     ar_combo = Mathf.Round(ar_combo * 100f) / 100f;
+    //
+    //     GameObject.Find("ARValuePreviewDecimal").GetComponent<Text>().text = ar_combo.ToString();
+    // }
 
-        // split and parse float
-        var split = _mainDisplay.GetCurrentAR().Split(':');
-        var ar_width = float.Parse(split[0]);
-        var ar_height = float.Parse(split[1]);
-
-        var ar_combo = ar_width / ar_height;
-        ar_combo = Mathf.Round(ar_combo * 100f) / 100f;
-
-        GameObject.Find("ARValuePreviewDecimal").GetComponent<Text>().text = ar_combo.ToString();
-    }
-
-    public void ApplyCustomARPopup()
-    {
-        HidePopupByID(PopupID.CUSTOM_AR_POPUP);
-        var requested_value = _aspect_popup.transform.Find("ARTextInput").GetComponent<InputField>().text;
-        _mainDisplay.SetCurrentAspectRatio(requested_value);
-    }
+    // public void ApplyCustomARPopup()
+    // {
+    //     HidePopupByID(PopupID.CUSTOM_AR_POPUP);
+    //     var requested_value = _aspect_popup.transform.Find("ARTextInput").GetComponent<InputField>().text;
+    //     _mainDisplay.SetCurrentAspectRatio(requested_value);
+    // }
 
     private void HideCustomARPopup()
     {

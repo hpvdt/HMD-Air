@@ -309,7 +309,7 @@ public class VLCController : MonoBehaviour
         var ar_combo = Mathf.Round(width / height * 100f) / 100f;
         ARComboBar.value = ar_combo;
 
-        mainDisplay.dashPanel.UpdateCustomARPopupValuePreviewText();
+        // mainDisplay.dashPanel.UpdateCustomARPopupValuePreviewText();
     }
 
     private void UpdateARWidthAndHeightFromCombo()
@@ -324,7 +324,7 @@ public class VLCController : MonoBehaviour
 
         mainDisplay.SetCurrentAspectRatio($"{fraction[0]}:{fraction[1]}");
 
-        mainDisplay.dashPanel.UpdateCustomARPopupValuePreviewText();
+        // mainDisplay.dashPanel.UpdateCustomARPopupValuePreviewText();
     }
 
     private int GCD(int a, int b)
