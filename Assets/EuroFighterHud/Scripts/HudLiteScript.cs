@@ -28,7 +28,7 @@ public class HudLiteScript : MonoBehaviour
     public float pitchAmplitude = 1, pitchOffSet = 0, pitchXOffSet = 0, pitchYOffSet = 0, pitchFilterFactor = 0.125f;
     public RectTransform horizonPitch;
     public Text horizonPitchTxt;
-
+    
     public bool useHeading = true;
     public float headingAmplitude = 1, headingOffSet = 0, headingFilterFactor = 0.1f;
     public RectTransform compassHSI;
@@ -55,11 +55,8 @@ public class HudLiteScript : MonoBehaviour
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Inicialization
-    void Awake()
-    {
-        if (aircraft == null && aircraftRB != null) aircraft = aircraftRB.transform;
-    }
-
+    void Awake() { if (aircraft == null && aircraftRB != null) aircraft = aircraftRB.transform; }
+    
     public void toggleHud()
     {
         SndPlayer.playClick();
@@ -75,8 +72,7 @@ public class HudLiteScript : MonoBehaviour
         }
         else
         {
-            isActive = false;
-            current = null;
+            isActive = false; current = null;
             DisplayMsg.show("Hud Disabled");
         }
     }
@@ -89,11 +85,7 @@ public class HudLiteScript : MonoBehaviour
     {
         // Return if not active
         if (!isActive || !hudPanel.gameObject.activeSelf) return;
-        if (aircraft == null)
-        {
-            isActive = false;
-            return;
-        }
+        if (aircraft == null) { isActive = false; return; }
 
         //////////////////////////////////////////// Frame Calculations
         lastPosition = currentPosition;
@@ -104,7 +96,7 @@ public class HudLiteScript : MonoBehaviour
             currentPosition = aircraft.transform.position;
             relativeSpeed = aircraft.transform.InverseTransformDirection((currentPosition - lastPosition) / Time.deltaTime);
         }
-        else if (aircraft != null && aircraftRB != null) //Mode RB
+        else if (aircraft != null && aircraftRB != null)  //Mode RB
         {
             currentPosition = aircraftRB.transform.position;
             relativeSpeed = aircraftRB.transform.InverseTransformDirection(aircraftRB.velocity);
@@ -125,11 +117,7 @@ public class HudLiteScript : MonoBehaviour
             //Send values to Gui and Instruments
             if (compassHSI != null) compassHSI.localRotation = Quaternion.Euler(0, 0, headingAmplitude * heading);
             if (compassBar != null) compassBar.heading = heading;
-            if (headingTxt != null)
-            {
-                if (heading < 0) headingTxt.text = (heading + 360f).ToString("000");
-                else headingTxt.text = heading.ToString("000");
-            }
+            if (headingTxt != null) { if (heading < 0) headingTxt.text = (heading + 360f).ToString("000"); else headingTxt.text = heading.ToString("000"); }
 
         }
         //////////////////////////////////////////// Compass, Heading and/or HSI
@@ -160,9 +148,7 @@ public class HudLiteScript : MonoBehaviour
             pitch = Mathf.LerpAngle(pitch, -aircraft.eulerAngles.x + pitchOffSet, pitchFilterFactor);
 
             //Send values to Gui and Instruments
-            if (horizonPitch != null)
-                horizonPitch.localPosition = new Vector3(-pitchAmplitude * pitch * Mathf.Sin(horizonPitch.transform.localEulerAngles.z * Mathf.Deg2Rad) + pitchXOffSet,
-                    pitchAmplitude * pitch * Mathf.Cos(horizonPitch.transform.localEulerAngles.z * Mathf.Deg2Rad) + pitchYOffSet, 0);
+            if (horizonPitch != null) horizonPitch.localPosition = new Vector3(-pitchAmplitude * pitch * Mathf.Sin(horizonPitch.transform.localEulerAngles.z * Mathf.Deg2Rad) + pitchXOffSet, pitchAmplitude * pitch * Mathf.Cos(horizonPitch.transform.localEulerAngles.z * Mathf.Deg2Rad) + pitchYOffSet, 0);
             if (horizonPitchTxt != null) horizonPitchTxt.text = pitch.ToString("0");
         }
         //////////////////////////////////////////// Pitch
@@ -185,7 +171,7 @@ public class HudLiteScript : MonoBehaviour
             speed = Mathf.Lerp(speed, speedOffSet + speedAmplitude * relativeSpeed.z, speedFilterFactor);
 
             //Send values to Gui and Instruments
-            if (speedTxt != null) speedTxt.text = speed.ToString("0").PadLeft(5); //.ToString("##0");
+            if (speedTxt != null) speedTxt.text = speed.ToString("0").PadLeft(5);//.ToString("##0");
         }
         //////////////////////////////////////////// Speed
 

@@ -16,10 +16,8 @@ public class CompassBar : MonoBehaviour
     //
     void Start()
     {
-        startX = rawImg.uvRect.x;
-        startY = rawImg.uvRect.y;
-        startWidth = rawImg.uvRect.width;
-        startHeight = rawImg.uvRect.height;
+        startX = rawImg.uvRect.x; startY = rawImg.uvRect.y;
+        startWidth = rawImg.uvRect.width; startHeight = rawImg.uvRect.height;
     }
     //
 
@@ -28,13 +26,9 @@ public class CompassBar : MonoBehaviour
     {
         if (isActive)
         {
-            if (moveX) rawImg.uvRect = new Rect(factor * (heading + headingOffSet) / maxValue + startX, rawImg.uvRect.y, rawImg.uvRect.width, rawImg.uvRect.height);
+            if(moveX) rawImg.uvRect = new Rect(factor * (heading + headingOffSet) / maxValue + startX, rawImg.uvRect.y, rawImg.uvRect.width, rawImg.uvRect.height);
 
-            if (headingTxt != null)
-            {
-                if (heading < 0) headingTxt.text = (heading + 360f).ToString("000");
-                else headingTxt.text = heading.ToString("000");
-            }
+            if (headingTxt != null) { if (heading < 0) headingTxt.text = (heading + 360f).ToString("000"); else headingTxt.text = heading.ToString("000"); }
         }
     }
     ///////////////////////////
