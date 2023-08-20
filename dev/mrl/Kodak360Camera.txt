@@ -1,2 +1,5 @@
-﻿dshow://
+﻿dshow:///
 :dshow-vdev="PIXPRO ORBIT360 4K"
+:dshow-adev=none
+:dshow-sdev=none
+:dshow-size=1920x1080

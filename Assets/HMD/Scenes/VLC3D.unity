@@ -19248,8 +19248,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 129841330}
-        m_TargetAssemblyTypeName: JakesSBSVLC, Assembly-CSharp
-        m_MethodName: OnSplitFOVSliderUpdated
+        m_TargetAssemblyTypeName: VLCMainDisplay, Assembly-CSharp
+        m_MethodName: OnFOVSliderUpdated
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

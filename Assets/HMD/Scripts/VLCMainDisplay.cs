@@ -762,12 +762,12 @@ public class VLCMainDisplay : MonoBehaviour
         if (path.ToLower().EndsWith(".url") || path.ToLower().EndsWith(".txt"))
         {
             var urlContent = File.ReadAllText(path);
-            var lines = urlContent.Split('\n');
+            var lines = urlContent.Split('\n').ToList();
+            lines.RemoveAll(string.IsNullOrEmpty);
 
-            if (lines.Length <= 0) throw new IOException($"No line defined in file `${path}`");
+            if (lines.Count <= 0) throw new IOException($"No line defined in file `${path}`");
 
             Args = new VLCArgs(lines.ToList(), FromType.FromLocation);
-
         }
         else
         {
