@@ -31,8 +31,7 @@ public class VLCMainDisplay : MonoBehaviour
     private float nextActionTime = 0.0f;
     public float period = 1.0f;
 
-    [FormerlySerializedAs("jakesRemoteController")]
-    public HeadDownController headDownController;
+    public ControlPanel controlPanel;
 
 
     private LibVLC _libVLC;
@@ -344,7 +343,7 @@ public class VLCMainDisplay : MonoBehaviour
             mainDisplay.transform.position.z
         );
 
-        headDownController.SetVLC(this);
+        controlPanel.SetVLC(this);
 
         // UpdateCameraReferences();
 
@@ -392,24 +391,24 @@ public class VLCMainDisplay : MonoBehaviour
         DestroyMediaPlayer();
     }
 
-    private void UpdateColorGrade()
-    {
-        // Get the Color Grading effect from the camera's post-processing profile
-        /*ColorGrading colorGrading;
-        if (camera.TryGetComponent(out PostProcessVolume volume))
-        {
-            volume.profile.TryGetSettings(out colorGrading);
-        }
-        else
-        {
-            return;
-        }*/
-
-        // Set the brightness, contrast, and gamma levels
-        /*colorGrading.brightness.value = brightnessBar.value;
-        colorGrading.contrast.value = contrastBar.value;
-        colorGrading.gamma.value = gammaBar.value;*/
-    }
+    // private void UpdateColorGrade()
+    // {
+    //     // Get the Color Grading effect from the camera's post-processing profile
+    //     /*ColorGrading colorGrading;
+    //     if (camera.TryGetComponent(out PostProcessVolume volume))
+    //     {
+    //         volume.profile.TryGetSettings(out colorGrading);
+    //     }
+    //     else
+    //     {
+    //         return;
+    //     }*/
+    //
+    //     // Set the brightness, contrast, and gamma levels
+    //     /*colorGrading.brightness.value = brightnessBar.value;
+    //     colorGrading.contrast.value = contrastBar.value;
+    //     colorGrading.gamma.value = gammaBar.value;*/
+    // }
 
     private void Update()
     {
@@ -498,67 +497,67 @@ public class VLCMainDisplay : MonoBehaviour
     private IEnumerator lerpROne;
     //float valueToLerp;
 
-    public void TogglePlaneToSphere() // TODO: cleanup
-    {
-        var current = leftEyeScreen.GetComponent<SkinnedMeshRenderer>().GetBlendShapeWeight(0);
-        if (current < 50)
-            AnimatePlaneToSphere();
-        else
-            AnimateSphereToPlane();
-    }
+    // public void TogglePlaneToSphere() // TODO: cleanup
+    // {
+    //     var current = leftEyeScreen.GetComponent<SkinnedMeshRenderer>().GetBlendShapeWeight(0);
+    //     if (current < 50)
+    //         AnimatePlaneToSphere();
+    //     else
+    //         AnimateSphereToPlane();
+    // }
 
-    public void AnimatePlaneToSphere()
-    {
-        DoPlaneSphereLerp(100.0f);
-    }
+    // public void AnimatePlaneToSphere()
+    // {
+    //     DoPlaneSphereLerp(100.0f);
+    // }
 
-    public void AnimateSphereToPlane()
-    {
-        DoPlaneSphereLerp(0.0f);
-    }
+    // public void AnimateSphereToPlane()
+    // {
+    //     DoPlaneSphereLerp(0.0f);
+    // }
+    //
+    // public void DoPlaneSphereLerp(float _endValue)
+    // {
+    //     if (lerpLZero is not null)
+    //         StopCoroutine(lerpLZero);
+    //
+    //     if (lerpLOne is not null)
+    //         StopCoroutine(lerpLOne);
+    //
+    //     if (lerpRZero is not null)
+    //         StopCoroutine(lerpRZero);
+    //
+    //     if (lerpROne is not null)
+    //         StopCoroutine(lerpROne);
+    //
+    //     endValue = _endValue;
+    //
+    //     lerpLZero = LerpPlaneToSphere(leftEyeScreen.GetComponent<SkinnedMeshRenderer>(), 0);
+    //     lerpLOne = LerpPlaneToSphere(leftEyeScreen.GetComponent<SkinnedMeshRenderer>(), 1);
+    //
+    //     StartCoroutine(lerpLZero);
+    //     StartCoroutine(lerpLOne);
+    //
+    //     lerpRZero = LerpPlaneToSphere(rightEyeScreen.GetComponent<SkinnedMeshRenderer>(), 0);
+    //     lerpROne = LerpPlaneToSphere(rightEyeScreen.GetComponent<SkinnedMeshRenderer>(), 1);
+    //
+    //     StartCoroutine(lerpRZero);
+    //     StartCoroutine(lerpROne);
+    // }
 
-    public void DoPlaneSphereLerp(float _endValue)
-    {
-        if (lerpLZero is not null)
-            StopCoroutine(lerpLZero);
-
-        if (lerpLOne is not null)
-            StopCoroutine(lerpLOne);
-
-        if (lerpRZero is not null)
-            StopCoroutine(lerpRZero);
-
-        if (lerpROne is not null)
-            StopCoroutine(lerpROne);
-
-        endValue = _endValue;
-
-        lerpLZero = LerpPlaneToSphere(leftEyeScreen.GetComponent<SkinnedMeshRenderer>(), 0);
-        lerpLOne = LerpPlaneToSphere(leftEyeScreen.GetComponent<SkinnedMeshRenderer>(), 1);
-
-        StartCoroutine(lerpLZero);
-        StartCoroutine(lerpLOne);
-
-        lerpRZero = LerpPlaneToSphere(rightEyeScreen.GetComponent<SkinnedMeshRenderer>(), 0);
-        lerpROne = LerpPlaneToSphere(rightEyeScreen.GetComponent<SkinnedMeshRenderer>(), 1);
-
-        StartCoroutine(lerpRZero);
-        StartCoroutine(lerpROne);
-    }
-
-    private IEnumerator LerpPlaneToSphere(SkinnedMeshRenderer renderer, int ShapeIndex)
-    {
-        float timeElapsed = 0;
-        startValue = renderer.GetBlendShapeWeight(ShapeIndex);
-        while (timeElapsed < lerpDuration)
-        {
-            renderer.SetBlendShapeWeight(ShapeIndex, Mathf.Lerp(startValue, endValue, timeElapsed / lerpDuration));
-            timeElapsed += UnityEngine.Time.deltaTime;
-            yield return null;
-        }
-
-        renderer.SetBlendShapeWeight(ShapeIndex, endValue);
-    }
+    // private IEnumerator LerpPlaneToSphere(SkinnedMeshRenderer renderer, int ShapeIndex)
+    // {
+    //     float timeElapsed = 0;
+    //     startValue = renderer.GetBlendShapeWeight(ShapeIndex);
+    //     while (timeElapsed < lerpDuration)
+    //     {
+    //         renderer.SetBlendShapeWeight(ShapeIndex, Mathf.Lerp(startValue, endValue, timeElapsed / lerpDuration));
+    //         timeElapsed += UnityEngine.Time.deltaTime;
+    //         yield return null;
+    //     }
+    //
+    //     renderer.SetBlendShapeWeight(ShapeIndex, endValue);
+    // }
 
     public void OnBrightnessSliderUpdated()
     {
@@ -604,11 +603,11 @@ public class VLCMainDisplay : MonoBehaviour
         );
     }
 
-    public void ResetDisplayAdjustments()
-    {
-        mainDisplay.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
-        mainDisplay.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
-    }
+    // public void ResetDisplayAdjustments()
+    // {
+    //     mainDisplay.transform.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+    //     mainDisplay.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+    // }
 
     private float leftCameraMinX = -1.5f;
     private float rightCameraMaxX = 1.5f;
@@ -697,7 +696,7 @@ public class VLCMainDisplay : MonoBehaviour
 
     private void OnGUI()
     {
-        if (!headDownController.OGMenuVisible()) return;
+        if (!controlPanel.OGMenuVisible()) return;
         if (NRInput.GetButtonDown(ControllerButton.TRIGGER))
         {
             m_PreviousPos = NRInput.GetTouch();
@@ -791,37 +790,43 @@ public class VLCMainDisplay : MonoBehaviour
 
         // mediaPlayer.Media = new Media(new Uri(Args.Location), parameters);
         // mediaPlayer.Media = new Media(Args.Location, Args.FromType, parameters);
-        mediaPlayer.Media = new Media(Args.Location, Args.FromType);
+
+        var m = new Media(Args.Location, Args.FromType);
         foreach (var parameter in parameters)
         {
-            mediaPlayer.Media.AddOption(parameter);
+            m.AddOption(parameter);
         }
 
-        // Task.Run(async () =>
-        // {
-        //     var result = await mediaPlayer.Media.ParseAsync(libVLC, MediaParseOptions.FetchNetwork);
-        //     // _is360 = trackList[0].Data.Video.Projection == VideoProjection.Equirectangular;
-        //     //
-        //     // Debug.Log($"projection {trackList[0].Data.Video.Projection}");
-        //
-        //     // TODO: add SBS / OU / TB filename recognition
-        //
-        //     // if (_is360)
-        //     // {
-        //     //     Debug.Log("The video is a 360 video");
-        //     //     SetVideoMode(VideoMode._360_2D);
-        //     // }
-        //     //
-        //     // else
-        //     // {
-        //     //     Debug.Log("The video was not identified as a 360 video by VLC");
-        //     // SetVideoMode(VideoMode.Mono);
-        //     // }
-        // });
+        mediaPlayer.Media = m;
 
-        // var trackList = mediaPlayer.Media.TrackList(TrackType.Video);
-        // Debug.Log($"discarding {trackList.Count} track(s)");
-        // trackList.Dispose();
+        Task.Run(async () =>
+        {
+            var result = await mediaPlayer.Media.ParseAsync(libVLC, MediaParseOptions.ParseNetwork);
+            var trackList = mediaPlayer.Media.TrackList(TrackType.Video);
+
+            Debug.Log($"tracklist of {trackList.Count}");
+
+
+            _is360 = trackList[0].Data.Video.Projection == VideoProjection.Equirectangular;
+
+            Debug.Log($"projection {trackList[0].Data.Video.Projection}");
+
+            // TODO: add SBS / OU / TB filename recognition
+
+            // if (_is360)
+            // {
+            //     Debug.Log("The video is a 360 video");
+            //     SetVideoMode(VideoMode._360_2D);
+            // }
+            //
+            // else
+            // {
+            //     Debug.Log("The video was not identified as a 360 video by VLC");
+            // SetVideoMode(VideoMode.Mono);
+            // }
+
+            trackList.Dispose();
+        });
 
         // flag to read and store the texture aspect ratio
         m_updatedARSinceOpen = false;
@@ -1056,7 +1061,7 @@ public class VLCMainDisplay : MonoBehaviour
                     texptr); //Make a texture of the proper size for the video to output to
             texture = new RenderTexture(_vlcTexture.width, _vlcTexture.height, 0,
                 RenderTextureFormat.ARGB32); //Make a renderTexture the same size as vlctex
-            SetVideoModeASAP();
+            SetVideoModeAsap();
 
             Debug.Log($"texture size {px} {py} | {_vlcTexture.width} {_vlcTexture.height}");
 
@@ -1143,11 +1148,11 @@ public class VLCMainDisplay : MonoBehaviour
         _videoMode = mode;
         if (texture != null)
         {
-            SetVideoModeASAP();
+            SetVideoModeAsap();
         }
     }
 
-    private void SetVideoModeASAP()
+    private void SetVideoModeAsap()
     {
         if (texture == null) throw new VLCException("[SetVideoMode] texture is null!");
 
@@ -1214,20 +1219,20 @@ public class VLCMainDisplay : MonoBehaviour
         SetVideoMode(VideoMode._3D_OU);
     }
 
-    public void ResetScreen() // TODO: bind it to button
-    {
-        leftEyeScreen.transform.localPosition = _startPosition;
-        leftEyeScreen.transform.localRotation = Quaternion.identity;
-        leftEyeScreen.transform.localScale = new Vector3(1, 1, 1);
+    // public void ResetScreen() // TODO: bind it to button
+    // {
+    //     leftEyeScreen.transform.localPosition = _startPosition;
+    //     leftEyeScreen.transform.localRotation = Quaternion.identity;
+    //     leftEyeScreen.transform.localScale = new Vector3(1, 1, 1);
+    //
+    //     rightEyeScreen.transform.localPosition = _startPosition;
+    //     rightEyeScreen.transform.localRotation = Quaternion.identity;
+    //     rightEyeScreen.transform.localScale = new Vector3(1, 1, 1);
+    // }
 
-        rightEyeScreen.transform.localPosition = _startPosition;
-        rightEyeScreen.transform.localRotation = Quaternion.identity;
-        rightEyeScreen.transform.localScale = new Vector3(1, 1, 1);
-    }
-
-    public void promptUserFilePicker()
+    public void PromptUserFilePicker()
     {
-        var fileTypes = new[] { "Media resource locator/mrl,url,txt", "video/*", "Video(others)/movie", "*" };
+        var fileTypes = new[] { "*", "Media resource locator/mrl,url,txt", "video/*", "Video(others)/movie" };
 
         // Pick image(s) and/or video(s)
         var permission = NativeFilePicker.PickFile(path =>
@@ -1267,132 +1272,132 @@ public class VLCMainDisplay : MonoBehaviour
         }
     }
 
-    public void OnSingleTap(string name)
-    {
-        Debug.Log($"[SBSVLC] Single Tap Triggered {name}");
-        if (name == "LockScreenButton")
-            if (!_screenLocked)
-                ToggleScreenLock();
-    }
+    // public void OnSingleTap(string name)
+    // {
+    //     Debug.Log($"[SBSVLC] Single Tap Triggered {name}");
+    //     if (name == "LockScreenButton")
+    //         if (!_screenLocked)
+    //             ToggleScreenLock();
+    // }
 
     // we require a double-tap to unlock
-    public void OnDoubleTap(string name)
-    {
-        Debug.Log($"[SBSVLC] Double Tap Triggered {name}");
-        if (name == "LockScreenButton")
-            if (_screenLocked)
-                ToggleScreenLock();
-    }
+    // public void OnDoubleTap(string name)
+    // {
+    //     Debug.Log($"[SBSVLC] Double Tap Triggered {name}");
+    //     if (name == "LockScreenButton")
+    //         if (_screenLocked)
+    //             ToggleScreenLock();
+    // }
 
-    private void GetContext()
-    {
-        unityPlayer = new AndroidJavaClass("com.jakedowns.VLC3D.VLC3DActivity");
-        try
-        {
-            activity = unityPlayer?.GetStatic<AndroidJavaObject>("currentActivity");
-            context = activity?.Call<AndroidJavaObject>("getApplicationContext");
-        }
-        catch (Exception e)
-        {
-            Debug.Log("error getting context " + e);
-        }
-    }
+    // private void GetContext()
+    // {
+    //     unityPlayer = new AndroidJavaClass("com.jakedowns.VLC3D.VLC3DActivity");
+    //     try
+    //     {
+    //         activity = unityPlayer?.GetStatic<AndroidJavaObject>("currentActivity");
+    //         context = activity?.Call<AndroidJavaObject>("getApplicationContext");
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         Debug.Log("error getting context " + e);
+    //     }
+    // }
 
-    public void ToggleScreenLock()
-    {
-        _screenLocked = !_screenLocked;
-
-        if (_screenLocked)
-        {
-            // Hide All UI except for the lock button
-            _hideWhenLocked.SetActive(false);
-            _lockScreenNotice.SetActive(true);
-            _logo.SetActive(false);
-            _menuToggleButton.SetActive(false);
-            // Lower Brightness
-            var _unityBrightnessOnLock = Screen.brightness;
-            Debug.Log($"lockbrightness Unity brightness on lock {_unityBrightnessOnLock}");
-
-#if UNITY_ANDROID
-            if (!Application.isEditor)
-            {
-                try
-                {
-                    // get int from _brightnessHelper
-                    _brightnessOnLock = (int)(_brightnessHelper?.CallStatic<int>("getBrightness"));
-
-                    _brightnessModeOnLock = (int)(_brightnessHelper?.CallStatic<int>("getBrightnessMode"));
-
-                    Debug.Log($"lockbrightness Android brightness on lock {_brightnessOnLock}");
-                }catch(Exception e)
-                {
-                    Debug.Log("Error getting brightness " + e.ToString());
-                }
-
-                // Set it to 0? 0.1?
-                //Debug.Log($"set brightness with unity");
-                //Screen.brightness = 0.1f;
-
-                if (context is null)
-                {
-                    Debug.Log("context is null");
-                    GetContext();
-                }
-                if (context is not null)
-                {
-                    // TODO: maybe try to fetch it again now?
-
-                    object _args = new object[2] { context, 1 };
-
-                    // call _brightnessHelper
-                    _brightnessHelper?.CallStatic("SetBrightness", _args);
-                }
-                 
-
-            }
-#endif
-        }
-        else
-        {
-#if UNITY_ANDROID
-            if (!Application.isEditor)
-            {
-                if (context is null)
-                {
-                    Debug.Log("context is null");
-                    GetContext();
-                }
-                if (context is not null)
-                {
-                    try
-                    {
-                        object _args = new object[2] { context, _brightnessOnLock };
-                        _brightnessHelper?.CallStatic("setBrightness", _args);
-
-                        // restore brightness mode
-                        object _args_mode = new object[2] { context, _brightnessModeOnLock };
-                        _brightnessHelper?.CallStatic("setBrightnessMode", _args_mode);
-                    }
-                    catch(Exception e)
-                    {
-                        Debug.Log("error setting brightness " + e.ToString());
-                    }
-                    
-                }
-                
-            }
-#else
-            // Restore Brightness
-            Screen.brightness = _brightnessOnLock;
-#endif
-
-            // Show All UI when screen is unlocked
-            _hideWhenLocked.SetActive(true);
-            _lockScreenNotice.SetActive(false);
-            _logo.SetActive(true);
-            _menuToggleButton.SetActive(true);
-        }
-    }
+//     public void ToggleScreenLock()
+//     {
+//         _screenLocked = !_screenLocked;
+//
+//         if (_screenLocked)
+//         {
+//             // Hide All UI except for the lock button
+//             _hideWhenLocked.SetActive(false);
+//             _lockScreenNotice.SetActive(true);
+//             _logo.SetActive(false);
+//             _menuToggleButton.SetActive(false);
+//             // Lower Brightness
+//             var _unityBrightnessOnLock = Screen.brightness;
+//             Debug.Log($"lockbrightness Unity brightness on lock {_unityBrightnessOnLock}");
+//
+// #if UNITY_ANDROID
+//             if (!Application.isEditor)
+//             {
+//                 try
+//                 {
+//                     // get int from _brightnessHelper
+//                     _brightnessOnLock = (int)(_brightnessHelper?.CallStatic<int>("getBrightness"));
+//
+//                     _brightnessModeOnLock = (int)(_brightnessHelper?.CallStatic<int>("getBrightnessMode"));
+//
+//                     Debug.Log($"lockbrightness Android brightness on lock {_brightnessOnLock}");
+//                 }catch(Exception e)
+//                 {
+//                     Debug.Log("Error getting brightness " + e.ToString());
+//                 }
+//
+//                 // Set it to 0? 0.1?
+//                 //Debug.Log($"set brightness with unity");
+//                 //Screen.brightness = 0.1f;
+//
+//                 if (context is null)
+//                 {
+//                     Debug.Log("context is null");
+//                     GetContext();
+//                 }
+//                 if (context is not null)
+//                 {
+//                     // TODO: maybe try to fetch it again now?
+//
+//                     object _args = new object[2] { context, 1 };
+//
+//                     // call _brightnessHelper
+//                     _brightnessHelper?.CallStatic("SetBrightness", _args);
+//                 }
+//                  
+//
+//             }
+// #endif
+//         }
+//         else
+//         {
+// #if UNITY_ANDROID
+//             if (!Application.isEditor)
+//             {
+//                 if (context is null)
+//                 {
+//                     Debug.Log("context is null");
+//                     GetContext();
+//                 }
+//                 if (context is not null)
+//                 {
+//                     try
+//                     {
+//                         object _args = new object[2] { context, _brightnessOnLock };
+//                         _brightnessHelper?.CallStatic("setBrightness", _args);
+//
+//                         // restore brightness mode
+//                         object _args_mode = new object[2] { context, _brightnessModeOnLock };
+//                         _brightnessHelper?.CallStatic("setBrightnessMode", _args_mode);
+//                     }
+//                     catch(Exception e)
+//                     {
+//                         Debug.Log("error setting brightness " + e.ToString());
+//                     }
+//                     
+//                 }
+//                 
+//             }
+// #else
+//             // Restore Brightness
+//             Screen.brightness = _brightnessOnLock;
+// #endif
+//
+//             // Show All UI when screen is unlocked
+//             _hideWhenLocked.SetActive(true);
+//             _lockScreenNotice.SetActive(false);
+//             _logo.SetActive(true);
+//             _menuToggleButton.SetActive(true);
+//         }
+//     }
 
     private void Log(object message)
     {

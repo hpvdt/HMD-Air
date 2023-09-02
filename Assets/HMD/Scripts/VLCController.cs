@@ -147,7 +147,7 @@ public class VLCController : MonoBehaviour
             if (ToggleElement(pathGroup))
                 pathInputField.Select();
         });
-        fileButton.onClick.AddListener(() => { vlcPlayer.promptUserFilePicker(); });
+        fileButton.onClick.AddListener(() => { vlcPlayer.PromptUserFilePicker(); });
         tracksButton.onClick.AddListener(() =>
         {
             ToggleElement(tracksButtonsGroup);
@@ -300,7 +300,7 @@ public class VLCController : MonoBehaviour
         var ar_combo = Mathf.Round(width / height * 100f) / 100f;
         ARComboBar.value = ar_combo;
 
-        vlcPlayer.headDownController.UpdateCustomARPopupValuePreviewText();
+        vlcPlayer.controlPanel.UpdateCustomARPopupValuePreviewText();
     }
 
     private void UpdateARWidthAndHeightFromCombo()
@@ -315,7 +315,7 @@ public class VLCController : MonoBehaviour
 
         vlcPlayer.SetCurrentAR($"{fraction[0]}:{fraction[1]}");
 
-        vlcPlayer.headDownController.UpdateCustomARPopupValuePreviewText();
+        vlcPlayer.controlPanel.UpdateCustomARPopupValuePreviewText();
     }
 
     private int GCD(int a, int b)

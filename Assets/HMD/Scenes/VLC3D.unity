@@ -1272,7 +1272,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _videoMode: 0
   period: 1
-  headDownController: {fileID: 114181559257564987}
+  controlPanel: {fileID: 114181559257564987}
   NRCameraRig: {fileID: 436146382}
   XRRig: {fileID: 1822193696}
   LeftCamera: {fileID: 2066632863}
@@ -26462,7 +26462,7 @@ GameObject:
   - component: {fileID: 114181559257564986}
   - component: {fileID: 114181559257564987}
   m_Layer: 0
-  m_Name: VirtualController
+  m_Name: ControlPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

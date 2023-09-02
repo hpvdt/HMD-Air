@@ -4,7 +4,7 @@ using System.Linq;
 using NRKernal;
 using UnityEngine;
 using UnityEngine.UI;
-public class HeadDownController : MonoBehaviour
+public class ControlPanel : MonoBehaviour
 {
     /*bool _menu_visible = false;*/
 
