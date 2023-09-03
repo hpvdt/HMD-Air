@@ -127,9 +127,9 @@ public class VLCMainDisplay : MonoBehaviour
     private float leftCameraXOnStart;
     private float rightCameraXOnStart;
 
-    [SerializeField]
-    // public MyIAPHandler myIAPHandler;
-    private GameObject _hideWhenLocked;
+    // [SerializeField]
+    // // public MyIAPHandler myIAPHandler;
+    // private GameObject _hideWhenLocked;
 
     private GameObject _lockScreenNotice;
     private GameObject _menuToggleButton;
@@ -262,7 +262,7 @@ public class VLCMainDisplay : MonoBehaviour
     public VLCArgs Args = new VLCArgs(new List<string> { "https://jakedowns.com/media/sbs2.mp4" }, FromType.FromPath);
 
     public bool flipTextureX; //No particular reason you'd need this but it is sometimes useful
-    public bool flipTextureY = true; //Set to false on Android, to true on Windows
+    public bool flipTextureY; //Set to false on Android, to true on Windows
 
     public bool automaticallyFlipOnAndroid = true; //Automatically invert Y on Android
 
@@ -324,7 +324,7 @@ public class VLCMainDisplay : MonoBehaviour
         _pointLight = GameObject.Find("Point Light");
 
         // TODO: extract lockscreen logic into a separate script
-        _hideWhenLocked = GameObject.Find("HideWhenScreenLocked");
+        // _hideWhenLocked = GameObject.Find("HideWhenScreenLocked");
         _lockScreenNotice = GameObject.Find("LockScreenNotice");
         _logo = GameObject.Find("logo");
         _menuToggleButton = GameObject.Find("MenuToggleButton");
@@ -340,10 +340,10 @@ public class VLCMainDisplay : MonoBehaviour
 
         //Automatically flip on android
         if (automaticallyFlipOnAndroid && UnityEngine.Application.platform == RuntimePlatform.Android)
-            flipTextureY = !flipTextureY;
-
-        if (UnityEngine.Application.platform != RuntimePlatform.Android)
+        {
             flipTextureX = !flipTextureX;
+            flipTextureY = !flipTextureY;
+        }
 
         SetVideoModeMono();
 
@@ -405,7 +405,7 @@ public class VLCMainDisplay : MonoBehaviour
 
             //Copy the vlc texture into the output texture, flipped over
             var flip = new Vector2(flipTextureX ? -1 : 1, flipTextureY ? -1 : 1);
-            Graphics.Blit(TextureView.Source, TextureView.Texture, flip, Vector2.zero);
+            Graphics.Blit(TextureView.Source, TextureView.Cache, flip, Vector2.zero);
             //If you wanted to do post processing outside of VLC you could use a shader here.
         }
 
@@ -1134,7 +1134,7 @@ public class VLCMainDisplay : MonoBehaviour
             rightEyeScreen.SetActive(false);
 
             _morphDisplayLeftRenderer.material = m_monoMaterial; // m_lMaterial;
-            _morphDisplayLeftRenderer.material.mainTexture = TextureView.Texture;
+            _morphDisplayLeftRenderer.material.mainTexture = TextureView.EffectiveTexture;
         }
         else
         {
@@ -1156,8 +1156,8 @@ public class VLCMainDisplay : MonoBehaviour
                 _morphDisplayRightRenderer.material = _flipStereo ? m_lMaterial : m_rMaterial;
             }
 
-            _morphDisplayLeftRenderer.material.mainTexture = TextureView.Texture;
-            _morphDisplayRightRenderer.material.mainTexture = TextureView.Texture;
+            _morphDisplayLeftRenderer.material.mainTexture = TextureView.EffectiveTexture;
+            _morphDisplayRightRenderer.material.mainTexture = TextureView.EffectiveTexture;
         }
     }
 

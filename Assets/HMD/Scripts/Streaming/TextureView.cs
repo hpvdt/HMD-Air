@@ -8,7 +8,6 @@ namespace HMD.Scripts.Streaming
         private Texture2D _source; //This is the texture libVLC writes to directly.
         private RenderTexture _cache; //We copy it into this texture which we actually use in unity.
 
-
         public Lazy<(int, int)> Size;
 
         public Lazy<float> AspectRatio;
@@ -31,15 +30,24 @@ namespace HMD.Scripts.Streaming
             _cache.Release();
         }
 
+        TextureView()
+        {
+            Destroy();
+        }
 
         public Texture2D Source
         {
             get { return _source; }
         }
 
-        public RenderTexture Texture
+        public RenderTexture Cache
         {
             get { return _cache; }
+        }
+
+        public Texture EffectiveTexture
+        {
+            get { return Cache; }
         }
     }
 }

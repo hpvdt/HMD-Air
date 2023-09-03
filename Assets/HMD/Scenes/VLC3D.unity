@@ -1249,7 +1249,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 129841328}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: 0.70710677, z: -0.70710677, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1257,7 +1257,7 @@ Transform:
   - {fileID: 1886762010}
   - {fileID: 1831399110}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 90, z: -90}
 --- !u!114 &129841330
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1279,7 +1279,6 @@ MonoBehaviour:
   CenterCamera: {fileID: 1085126938}
   RightCamera: {fileID: 2087385060}
   XRMainCamera: {fileID: 1233077427}
-  _hideWhenLocked: {fileID: 0}
   mainDisplay: {fileID: 129841328}
   leftEyeScreen: {fileID: 1641766814}
   rightEyeScreen: {fileID: 156391122}
@@ -1296,9 +1295,8 @@ MonoBehaviour:
   m_leftEyeTBMaterial: {fileID: 2100000, guid: a410d7c0e2ee6304f87a08311c41a76b, type: 2}
   m_rightEyeTBMaterial: {fileID: 2100000, guid: c720289ec3d4fda4b8cc911b84a4269e, type: 2}
   m_NRInput: {fileID: 48788700}
-  texture: {fileID: 0}
   flipTextureX: 0
-  flipTextureY: 1
+  flipTextureY: 0
   automaticallyFlipOnAndroid: 1
   playOnAwake: 0
   logToConsole: 0
@@ -16970,7 +16968,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -3887185075125053422, guid: a8feaefe81fd63c4dab49299e0827fcd, type: 3}
       propertyPath: m_AABB.m_Extent.y
-      value: 0.0031900136
+      value: 0.003190014
       objectReference: {fileID: 0}
     - target: {fileID: -3887185075125053422, guid: a8feaefe81fd63c4dab49299e0827fcd, type: 3}
       propertyPath: m_AABB.m_Extent.z
@@ -16990,6 +16988,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -3887185075125053422, guid: a8feaefe81fd63c4dab49299e0827fcd, type: 3}
       propertyPath: m_BlendShapeWeights.Array.data[1]
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -3887185075125053422, guid: a8feaefe81fd63c4dab49299e0827fcd, type: 3}
+      propertyPath: m_BlendShapeWeights.Array.data[2]
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: a8feaefe81fd63c4dab49299e0827fcd, type: 3}
@@ -23232,6 +23234,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -3887185075125053422, guid: a8feaefe81fd63c4dab49299e0827fcd, type: 3}
       propertyPath: m_BlendShapeWeights.Array.data[1]
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -3887185075125053422, guid: a8feaefe81fd63c4dab49299e0827fcd, type: 3}
+      propertyPath: m_BlendShapeWeights.Array.data[2]
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: a8feaefe81fd63c4dab49299e0827fcd, type: 3}
