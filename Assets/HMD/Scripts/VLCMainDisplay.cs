@@ -395,7 +395,7 @@ public class VLCMainDisplay : MonoBehaviour
 
         //Automatically resize output textures if size changes
         if (TextureView == null || TextureView.Size.Value != (width, height))
-            CreateTextures(width, height);
+            ResizeTextures(width, height);
 
         //Update the vlc texture (tex)
         var texptr = mediaPlayer.GetTexture(width, height, out var updated);
@@ -1008,7 +1008,7 @@ public class VLCMainDisplay : MonoBehaviour
     }
 
     //Resize the output textures to the size of the video
-    private void CreateTextures(uint px, uint py)
+    private void ResizeTextures(uint px, uint py)
     {
         var texptr = mediaPlayer.GetTexture(px, py, out var updated);
         if (px != 0 && py != 0 && updated && texptr != IntPtr.Zero)
