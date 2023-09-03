@@ -14565,8 +14565,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   vlcPlayer: {fileID: 129841330}
-  Rewind10Button: {fileID: 93350561}
-  FFW10Button: {fileID: 1680505162}
+  rewind10Button: {fileID: 1273118284}
+  ffw10Button: {fileID: 211444751}
   seekBar: {fileID: 1516209032}
   playButton: {fileID: 1246672278}
   pauseButton: {fileID: 1603396387}
@@ -26537,7 +26537,7 @@ GameObject:
   - component: {fileID: 4279752202902864}
   - component: {fileID: 114022272262855676}
   m_Layer: 0
-  m_Name: NRVirtualDisplayer
+  m_Name: DashUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

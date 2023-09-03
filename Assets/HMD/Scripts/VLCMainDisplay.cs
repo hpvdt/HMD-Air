@@ -146,7 +146,7 @@ public class VLCMainDisplay : MonoBehaviour
         return new List<GameObject> { leftEyeScreen, rightEyeScreen };
     }
 
-    private Vector3 _startPosition;
+    // private Vector3 _startPosition;
 
     private Renderer _morphDisplayLeftRenderer;
     private Renderer _morphDisplayRightRenderer;
@@ -304,11 +304,11 @@ public class VLCMainDisplay : MonoBehaviour
 
         if (deformBar is not null) deformBar.value = 0.0f;
 
-        _startPosition = new Vector3(
-            mainDisplay.transform.position.x,
-            mainDisplay.transform.position.y,
-            mainDisplay.transform.position.z
-        );
+        // _startPosition = new Vector3(
+        //     mainDisplay.transform.position.x,
+        //     mainDisplay.transform.position.y,
+        //     mainDisplay.transform.position.z
+        // );
 
         controlPanel.SetVLC(this);
 
@@ -395,20 +395,19 @@ public class VLCMainDisplay : MonoBehaviour
 
         //Automatically resize output textures if size changes
         if (TextureView == null || TextureView.Size.Value != (width, height))
-            ResizeTextures(width, height);
+            ResizeTextures(width, height); // always set TextureView
 
         //Update the vlc texture (tex)
-        var texptr = mediaPlayer.GetTexture(width, height, out var updated);
+        var texPtr = mediaPlayer.GetTexture(width, height, out var updated);
         if (updated)
         {
-            TextureView.Source.UpdateExternalTexture(texptr);
+            TextureView.Source.UpdateExternalTexture(texPtr);
 
             //Copy the vlc texture into the output texture, flipped over
             var flip = new Vector2(flipTextureX ? -1 : 1, flipTextureY ? -1 : 1);
             Graphics.Blit(TextureView.Source, TextureView.Cache, flip, Vector2.zero);
             //If you wanted to do post processing outside of VLC you could use a shader here.
         }
-
     }
     #endregion
 
@@ -639,17 +638,17 @@ public class VLCMainDisplay : MonoBehaviour
             mediaPlayer.AspectRatio = "16:9";
     }
 
-    public void SetAR16_10()
-    {
-        if (mediaPlayer is not null)
-            mediaPlayer.AspectRatio = "16:10";
-    }
+    // public void SetAR16_10()
+    // {
+    //     if (mediaPlayer is not null)
+    //         mediaPlayer.AspectRatio = "16:10";
+    // }
 
-    public void SetAR_2_35_to_1()
-    {
-        if (mediaPlayer is not null)
-            mediaPlayer.AspectRatio = "2.35:1";
-    }
+    // public void SetAR_2_35_to_1()
+    // {
+    //     if (mediaPlayer is not null)
+    //         mediaPlayer.AspectRatio = "2.35:1";
+    // }
 
     public void SetARNull()
     {

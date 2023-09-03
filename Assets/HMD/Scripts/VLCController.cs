@@ -3,19 +3,20 @@ using System.Collections.Generic;
 using LibVLCSharp;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 ///This script controls all the GUI for the VLC Unity Canvas Example
 ///It sets up event handlers and updates the GUI every frame
 ///This example shows how to safely set up LibVLC events and a simple way to call Unity functions from them
 public class VLCController : MonoBehaviour
 {
-    public VLCMainDisplay vlcPlayer;
+    public VLCMainDisplay mainDisplay;
 
     //GUI Elements
     //public RawImage screen;
     //public AspectRatioFitter screenAspectRatioFitter;
-    public Button Rewind10Button;
-    public Button FFW10Button;
+    public Button rewind10Button;
+    public Button ffw10Button;
 
     public Slider seekBar;
 
@@ -23,11 +24,15 @@ public class VLCController : MonoBehaviour
     public Button playButton;
     public Button pauseButton;
     public Button stopButton;
-    public Button pathButton;
     public Button fileButton;
     public Button tracksButton;
     public Button volumeButton;
+
+    public Button cameraButton;
+
+    public Button pathButton;
     public GameObject pathGroup; //Group containing pathInputField and openButton
+
     public InputField pathInputField;
     public Button openButton;
     public GameObject tracksButtonsGroup; //Group containing buttons to switch video, audio, and subtitle tracks
@@ -71,21 +76,21 @@ public class VLCController : MonoBehaviour
 
     private void Start()
     {
-        if (vlcPlayer is null)
+        if (mainDisplay is null)
         {
             Debug.LogError(
                 "VLC Player not found. Please assign a VLCMainDisplay component to the vlcPlayer variable in the inspector.");
             return;
         }
 
-        if (vlcPlayer?.mediaPlayer is null)
+        if (mainDisplay?.mediaPlayer is null)
         {
             Debug.LogError("VLC Player mediaPlayer not found");
             return;
         }
 
         //VLC Event Handlers
-        vlcPlayer.mediaPlayer.Playing += (object sender, EventArgs e) =>
+        mainDisplay.mediaPlayer.Playing += (object sender, EventArgs e) =>
         {
             //Always use Try/Catch for VLC Events
             try
@@ -101,7 +106,7 @@ public class VLCController : MonoBehaviour
             }
         };
 
-        vlcPlayer.mediaPlayer.Paused += (object sender, EventArgs e) =>
+        mainDisplay.mediaPlayer.Paused += (object sender, EventArgs e) =>
         {
             //Always use Try/Catch for VLC Events
             try
@@ -114,7 +119,7 @@ public class VLCController : MonoBehaviour
             }
         };
 
-        vlcPlayer.mediaPlayer.Stopped += (object sender, EventArgs e) =>
+        mainDisplay.mediaPlayer.Stopped += (object sender, EventArgs e) =>
         {
             //Always use Try/Catch for VLC Events
             try
@@ -129,25 +134,25 @@ public class VLCController : MonoBehaviour
         };
 
         //Buttons
-        Rewind10Button.onClick.AddListener(() =>
+        rewind10Button.onClick.AddListener(() =>
         {
             Debug.Log("Rewind10Button");
-            vlcPlayer.SeekBack10();
+            mainDisplay.SeekBack10();
         });
-        FFW10Button.onClick.AddListener(() =>
+        ffw10Button.onClick.AddListener(() =>
         {
             Debug.Log("FFW10Button");
-            vlcPlayer.SeekForward10();
+            mainDisplay.SeekForward10();
         });
-        pauseButton.onClick.AddListener(() => { vlcPlayer.Pause(); });
-        playButton.onClick.AddListener(() => { vlcPlayer.Play(); });
-        stopButton.onClick.AddListener(() => { vlcPlayer.Stop(); });
+        pauseButton.onClick.AddListener(() => { mainDisplay.Pause(); });
+        playButton.onClick.AddListener(() => { mainDisplay.Play(); });
+        stopButton.onClick.AddListener(() => { mainDisplay.Stop(); });
         pathButton.onClick.AddListener(() =>
         {
             if (ToggleElement(pathGroup))
                 pathInputField.Select();
         });
-        fileButton.onClick.AddListener(() => { vlcPlayer.PromptUserFilePicker(); });
+        fileButton.onClick.AddListener(() => { mainDisplay.PromptUserFilePicker(); });
         tracksButton.onClick.AddListener(() =>
         {
             ToggleElement(tracksButtonsGroup);
@@ -157,10 +162,10 @@ public class VLCController : MonoBehaviour
         openButton.onClick.AddListener(() =>
         {
             ToggleElement(pathGroup);
-            vlcPlayer.Open(pathInputField.text);
+            mainDisplay.Open(pathInputField.text);
         });
 
-        UpdatePlayPauseButton(vlcPlayer.playOnAwake);
+        UpdatePlayPauseButton(mainDisplay.playOnAwake);
 
         //Seek Bar Events
         var seekBarEvents = seekBar.GetComponent<EventTrigger>();
@@ -175,7 +180,7 @@ public class VLCController : MonoBehaviour
         seekBarPointerUp.callback.AddListener((data) =>
         {
             _isDraggingSeekBar = false;
-            vlcPlayer.SetTime((long)((double)vlcPlayer.Duration * seekBar.value));
+            mainDisplay.SetTime((long)((double)mainDisplay.Duration * seekBar.value));
         });
         seekBarEvents.triggers.Add(seekBarPointerUp);
 
@@ -256,7 +261,7 @@ public class VLCController : MonoBehaviour
         ARComboBar.onValueChanged.AddListener((value) => { UpdateARWidthAndHeightFromCombo(); });
 
         //Path Input
-        pathInputField.text = vlcPlayer.Args.Location;
+        pathInputField.text = mainDisplay.Args.Location;
         pathGroup.SetActive(false);
 
         //Track Selection Buttons
@@ -265,8 +270,8 @@ public class VLCController : MonoBehaviour
         //Volume Bar
         volumeBar.wholeNumbers = true;
         volumeBar.maxValue = maxVolume; //You can go higher than 100 but you risk audio clipping
-        volumeBar.value = vlcPlayer.Volume;
-        volumeBar.onValueChanged.AddListener((data) => { vlcPlayer.SetVolume((int)volumeBar.value); });
+        volumeBar.value = mainDisplay.Volume;
+        volumeBar.onValueChanged.AddListener((data) => { mainDisplay.SetVolume((int)volumeBar.value); });
         volumeBar.gameObject.SetActive(false);
     }
 
@@ -275,7 +280,7 @@ public class VLCController : MonoBehaviour
         if (_isDraggingARComboBar) return;
         var width_rounded = (float)Math.Round((double)ARWidthBar.value, 2);
         var height_rounded = (float)Math.Round((double)ARHeightBar.value, 2);
-        vlcPlayer.SetCurrentAR($"{width_rounded}:{height_rounded}");
+        mainDisplay.SetCurrentAR($"{width_rounded}:{height_rounded}");
         UpdateARComboFromWidthAndHeight(width_rounded, height_rounded);
     }
 
@@ -300,7 +305,7 @@ public class VLCController : MonoBehaviour
         var ar_combo = Mathf.Round(width / height * 100f) / 100f;
         ARComboBar.value = ar_combo;
 
-        vlcPlayer.controlPanel.UpdateCustomARPopupValuePreviewText();
+        mainDisplay.controlPanel.UpdateCustomARPopupValuePreviewText();
     }
 
     private void UpdateARWidthAndHeightFromCombo()
@@ -313,9 +318,9 @@ public class VLCController : MonoBehaviour
         ARWidthBar.value = fraction[0] / 100f;
         ARHeightBar.value = fraction[1] / 100f;
 
-        vlcPlayer.SetCurrentAR($"{fraction[0]}:{fraction[1]}");
+        mainDisplay.SetCurrentAR($"{fraction[0]}:{fraction[1]}");
 
-        vlcPlayer.controlPanel.UpdateCustomARPopupValuePreviewText();
+        mainDisplay.controlPanel.UpdateCustomARPopupValuePreviewText();
     }
 
     private int GCD(int a, int b)
@@ -372,7 +377,7 @@ public class VLCController : MonoBehaviour
     private void UpdateSeekBar()
     {
         // Get the current playback time as a TimeSpan object
-        var currentTime = vlcPlayer.Time;
+        var currentTime = mainDisplay.Time;
         var currentTimeSpan = TimeSpan.FromMilliseconds(currentTime);
 
         // Format the TimeSpan object as a string in the desired format
@@ -382,9 +387,9 @@ public class VLCController : MonoBehaviour
 
         if (!_isDraggingSeekBar)
         {
-            var duration = vlcPlayer.Duration;
+            var duration = mainDisplay.Duration;
             if (duration > 0)
-                seekBar.value = (float)((double)vlcPlayer.Time / duration);
+                seekBar.value = (float)((double)mainDisplay.Time / duration);
         }
     }
 
@@ -417,8 +422,8 @@ public class VLCController : MonoBehaviour
     private void SetupTrackButtonsGroup(TrackType type, string label, List<Button> buttonList, bool includeNone = false)
     {
         buttonList.Clear();
-        var tracks = vlcPlayer.Tracks(type);
-        var selected = vlcPlayer.SelectedTrack(type);
+        var tracks = mainDisplay.Tracks(type);
+        var selected = mainDisplay.SelectedTrack(type);
 
         if (tracks.Count > 0)
         {
@@ -442,7 +447,7 @@ public class VLCController : MonoBehaviour
                     foreach (var button in buttonList)
                         button.GetComponentInChildren<Text>().color = unselectedButtonColor;
                     textMeshPro.color = selectedButtonColor;
-                    vlcPlayer.Select(track);
+                    mainDisplay.Select(track);
                 });
             }
 
@@ -462,7 +467,7 @@ public class VLCController : MonoBehaviour
                     foreach (var button in buttonList)
                         button.GetComponentInChildren<Text>().color = unselectedButtonColor;
                     textMeshPro.color = selectedButtonColor;
-                    vlcPlayer.Unselect(type);
+                    mainDisplay.Unselect(type);
                 });
             }
         }
