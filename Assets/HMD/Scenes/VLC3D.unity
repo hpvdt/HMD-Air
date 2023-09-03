@@ -26478,7 +26478,7 @@ GameObject:
   - component: {fileID: 114181559257564986}
   - component: {fileID: 114181559257564987}
   m_Layer: 0
-  m_Name: ControlPanel
+  m_Name: DashPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26646,7 +26646,7 @@ GameObject:
   - component: {fileID: 114788131304584970}
   - component: {fileID: 114788131304584971}
   m_Layer: 0
-  m_Name: UICamera
+  m_Name: DashUICamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
