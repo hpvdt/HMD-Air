@@ -12378,9 +12378,25 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1558675789564490, guid: ad152f08ed7eb6e4abd93376a0203e38, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1581093954426074, guid: ad152f08ed7eb6e4abd93376a0203e38, type: 3}
       propertyPath: m_Name
       value: NRInput (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1581093954426074, guid: ad152f08ed7eb6e4abd93376a0203e38, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1651265338886202, guid: ad152f08ed7eb6e4abd93376a0203e38, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1654180099130866, guid: ad152f08ed7eb6e4abd93376a0203e38, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4808320353365586, guid: ad152f08ed7eb6e4abd93376a0203e38, type: 3}
       propertyPath: m_RootOrder
@@ -26630,7 +26646,7 @@ GameObject:
   - component: {fileID: 114788131304584970}
   - component: {fileID: 114788131304584971}
   m_Layer: 0
-  m_Name: PhoneCamera
+  m_Name: UICamera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
