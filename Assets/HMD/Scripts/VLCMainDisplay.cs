@@ -39,7 +39,7 @@ public class VLCMainDisplay : MonoBehaviour
     //Create a new static LibVLC instance and dispose of the old one. You should only ever have one LibVLC instance.
     private void RefreshLibVLC()
     {
-        Log("VLCPlayerExample CreateLibVLC");
+        Log("[MainDisplay] CreateLibVLC");
         //Dispose of the old libVLC if necessary
         if (_libVLC != null)
         {
@@ -83,7 +83,7 @@ public class VLCMainDisplay : MonoBehaviour
     //Create a new MediaPlayer object and dispose of the old one. 
     private void RefreshMediaPlayer()
     {
-        Log("VLCPlayerExample CreateMediaPlayer");
+        Log("[MainDisplay] CreateMediaPlayer");
         if (_mediaPlayer != null) DestroyMediaPlayer();
         _mediaPlayer = new MediaPlayer(libVLC);
         Log("Media Player SET!");
@@ -101,8 +101,8 @@ public class VLCMainDisplay : MonoBehaviour
 
     private AndroidJavaClass _brightnessHelper;
 
-    [SerializeField] private GameObject NRCameraRig; // TODO: remove
-    [SerializeField] private GameObject XRRig;
+    // [SerializeField] private GameObject NRCameraRig; // TODO: remove
+    // [SerializeField] private GameObject XRRig;
 
     [SerializeField] private Camera LeftCamera;
     [SerializeField] private Camera CenterCamera;
@@ -124,17 +124,17 @@ public class VLCMainDisplay : MonoBehaviour
         return result;
     }
 
-    private float leftCameraXOnStart;
-    private float rightCameraXOnStart;
+    private float _leftCameraXOnStart;
+    private float _rightCameraXOnStart;
 
     // [SerializeField]
     // // public MyIAPHandler myIAPHandler;
     // private GameObject _hideWhenLocked;
 
-    private GameObject _lockScreenNotice;
-    private GameObject _menuToggleButton;
-
-    private GameObject _logo;
+    // private GameObject _lockScreenNotice;
+    // private GameObject _menuToggleButton;
+    //
+    // private GameObject _logo;
 
     [SerializeField] private GameObject mainDisplay;
 
@@ -314,8 +314,8 @@ public class VLCMainDisplay : MonoBehaviour
 
         // UpdateCameraReferences();
 
-        leftCameraXOnStart = LeftCamera.transform.position.x;
-        rightCameraXOnStart = RightCamera.transform.position.x;
+        _leftCameraXOnStart = LeftCamera.transform.position.x;
+        _rightCameraXOnStart = RightCamera.transform.position.x;
 
         // init
         OnFOVSliderUpdated();
@@ -325,9 +325,9 @@ public class VLCMainDisplay : MonoBehaviour
 
         // TODO: extract lockscreen logic into a separate script
         // _hideWhenLocked = GameObject.Find("HideWhenScreenLocked");
-        _lockScreenNotice = GameObject.Find("LockScreenNotice");
-        _logo = GameObject.Find("logo");
-        _menuToggleButton = GameObject.Find("MenuToggleButton");
+        // _lockScreenNotice = GameObject.Find("LockScreenNotice");
+        // _logo = GameObject.Find("logo");
+        // _menuToggleButton = GameObject.Find("MenuToggleButton");
 
         //Setup Screen
         /*if (screen == null)
@@ -379,7 +379,7 @@ public class VLCMainDisplay : MonoBehaviour
 
     private void Update()
     {
-        if ((bool)mediaPlayer?.IsPlaying)
+        if (isPlaying)
             if (UnityEngine.Time.time > nextActionTime)
                 nextActionTime = UnityEngine.Time.time + period;
 
@@ -584,8 +584,8 @@ public class VLCMainDisplay : MonoBehaviour
         // if the value is 0, the cameras are the min distance apart from each other on their local x axis (leftCameraXOnStart / rightCameraXOnStart)
         // if the value is 100, the cameras are at the max distance apart from each other on their local x axis (leftCameraMinX / rightCameraMaxX)
 
-        var leftCameraX = Mathf.Lerp(leftCameraXOnStart, leftCameraMinX, newDepth / 100.0f);
-        var rightCameraX = Mathf.Lerp(rightCameraXOnStart, rightCameraMaxX, newDepth / 100.0f);
+        var leftCameraX = Mathf.Lerp(_leftCameraXOnStart, leftCameraMinX, newDepth / 100.0f);
+        var rightCameraX = Mathf.Lerp(_rightCameraXOnStart, rightCameraMaxX, newDepth / 100.0f);
 
         Debug.Log($"{newDepth} , {leftCameraX} , {rightCameraX}");
 
@@ -721,7 +721,7 @@ public class VLCMainDisplay : MonoBehaviour
     #region vlc
     public void Open(string path)
     {
-        Log("VLCPlayerExample Open " + path);
+        Log("[MainDisplay] Open " + path);
         if (path.ToLower().EndsWith(".url") || path.ToLower().EndsWith(".txt"))
         {
             var urlContent = File.ReadAllText(path);
@@ -742,7 +742,7 @@ public class VLCMainDisplay : MonoBehaviour
 
     public void Open()
     {
-        Log("VLCPlayerExample Open");
+        Log("[MainDisplay] Open");
 
         if (mediaPlayer?.Media != null)
             mediaPlayer.Media.Dispose();
@@ -808,7 +808,6 @@ public class VLCMainDisplay : MonoBehaviour
         Task.Run(async () =>
             {
                 var isSuccessful = await mediaPlayer.PlayAsync();
-                var isPlaying = mediaPlayer.IsPlaying;
 
                 Assert.IsTrue(isSuccessful && isPlaying, "should be playing");
 
@@ -826,13 +825,13 @@ public class VLCMainDisplay : MonoBehaviour
 
     public void Pause()
     {
-        Log("VLCPlayerExample Pause");
+        Log("[MainDisplay] Pause");
         mediaPlayer.Pause();
     }
 
     public void Stop()
     {
-        Log("VLCPlayerExample Stop");
+        Log("[MainDisplay] Stop");
         mediaPlayer?.Stop();
 
         mainDisplay.SetActive(false);
@@ -850,8 +849,6 @@ public class VLCMainDisplay : MonoBehaviour
         // if (m_r360Renderer?.material is not null)
         //     m_r360Renderer.material.mainTexture = null;
 
-
-        // show cone
         _cone?.SetActive(true);
         _pointLight?.SetActive(true);
 
@@ -878,19 +875,19 @@ public class VLCMainDisplay : MonoBehaviour
 
     public void Seek(long timeDelta)
     {
-        Debug.Log("VLCPlayerExample Seek " + timeDelta);
+        Debug.Log("[MainDisplay] Seek " + timeDelta);
         mediaPlayer.SetTime(mediaPlayer.Time + timeDelta);
     }
 
     public void SetTime(long time)
     {
-        Log("VLCPlayerExample SetTime " + time);
+        Log("[MainDisplay] SetTime " + time);
         mediaPlayer.SetTime(time);
     }
 
     public void SetVolume(int volume = 100)
     {
-        Log("VLCPlayerExample SetVolume " + volume);
+        Log("[MainDisplay] SetVolume " + volume);
         mediaPlayer.SetVolume(volume);
     }
 
@@ -904,7 +901,7 @@ public class VLCMainDisplay : MonoBehaviour
         }
     }
 
-    public bool IsPlaying
+    private bool isPlaying
     {
         get
         {
@@ -936,25 +933,25 @@ public class VLCMainDisplay : MonoBehaviour
 
     public List<MediaTrack> Tracks(TrackType type)
     {
-        Log("VLCPlayerExample Tracks " + type);
+        Log("[MainDisplay] Tracks " + type);
         return ConvertMediaTrackList(mediaPlayer?.Tracks(type));
     }
 
     public MediaTrack SelectedTrack(TrackType type)
     {
-        Log("VLCPlayerExample SelectedTrack " + type);
+        Log("[MainDisplay] SelectedTrack " + type);
         return mediaPlayer?.SelectedTrack(type);
     }
 
     public void Select(MediaTrack track)
     {
-        Log("VLCPlayerExample Select " + track.Name);
+        Log("[MainDisplay] Select " + track.Name);
         mediaPlayer?.Select(track);
     }
 
     public void Unselect(TrackType type)
     {
-        Log("VLCPlayerExample Unselect " + type);
+        Log("[MainDisplay] Unselect " + type);
         mediaPlayer?.Unselect(type);
     }
 
@@ -1126,6 +1123,7 @@ public class VLCMainDisplay : MonoBehaviour
 
         ClearMaterialTextureLinks();
 
+        // TODO: this selection is incomplete, 2D_SBS and 2D_OU should be implemented with higher priority
         if (mode == VideoMode.Mono)
         {
             // 2D

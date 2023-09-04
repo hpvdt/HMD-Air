@@ -3,7 +3,7 @@ using UnityEngine;
 namespace HMD.Scripts.Streaming
 {
     using System;
-    public class TextureView // immutable, can only be initialised once, all derivative textures can only be destroyed together
+    public class TextureView : IDisposable // immutable, can only be initialised once, all derivative textures can only be destroyed together
     {
         private Texture2D _source; //This is the texture libVLC writes to directly.
         private RenderTexture _cache; //We copy it into this texture which we actually use in unity.
@@ -25,16 +25,6 @@ namespace HMD.Scripts.Streaming
             AspectRatio = new Lazy<float>((float)_source.width / _source.height);
         }
 
-        public void Destroy()
-        {
-            _cache.Release();
-        }
-
-        TextureView()
-        {
-            Destroy();
-        }
-
         public Texture2D Source
         {
             get { return _source; }
@@ -48,6 +38,16 @@ namespace HMD.Scripts.Streaming
         public Texture EffectiveTexture
         {
             get { return Cache; }
+        }
+
+        public void Dispose()
+        {
+            _cache.Release();
+        }
+
+        TextureView()
+        {
+            Dispose();
         }
     }
 }
