@@ -165,8 +165,6 @@ public class VLCController : MonoBehaviour
             mainDisplay.Open(pathInputField.text);
         });
 
-        UpdatePlayPauseButton(mainDisplay.playOnAwake);
-
         //Seek Bar Events
         var seekBarEvents = seekBar.GetComponent<EventTrigger>();
 

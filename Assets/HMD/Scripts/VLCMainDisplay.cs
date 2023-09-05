@@ -264,8 +264,6 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
     public bool automaticallyFlipOnAndroid = true; //Automatically invert Y on Android
 
-    public bool playOnAwake = true; //Open path and Play during Awake
-
     private AndroidJavaClass unityPlayer;
     private AndroidJavaObject activity;
     private AndroidJavaObject context;
@@ -342,10 +340,6 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
         }
 
         SetVideoModeMono();
-
-        //Play On Start
-        if (playOnAwake)
-            Open();
     }
 
     private void OnDestroy()
