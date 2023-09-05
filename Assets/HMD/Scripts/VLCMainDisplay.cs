@@ -28,9 +28,6 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
     [SerializeField] public VideoMode _videoMode = VideoMode.Mono; // 2d by default
 
-    private float nextActionTime = 0.0f;
-    public float period = 1.0f;
-
     public ControlPanel controlPanel;
 
 
@@ -59,7 +56,7 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
             //LibVLC can freeze Unity if an exception goes unhandled inside an event handler.
             try
             {
-                if (logToConsole) Log(e.FormattedLog);
+                Log(e.FormattedLog);
             }
             catch (Exception ex)
             {
@@ -269,8 +266,6 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
     public bool playOnAwake = true; //Open path and Play during Awake
 
-    public bool logToConsole = true; //Log function calls and LibVLC logs to Unity console
-
     private AndroidJavaClass unityPlayer;
     private AndroidJavaObject activity;
     private AndroidJavaObject context;
@@ -380,10 +375,6 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
     private void Update()
     {
-        if (isPlaying)
-            if (UnityEngine.Time.time > nextActionTime)
-                nextActionTime = UnityEngine.Time.time + period;
-
 #if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.F1))
             EditorWindow.focusedWindow.maximized = !EditorWindow.focusedWindow.maximized;
@@ -396,18 +387,20 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
         //Automatically resize output textures if size changes
         if (_textureView == null || _textureView.Size.Value != (width, height))
-            ResizeTextures(width, height); // always set TextureView
-
-        //Update the vlc texture (tex)
-        var texPtr = mediaPlayer.GetTexture(width, height, out var updated);
-        if (updated)
+            TrySetTextures(width, height); // may fail if video is not ready
+        else
         {
-            _source.UpdateExternalTexture(texPtr);
+            //Update the vlc texture (tex)
+            var texPtr = mediaPlayer.GetTexture(width, height, out var updated);
+            if (updated)
+            {
+                _source.UpdateExternalTexture(texPtr);
 
-            //Copy the vlc texture into the output texture, flipped over
-            var flip = new Vector2(flipTextureX ? -1 : 1, flipTextureY ? -1 : 1);
-            Graphics.Blit(_textureView.Source, _textureView.Cache, flip, Vector2.zero);
-            //If you wanted to do post processing outside of VLC you could use a shader here.
+                //Copy the vlc texture into the output texture, flipped over
+                var flip = new Vector2(flipTextureX ? -1 : 1, flipTextureY ? -1 : 1);
+                Graphics.Blit(_textureView.Source, _textureView.Cache, flip, Vector2.zero);
+                //If you wanted to do post processing outside of VLC you could use a shader here.
+            }
         }
     }
     #endregion
@@ -948,6 +941,7 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
         _textureView = null;
 
+        Log("DestroyMediaPlayer");
         mediaPlayer?.Stop();
         mediaPlayer?.Dispose();
         mediaPlayer = null;
@@ -955,16 +949,13 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
         libVLC?.Dispose();
         libVLC = null;
 
-        Log("DestroyMediaPlayer");
-        mediaPlayer?.Stop();
-        mediaPlayer?.Dispose();
-        mediaPlayer = null;
     }
 
     //Resize the output textures to the size of the video
-    private void ResizeTextures(uint px, uint py)
+    private void TrySetTextures(uint px, uint py)
     {
         var texptr = mediaPlayer.GetTexture(px, py, out var updated);
+        // if texptr is zero, video is still pending
         if (px != 0 && py != 0 && updated && texptr != IntPtr.Zero)
         {
             //If the currently playing video uses the Bottom Right orientation, we have to do this to avoid stretching it.
