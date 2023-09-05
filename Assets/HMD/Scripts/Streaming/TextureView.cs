@@ -34,7 +34,7 @@ namespace HMD.Scripts.Streaming
             get { return _cache; }
         }
 
-        public Texture EffectiveTexture
+        public Texture Effective
         {
             get { return Cache; }
         }

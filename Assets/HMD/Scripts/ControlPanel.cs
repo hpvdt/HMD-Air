@@ -441,7 +441,7 @@ public class ControlPanel : MonoBehaviour
     {
         HidePopupByID(PopupID.CUSTOM_AR_POPUP);
         var requested_value = _aspect_popup.transform.Find("ARTextInput").GetComponent<InputField>().text;
-        _vlcMainDisplay.SetAspectRatio(requested_value);
+        _vlcMainDisplay.SetCurrentAspectRatio(requested_value);
     }
 
     public void HideCustomARPopup()

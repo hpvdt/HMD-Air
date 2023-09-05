@@ -1,17 +1,11 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using HMD.Scripts.Streaming;
 using LibVLCSharp;
 using NRKernal;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.UI;
-using Application = UnityEngine.Device.Application;
 
 public class VLCMainDisplay : MonoBehaviourWithLogging
 {
@@ -30,71 +24,7 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
     public ControlPanel controlPanel;
 
-
-    private LibVLC _libVLC;
-
-    //Create a new static LibVLC instance and dispose of the old one. You should only ever have one LibVLC instance.
-    private void RefreshLibVLC()
-    {
-        Log("[MainDisplay] CreateLibVLC");
-        //Dispose of the old libVLC if necessary
-        if (_libVLC != null)
-        {
-            _libVLC.Dispose();
-            _libVLC = null;
-        }
-
-        Core.Initialize(Application.dataPath); //Load VLC dlls
-        _libVLC = new LibVLC(
-            true); //You can customize LibVLC with advanced CLI options here https://wiki.videolan.org/VLC_command-line_help/
-
-        //Setup Error Logging
-        Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
-        _libVLC.Log += (s, e) =>
-        {
-            //Always use try/catch in LibVLC events.
-            //LibVLC can freeze Unity if an exception goes unhandled inside an event handler.
-            try
-            {
-                Log(e.FormattedLog);
-            }
-            catch (Exception ex)
-            {
-                Log("Exception caught in libVLC.Log: \n" + ex);
-            }
-        };
-    }
-
-    private LibVLC libVLC
-    {
-        get
-        {
-            if (_libVLC == null) RefreshLibVLC();
-            return _libVLC;
-        }
-        set => _libVLC = value;
-    }
-
-    private MediaPlayer _mediaPlayer;
-
-    //Create a new MediaPlayer object and dispose of the old one. 
-    private void RefreshMediaPlayer()
-    {
-        Log("[MainDisplay] CreateMediaPlayer");
-        if (_mediaPlayer != null) DestroyMediaPlayer();
-        _mediaPlayer = new MediaPlayer(libVLC);
-        Log("Media Player SET!");
-    }
-
-    public MediaPlayer mediaPlayer
-    {
-        get
-        {
-            if (_mediaPlayer == null) RefreshMediaPlayer();
-            return _mediaPlayer;
-        }
-        set => _mediaPlayer = value;
-    }
+    public VLCFeed VLC;
 
     private AndroidJavaClass _brightnessHelper;
 
@@ -176,8 +106,8 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
     [SerializeField] public Slider focusBar;
 
-    private GameObject _cone;
-    private GameObject _pointLight;
+    public GameObject cone;
+    public GameObject pointLight;
 
     private bool _screenLocked = false;
     private int _brightnessOnLock = 0;
@@ -225,9 +155,6 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
     /// <summary> The NRInput. </summary>
     [SerializeField] private NRInput m_NRInput;
 
-    private Texture2D _source;
-    private TextureView _textureView;
-
     // private bool _is360 = false;
 
     private float Yaw;
@@ -256,14 +183,6 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
         }
     }
 
-
-    public VLCArgs Args = new VLCArgs(new List<string> { "https://jakedowns.com/media/sbs2.mp4" }, FromType.FromPath);
-
-    public bool flipTextureX; //No particular reason you'd need this but it is sometimes useful
-    public bool flipTextureY; //Set to false on Android, to true on Windows
-
-    public bool automaticallyFlipOnAndroid = true; //Automatically invert Y on Android
-
     private AndroidJavaClass unityPlayer;
     private AndroidJavaObject activity;
     private AndroidJavaObject context;
@@ -273,27 +192,6 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
     #region unity
     private void Awake()
     {
-        //Setup Media Player
-        RefreshMediaPlayer();
-
-// #if UNITY_ANDROID
-//         if (!Application.isEditor)
-//         {
-//             GetContext();
-//
-//
-//
-//             _brightnessHelper = new AndroidJavaClass("com.jakedowns.BrightnessHelper");
-//             if (_brightnessHelper == null)
-//             {
-//                 Debug.Log("error loading _brightnessHelper");
-//             }
-//         }
-// #endif
-
-        Debug.Log($"[VLC] LibVLC version and architecture {libVLC.Changeset}");
-        Debug.Log($"[VLC] LibVLCSharp version {typeof(LibVLC).Assembly.GetName().Version}");
-
         if (fovBar is not null) fovBar.value = fov;
 
         if (deformBar is not null) deformBar.value = 0.0f;
@@ -314,9 +212,6 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
         // init
         OnFOVSliderUpdated();
 
-        _cone = GameObject.Find("CONE_PARENT");
-        _pointLight = GameObject.Find("Point Light");
-
         // TODO: extract lockscreen logic into a separate script
         // _hideWhenLocked = GameObject.Find("HideWhenScreenLocked");
         // _lockScreenNotice = GameObject.Find("LockScreenNotice");
@@ -332,20 +227,13 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
         _morphDisplayLeftRenderer = leftEyeScreen.GetComponent<Renderer>();
         _morphDisplayRightRenderer = rightEyeScreen.GetComponent<Renderer>();
 
-        //Automatically flip on android
-        if (automaticallyFlipOnAndroid && UnityEngine.Application.platform == RuntimePlatform.Android)
-        {
-            flipTextureX = !flipTextureX;
-            flipTextureY = !flipTextureY;
-        }
-
         SetVideoModeMono();
     }
 
     private void OnDestroy()
     {
         //Dispose of mediaPlayer, or it will stay in nemory and keep playing audio
-        DestroyMediaPlayer();
+        VLC.DestroyMediaPlayer();
     }
 
     // private void UpdateColorGrade()
@@ -367,6 +255,8 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
     //     colorGrading.gamma.value = gammaBar.value;*/
     // }
 
+    public TextureView Texture;
+
     private void Update()
     {
 #if UNITY_EDITOR
@@ -374,47 +264,23 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
             EditorWindow.focusedWindow.maximized = !EditorWindow.focusedWindow.maximized;
 #endif
 
-        //Get size every frame
-        uint height = 0;
-        uint width = 0;
-        mediaPlayer?.Size(0, ref width, ref height);
-
-        //Automatically resize output textures if size changes
-        if (_textureView == null || _textureView.Size.Value != (width, height))
-            TrySetTextures(width, height); // may fail if video is not ready
-        else
+        Texture = VLC.TryGetTexture(Texture);
+        if (Texture != null)
         {
-            //Update the vlc texture (tex)
-            var texPtr = mediaPlayer.GetTexture(width, height, out var updated);
-            if (updated)
-            {
-                _source.UpdateExternalTexture(texPtr);
-
-                //Copy the vlc texture into the output texture, flipped over
-                var flip = new Vector2(flipTextureX ? -1 : 1, flipTextureY ? -1 : 1);
-                Graphics.Blit(_textureView.Source, _textureView.Cache, flip, Vector2.zero);
-                //If you wanted to do post processing outside of VLC you could use a shader here.
-            }
+            SetVideoModeAsap();
         }
     }
     #endregion
 
     private void OnDisable()
     {
-        DestroyMediaPlayer();
+        VLC.DestroyMediaPlayer();
     }
 
     private void OnApplicationQuit()
     {
-        DestroyMediaPlayer();
+        VLC.DestroyMediaPlayer();
     }
-
-    // public void Demo3602D()
-    // {
-    //     //Open("https://streams.videolan.org/streams/360/eagle_360.mp4");
-    //     Open("https://streams.videolan.org/streams/360/kolor-balloon-icare-full-hd.mp4");
-    //     SetVideoMode3602D();
-    // }
 
     private static Vector2 SCALE_RANGE = new(1f, 4.702173720867682f);
 
@@ -610,36 +476,8 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
         fov = fovBar.value;
         Debug.Log("fov " + fov);
-    }
 
-    public void SetAR4_3()
-    {
-        if (mediaPlayer is not null)
-            mediaPlayer.AspectRatio = "4:3";
-    }
-
-    public void SetAR169()
-    {
-        if (mediaPlayer is not null)
-            mediaPlayer.AspectRatio = "16:9";
-    }
-
-    // public void SetAR16_10()
-    // {
-    //     if (mediaPlayer is not null)
-    //         mediaPlayer.AspectRatio = "16:10";
-    // }
-
-    // public void SetAR_2_35_to_1()
-    // {
-    //     if (mediaPlayer is not null)
-    //         mediaPlayer.AspectRatio = "2.35:1";
-    // }
-
-    public void SetARNull()
-    {
-        if (mediaPlayer is not null)
-            mediaPlayer.AspectRatio = null;
+        // Do360Navigation();
     }
 
     private float _sphereScale;
@@ -664,122 +502,29 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
     //Public functions that expose VLC MediaPlayer functions in a Unity-friendly way. You may want to add more of these.
 
     #region vlc
-    public void Open(string path)
-    {
-        Log("[MainDisplay] Open " + path);
-        if (path.ToLower().EndsWith(".url") || path.ToLower().EndsWith(".txt"))
-        {
-            var urlContent = File.ReadAllText(path);
-            var lines = urlContent.Split('\n').ToList();
-            lines.RemoveAll(string.IsNullOrEmpty);
-
-            if (lines.Count <= 0) throw new IOException($"No line defined in file `${path}`");
-
-            Args = new VLCArgs(lines.ToList(), FromType.FromLocation);
-        }
-        else
-        {
-            Args = new VLCArgs(new List<string> { path }, FromType.FromPath);
-        }
-
-        Open();
-    }
-
-    public void Open()
-    {
-        Log("[MainDisplay] Open");
-
-        if (mediaPlayer?.Media != null)
-            mediaPlayer.Media.Dispose();
-
-        SetVideoModeMono();
-
-        var parameters = Args.Parameters;
-        Debug.Log($"Opening `{Args.Location}` with {parameters.Length} parameter(s) {string.Join(" ", parameters)}");
-
-        // mediaPlayer.Media = new Media(new Uri(Args.Location), parameters);
-        // mediaPlayer.Media = new Media(Args.Location, Args.FromType, parameters);
-
-        var m = new Media(Args.Location, Args.FromType);
-        foreach (var parameter in parameters)
-        {
-            m.AddOption(parameter);
-        }
-
-        mediaPlayer.Media = m;
-
-        Task.Run(async () =>
-        {
-            var result = await mediaPlayer.Media.ParseAsync(libVLC, MediaParseOptions.ParseNetwork);
-            var trackList = mediaPlayer.Media.TrackList(TrackType.Video);
-
-            Debug.Log($"tracklist of {trackList.Count}");
-
-
-            var _is360 = trackList[0].Data.Video.Projection == VideoProjection.Equirectangular;
-
-            Debug.Log($"projection {trackList[0].Data.Video.Projection}");
-
-            // TODO: add SBS / OU / TB filename recognition
-
-            // if (_is360)
-            // {
-            //     Debug.Log("The video is a 360 video");
-            //     SetVideoMode(VideoMode._360_2D);
-            // }
-            //
-            // else
-            // {
-            //     Debug.Log("The video was not identified as a 360 video by VLC");
-            // SetVideoMode(VideoMode.Mono);
-            // }
-
-            trackList.Dispose();
-        });
-
-        // flag to read and store the texture aspect ratio
-        m_updatedARSinceOpen = false;
-
-        Play();
-    }
-
     public void Play()
     {
-        _cone?.SetActive(false); // hide cone logo
-        _pointLight?.SetActive(false);
+        cone?.SetActive(false); // hide cone logo
+        pointLight?.SetActive(false);
 
         mainDisplay?.SetActive(true);
 
-        Task.Run(async () =>
-            {
-                var isSuccessful = await mediaPlayer.PlayAsync();
-
-                Assert.IsTrue(isSuccessful && isPlaying, "should be playing");
-
-                uint height = 0;
-                uint width = 0;
-                mediaPlayer?.Size(0, ref width, ref height);
-
-                Assert.AreNotEqual(height, 0, "height should not be 0");
-                Assert.AreNotEqual(width, 0, "width should not be 0");
-
-                Debug.Log("Playing ...");
-            }
-        );
+        VLC.Play();
     }
 
-    public void Pause()
-    {
-        Log("[MainDisplay] Pause");
-        mediaPlayer.Pause();
-    }
 
     public void Stop()
     {
         Log("[MainDisplay] Stop");
-        mediaPlayer?.Stop();
+        VLC.Stop();
+
+        Texture = null;
 
         mainDisplay.SetActive(false);
+        cone?.SetActive(true);
+        pointLight?.SetActive(true);
+
+        ClearMaterialTextureLinks();
 
         // TODO: encapsulate this
         // if (m_lRenderer?.material is not null)
@@ -793,204 +538,12 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
         //
         // if (m_r360Renderer?.material is not null)
         //     m_r360Renderer.material.mainTexture = null;
-
-        _cone?.SetActive(true);
-        _pointLight?.SetActive(true);
-
-
-        // clear to black
-        // TextureView?.Destroy();
-        _textureView = null;
-    }
-
-    public void SeekForward10()
-    {
-        SeekSeconds(10);
-    }
-
-    public void SeekBack10()
-    {
-        SeekSeconds(-10);
-    }
-
-    public void SeekSeconds(float seconds)
-    {
-        Seek((long)seconds * 1000);
-    }
-
-    public void Seek(long timeDelta)
-    {
-        Debug.Log("[MainDisplay] Seek " + timeDelta);
-        mediaPlayer.SetTime(mediaPlayer.Time + timeDelta);
-    }
-
-    public void SetTime(long time)
-    {
-        Log("[MainDisplay] SetTime " + time);
-        mediaPlayer.SetTime(time);
-    }
-
-    public void SetVolume(int volume = 100)
-    {
-        Log("[MainDisplay] SetVolume " + volume);
-        mediaPlayer.SetVolume(volume);
-    }
-
-    public int Volume
-    {
-        get
-        {
-            if (mediaPlayer == null)
-                return 0;
-            return mediaPlayer.Volume;
-        }
-    }
-
-    private bool isPlaying
-    {
-        get
-        {
-            if (mediaPlayer == null)
-                return false;
-            return mediaPlayer.IsPlaying;
-        }
-    }
-
-    public long Duration
-    {
-        get
-        {
-            if (mediaPlayer == null || mediaPlayer.Media == null)
-                return 0;
-            return mediaPlayer.Media.Duration;
-        }
-    }
-
-    public long Time
-    {
-        get
-        {
-            if (mediaPlayer == null)
-                return 0;
-            return mediaPlayer.Time;
-        }
-    }
-
-    public List<MediaTrack> Tracks(TrackType type)
-    {
-        Log("[MainDisplay] Tracks " + type);
-        return ConvertMediaTrackList(mediaPlayer?.Tracks(type));
-    }
-
-    public MediaTrack SelectedTrack(TrackType type)
-    {
-        Log("[MainDisplay] SelectedTrack " + type);
-        return mediaPlayer?.SelectedTrack(type);
-    }
-
-    public void Select(MediaTrack track)
-    {
-        Log("[MainDisplay] Select " + track.Name);
-        mediaPlayer?.Select(track);
-    }
-
-    public void Unselect(TrackType type)
-    {
-        Log("[MainDisplay] Unselect " + type);
-        mediaPlayer?.Unselect(type);
-    }
-
-    //This returns the video orientation for the currently playing video, if there is one
-    public VideoOrientation? GetVideoOrientation()
-    {
-        var tracks = mediaPlayer?.Tracks(TrackType.Video);
-
-        if (tracks == null || tracks.Count == 0)
-            return null;
-
-        var orientation =
-            tracks[0]?.Data.Video.Orientation; //At the moment we're assuming the track we're playing is the first track
-
-        return orientation;
     }
     #endregion
 
     //Private functions create and destroy VLC objects and textures
 
     #region internal
-    //Dispose of the MediaPlayer object. 
-    private void DestroyMediaPlayer()
-    {
-        // if (m_lRenderer?.material is not null)
-        //     m_lRenderer.material.mainTexture = null;
-        //
-        // if (m_rRenderer?.material is not null)
-        //     m_rRenderer.material.mainTexture = null;
-        //
-        // if (m_l360Renderer is not null && m_l360Renderer?.material is not null)
-        //     m_l360Renderer.material.mainTexture = null;
-        //
-        // if (m_r360Renderer is not null && m_r360Renderer?.material is not null)
-        //     m_r360Renderer.material.mainTexture = null;
-
-        _textureView = null;
-
-        Log("DestroyMediaPlayer");
-        mediaPlayer?.Stop();
-        mediaPlayer?.Dispose();
-        mediaPlayer = null;
-
-        libVLC?.Dispose();
-        libVLC = null;
-
-    }
-
-    //Resize the output textures to the size of the video
-    private void TrySetTextures(uint px, uint py)
-    {
-        var texptr = mediaPlayer.GetTexture(px, py, out var updated);
-        // if texptr is zero, video is still pending
-        if (px != 0 && py != 0 && updated && texptr != IntPtr.Zero)
-        {
-            //If the currently playing video uses the Bottom Right orientation, we have to do this to avoid stretching it.
-            if (GetVideoOrientation() == VideoOrientation.BottomRight)
-            {
-                var swap = px;
-                px = py;
-                py = swap;
-            }
-
-            _source = Texture2D.CreateExternalTexture((int)px, (int)py, TextureFormat.RGBA32, false, true, texptr);
-            //Make a texture of the proper size for the video to output to
-
-            _textureView = new TextureView(_source);
-            SetVideoModeAsap();
-
-            Debug.Log($"texture size {px} {py} | {_textureView.Size}");
-
-            if (!m_updatedARSinceOpen)
-            {
-                m_updatedARSinceOpen = true;
-                Debug.Log($"[SBSVLC] aspect ratio {_textureView.AspectRatio.Value}");
-                var size = _textureView.Size.Value;
-                _currentARString = $"{size.Item1}:{size.Item2}";
-                mediaPlayer.AspectRatio = _currentARString;
-            }
-
-            // if (m_lRenderer != null)
-            //     m_lRenderer.material.mainTexture = texture;
-            //
-            // if (m_rRenderer != null)
-            //     m_rRenderer.material.mainTexture = texture;
-
-//             if (m_l360Renderer != null)
-//                 m_l360Renderer.material.mainTexture = texture;
-//
-//             if (m_r360Renderer != null)
-//                 m_r360Renderer.material.mainTexture = texture;
-        }
-    }
-
     //Converts MediaTrackList objects to Unity-friendly generic lists. Might not be worth the trouble.
     private List<MediaTrack> ConvertMediaTrackList(MediaTrackList tracklist)
     {
@@ -1013,10 +566,15 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
         return _currentARString;
     }
 
-    public void SetCurrentAR(string currentARString)
+
+    // public void SetAspectRatio(string value) // TODO: marked for removal
+    // {
+    //     mediaPlayer.AspectRatio = value;
+    // }
+
+    public void SetCurrentAspectRatio(string currentARString)
     {
-        _currentARString = currentARString;
-        mediaPlayer.AspectRatio = _currentARString;
+        VLC.mediaPlayer.AspectRatio = currentARString;
 
         var split = _currentARString.Split(':');
         var ar_width = float.Parse(split[0]);
@@ -1049,7 +607,7 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
     public void SetVideoMode(VideoMode mode)
     {
         _videoMode = mode;
-        if (_textureView != null)
+        if (Texture != null)
         {
             SetVideoModeAsap();
         }
@@ -1057,12 +615,10 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
     private void SetVideoModeAsap()
     {
-        if (_textureView == null) throw new VLCException("[SetVideoMode] texture is null!");
+        if (Texture == null) throw new VLCException("[SetVideoMode] texture is null!");
 
         var mode = _videoMode;
         Debug.Log($"[JakeDowns] set video mode {mode}");
-
-        //flipTextureX = false;
 
         ClearMaterialTextureLinks();
 
@@ -1074,7 +630,7 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
             rightEyeScreen.SetActive(false);
 
             _morphDisplayLeftRenderer.material = m_monoMaterial; // m_lMaterial;
-            _morphDisplayLeftRenderer.material.mainTexture = _textureView.EffectiveTexture;
+            _morphDisplayLeftRenderer.material.mainTexture = Texture.Effective;
         }
         else
         {
@@ -1096,14 +652,9 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
                 _morphDisplayRightRenderer.material = _flipStereo ? m_lMaterial : m_rMaterial;
             }
 
-            _morphDisplayLeftRenderer.material.mainTexture = _textureView.EffectiveTexture;
-            _morphDisplayRightRenderer.material.mainTexture = _textureView.EffectiveTexture;
+            _morphDisplayLeftRenderer.material.mainTexture = Texture.Effective;
+            _morphDisplayRightRenderer.material.mainTexture = Texture.Effective;
         }
-    }
-
-    public void SetAspectRatio(string value)
-    {
-        mediaPlayer.AspectRatio = value;
     }
 
     // https://answers.unity.com/questions/1549639/enum-as-a-function-param-in-a-button-onclick.html?page=2&pageSize=5&sort=votes
@@ -1148,7 +699,8 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
             else
             {
                 Debug.Log("Picked file: " + path);
-                Open(path);
+                VLC.Open(path);
+                Play();
             }
         }, fileTypes);
 

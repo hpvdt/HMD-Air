@@ -1153,6 +1153,7 @@ GameObject:
   m_Component:
   - component: {fileID: 129841329}
   - component: {fileID: 129841330}
+  - component: {fileID: 129841331}
   m_Layer: 0
   m_Name: VLCMainDisplay
   m_TagString: Untagged
@@ -1189,9 +1190,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb6d0131f10149647a026af4cd493912, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  logToConsole: 0
   _videoMode: 0
-  period: 1
   controlPanel: {fileID: 114181559257564987}
+  VLC: {fileID: 129841331}
   LeftCamera: {fileID: 2066632863}
   CenterCamera: {fileID: 1085126938}
   RightCamera: {fileID: 2087385060}
@@ -1206,17 +1208,30 @@ MonoBehaviour:
   verticalBar: {fileID: 1932588666}
   depthBar: {fileID: 1196666937}
   focusBar: {fileID: 837621466}
+  cone: {fileID: 1725708169}
+  pointLight: {fileID: 1060310524}
   m_lMaterial: {fileID: 2100000, guid: 4a448906e5ec28541b18c91590a37d3d, type: 2}
   m_rMaterial: {fileID: 2100000, guid: 17bebe1b94c264c4f9a56754e76cd12b, type: 2}
   m_monoMaterial: {fileID: 2100000, guid: 82072d1bd4e86664f8138d3cb31d9a4d, type: 2}
   m_leftEyeTBMaterial: {fileID: 2100000, guid: a410d7c0e2ee6304f87a08311c41a76b, type: 2}
   m_rightEyeTBMaterial: {fileID: 2100000, guid: c720289ec3d4fda4b8cc911b84a4269e, type: 2}
   m_NRInput: {fileID: 48788700}
+--- !u!114 &129841331
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 129841328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd777f6533fa4bea927c2e28a462cc8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  logToConsole: 1
   flipTextureX: 0
   flipTextureY: 0
   automaticallyFlipOnAndroid: 1
-  playOnAwake: 0
-  logToConsole: 0
 --- !u!1001 &132163816
 PrefabInstance:
   m_ObjectHideFlags: 0
