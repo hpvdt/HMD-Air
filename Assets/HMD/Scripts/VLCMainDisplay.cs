@@ -13,7 +13,7 @@ using UnityEngine.Assertions;
 using UnityEngine.UI;
 using Application = UnityEngine.Device.Application;
 
-public class VLCMainDisplay : MonoBehaviour
+public class VLCMainDisplay : MonoBehaviourWithLogging
 {
     [SerializeField]
     public enum VideoMode
@@ -228,7 +228,8 @@ public class VLCMainDisplay : MonoBehaviour
     /// <summary> The NRInput. </summary>
     [SerializeField] private NRInput m_NRInput;
 
-    private TextureView TextureView;
+    private Texture2D _source;
+    private TextureView _textureView;
 
     // private bool _is360 = false;
 
@@ -394,18 +395,18 @@ public class VLCMainDisplay : MonoBehaviour
         mediaPlayer?.Size(0, ref width, ref height);
 
         //Automatically resize output textures if size changes
-        if (TextureView == null || TextureView.Size.Value != (width, height))
+        if (_textureView == null || _textureView.Size.Value != (width, height))
             ResizeTextures(width, height); // always set TextureView
 
         //Update the vlc texture (tex)
         var texPtr = mediaPlayer.GetTexture(width, height, out var updated);
         if (updated)
         {
-            TextureView.Source.UpdateExternalTexture(texPtr);
+            _source.UpdateExternalTexture(texPtr);
 
             //Copy the vlc texture into the output texture, flipped over
             var flip = new Vector2(flipTextureX ? -1 : 1, flipTextureY ? -1 : 1);
-            Graphics.Blit(TextureView.Source, TextureView.Cache, flip, Vector2.zero);
+            Graphics.Blit(_textureView.Source, _textureView.Cache, flip, Vector2.zero);
             //If you wanted to do post processing outside of VLC you could use a shader here.
         }
     }
@@ -855,7 +856,7 @@ public class VLCMainDisplay : MonoBehaviour
 
         // clear to black
         // TextureView?.Destroy();
-        TextureView = null;
+        _textureView = null;
     }
 
     public void SeekForward10()
@@ -988,7 +989,7 @@ public class VLCMainDisplay : MonoBehaviour
         // if (m_r360Renderer is not null && m_r360Renderer?.material is not null)
         //     m_r360Renderer.material.mainTexture = null;
 
-        TextureView = null;
+        _textureView = null;
 
         mediaPlayer?.Stop();
         mediaPlayer?.Dispose();
@@ -1017,19 +1018,19 @@ public class VLCMainDisplay : MonoBehaviour
                 py = swap;
             }
 
-            TextureView = new TextureView(
-                Texture2D.CreateExternalTexture((int)px, (int)py, TextureFormat.RGBA32, false, true, texptr)
-                //Make a texture of the proper size for the video to output to
-            );
+            _source = Texture2D.CreateExternalTexture((int)px, (int)py, TextureFormat.RGBA32, false, true, texptr);
+            //Make a texture of the proper size for the video to output to
+
+            _textureView = new TextureView(_source);
             SetVideoModeAsap();
 
-            Debug.Log($"texture size {px} {py} | {TextureView.Size}");
+            Debug.Log($"texture size {px} {py} | {_textureView.Size}");
 
             if (!m_updatedARSinceOpen)
             {
                 m_updatedARSinceOpen = true;
-                Debug.Log($"[SBSVLC] aspect ratio {TextureView.AspectRatio.Value}");
-                var size = TextureView.Size.Value;
+                Debug.Log($"[SBSVLC] aspect ratio {_textureView.AspectRatio.Value}");
+                var size = _textureView.Size.Value;
                 _currentARString = $"{size.Item1}:{size.Item2}";
                 mediaPlayer.AspectRatio = _currentARString;
             }
@@ -1106,7 +1107,7 @@ public class VLCMainDisplay : MonoBehaviour
     public void SetVideoMode(VideoMode mode)
     {
         _videoMode = mode;
-        if (TextureView != null)
+        if (_textureView != null)
         {
             SetVideoModeAsap();
         }
@@ -1114,7 +1115,7 @@ public class VLCMainDisplay : MonoBehaviour
 
     private void SetVideoModeAsap()
     {
-        if (TextureView == null) throw new VLCException("[SetVideoMode] texture is null!");
+        if (_textureView == null) throw new VLCException("[SetVideoMode] texture is null!");
 
         var mode = _videoMode;
         Debug.Log($"[JakeDowns] set video mode {mode}");
@@ -1131,7 +1132,7 @@ public class VLCMainDisplay : MonoBehaviour
             rightEyeScreen.SetActive(false);
 
             _morphDisplayLeftRenderer.material = m_monoMaterial; // m_lMaterial;
-            _morphDisplayLeftRenderer.material.mainTexture = TextureView.EffectiveTexture;
+            _morphDisplayLeftRenderer.material.mainTexture = _textureView.EffectiveTexture;
         }
         else
         {
@@ -1153,8 +1154,8 @@ public class VLCMainDisplay : MonoBehaviour
                 _morphDisplayRightRenderer.material = _flipStereo ? m_lMaterial : m_rMaterial;
             }
 
-            _morphDisplayLeftRenderer.material.mainTexture = TextureView.EffectiveTexture;
-            _morphDisplayRightRenderer.material.mainTexture = TextureView.EffectiveTexture;
+            _morphDisplayLeftRenderer.material.mainTexture = _textureView.EffectiveTexture;
+            _morphDisplayRightRenderer.material.mainTexture = _textureView.EffectiveTexture;
         }
     }
 
@@ -1359,11 +1360,5 @@ public class VLCMainDisplay : MonoBehaviour
 //             _menuToggleButton.SetActive(true);
 //         }
 //     }
-
-    private void Log(object message)
-    {
-        if (logToConsole)
-            Debug.Log($"[VLC] {message}");
-    }
     #endregion
 }
