@@ -623,8 +623,6 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
         fov = fovBar.value;
         Debug.Log("fov " + fov);
-
-        Do360Navigation();
     }
 
     public void SetAR4_3()
@@ -659,62 +657,21 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
     private float _sphereScale;
 
-    private void OnGUI()
+    private void OnGUI() // TODO: test on phone
     {
         if (!controlPanel.OGMenuVisible()) return;
         if (NRInput.GetButtonDown(ControllerButton.TRIGGER))
         {
             m_PreviousPos = NRInput.GetTouch();
         }
-        else if (NRInput.GetButton(ControllerButton.TRIGGER))
-        {
-            //UpdateScroll();
-            Do360Navigation();
-        }
-        else if (NRInput.GetButtonUp(ControllerButton.TRIGGER))
-        {
-            //m_PreviousPos = Vector2.zero;
-        }
-    }
-
-    private void Do360Navigation()
-    {
-        var range = Math.Max(Screen.width, Screen.height);
-
-        Yaw = mediaPlayer.Viewpoint.Yaw;
-        Pitch = mediaPlayer.Viewpoint.Pitch;
-        Roll = mediaPlayer.Viewpoint.Roll;
-
-
-        var deltaMove = NRInput.GetTouch() - m_PreviousPos;
-        m_PreviousPos = NRInput.GetTouch();
-
-        var absX = Mathf.Abs(deltaMove.x);
-        var absY = Mathf.Abs(deltaMove.y);
-
-        var eighty_or_delta_x = absX > 0 ? absX * 10000 : 80;
-        var eighty_or_delta_y = absY > 0 ? absY * 10000 : 80;
-
-        //Debug.Log($"*80x {eighty_or_delta_x} 80y {eighty_or_delta_y} fov {fov} fov2 {nreal_fov}");
-
-        bool? result = null;
-        try
-        {
-            if (Input.GetKey(KeyCode.RightArrow) || deltaMove.x > 0)
-                result = mediaPlayer.UpdateViewpoint(Yaw + eighty_or_delta_x * +40 / range, Pitch, Roll, fov);
-            else if (Input.GetKey(KeyCode.LeftArrow) || deltaMove.x < 0)
-                result = mediaPlayer.UpdateViewpoint(Yaw - eighty_or_delta_x * +40 / range, Pitch, Roll, fov);
-            else if (Input.GetKey(KeyCode.DownArrow) || deltaMove.y < 0)
-                result = mediaPlayer.UpdateViewpoint(Yaw, Pitch + eighty_or_delta_y * +20 / range, Roll, fov);
-            else if (Input.GetKey(KeyCode.UpArrow) || deltaMove.y > 0)
-                result = mediaPlayer.UpdateViewpoint(Yaw, Pitch - eighty_or_delta_y * +20 / range, Roll, fov);
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning("error updating viewpoint " + e);
-        }
-
-        //Debug.Log("Update Viewpoint Result " + result.ToString());
+        // else if (NRInput.GetButton(ControllerButton.TRIGGER))
+        // {
+        //     //UpdateScroll();
+        // }
+        // else if (NRInput.GetButtonUp(ControllerButton.TRIGGER))
+        // {
+        //     //m_PreviousPos = Vector2.zero;
+        // }
     }
 
     //Public functions that expose VLC MediaPlayer functions in a Unity-friendly way. You may want to add more of these.
