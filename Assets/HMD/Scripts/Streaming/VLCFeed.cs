@@ -11,7 +11,6 @@ using Application = UnityEngine.Device.Application;
 namespace HMD.Scripts.Streaming
 {
     using JetBrains.Annotations;
-    using UnityEngine.UI;
     public class VLCFeed : MonoBehaviourWithLogging
     {
         public VLCArgs Args = new VLCArgs(new List<string> { "https://jakedowns.com/media/sbs2.mp4" }, FromType.FromPath);
@@ -74,31 +73,19 @@ namespace HMD.Scripts.Streaming
         //Dispose of the MediaPlayer object. 
         public void DestroyMediaPlayer()
         {
-            // if (m_lRenderer?.material is not null)
-            //     m_lRenderer.material.mainTexture = null;
-            //
-            // if (m_rRenderer?.material is not null)
-            //     m_rRenderer.material.mainTexture = null;
-            //
-            // if (m_l360Renderer is not null && m_l360Renderer?.material is not null)
-            //     m_l360Renderer.material.mainTexture = null;
-            //
-            // if (m_r360Renderer is not null && m_r360Renderer?.material is not null)
-            //     m_r360Renderer.material.mainTexture = null;
-
             Stop();
 
             Log("DestroyMediaPlayer");
-            mediaPlayer?.Stop();
-            mediaPlayer?.Dispose();
-            mediaPlayer = null;
+            Player?.Stop();
+            Player?.Dispose();
+            Player = null;
 
             libVLC?.Dispose();
             libVLC = null;
 
         }
 
-        public MediaPlayer mediaPlayer
+        public MediaPlayer Player
         {
             get
             {
@@ -152,7 +139,7 @@ namespace HMD.Scripts.Streaming
             //Get size every frame
             uint height = 0;
             uint width = 0;
-            mediaPlayer?.Size(0, ref width, ref height);
+            Player?.Size(0, ref width, ref height);
 
             //Automatically resize output textures if size changes
             var tex = existing;
@@ -164,7 +151,7 @@ namespace HMD.Scripts.Streaming
             if (tex != null)
             {
                 //Update the vlc texture (tex)
-                var texPtr = mediaPlayer.GetTexture(width, height, out var updated);
+                var texPtr = Player.GetTexture(width, height, out var updated);
                 if (updated)
                 {
                     var src = (Texture2D)tex.Source;
@@ -184,7 +171,7 @@ namespace HMD.Scripts.Streaming
         [CanBeNull]
         private TextureView TryGenerateTexture(uint px, uint py)
         {
-            var texptr = mediaPlayer.GetTexture(px, py, out var updated);
+            var texptr = Player.GetTexture(px, py, out var updated);
             if (px != 0 && py != 0 && updated && texptr != IntPtr.Zero)
             {
                 //If the currently playing video uses the Bottom Right orientation, we have to do this to avoid stretching it.
@@ -201,17 +188,6 @@ namespace HMD.Scripts.Streaming
                 Debug.Log($"texture size {px} {py} | {result.Size}");
 
                 return result;
-                // if (m_lRenderer != null)
-                //     m_lRenderer.material.mainTexture = texture;
-                //
-                // if (m_rRenderer != null)
-                //     m_rRenderer.material.mainTexture = texture;
-
-//             if (m_l360Renderer != null)
-//                 m_l360Renderer.material.mainTexture = texture;
-//
-//             if (m_r360Renderer != null)
-//                 m_r360Renderer.material.mainTexture = texture;
             }
 
             return null;
@@ -220,7 +196,7 @@ namespace HMD.Scripts.Streaming
         //This returns the video orientation for the currently playing video, if there is one
         public VideoOrientation? GetVideoOrientation()
         {
-            var tracks = mediaPlayer?.Tracks(TrackType.Video);
+            var tracks = Player?.Tracks(TrackType.Video);
 
             if (tracks == null || tracks.Count == 0)
                 return null;
@@ -233,20 +209,20 @@ namespace HMD.Scripts.Streaming
 
         public void SetARNull()
         {
-            if (mediaPlayer is not null)
-                mediaPlayer.AspectRatio = null;
+            if (Player is not null)
+                Player.AspectRatio = null;
         }
 
         public void SetAR4_3()
         {
-            if (mediaPlayer is not null)
-                mediaPlayer.AspectRatio = "4:3";
+            if (Player is not null)
+                Player.AspectRatio = "4:3";
         }
 
         public void SetAR169()
         {
-            if (mediaPlayer is not null)
-                mediaPlayer.AspectRatio = "16:9";
+            if (Player is not null)
+                Player.AspectRatio = "16:9";
         }
 
         // public void SetAR16_10()
@@ -279,15 +255,15 @@ namespace HMD.Scripts.Streaming
                 Args = new VLCArgs(new List<string> { path }, FromType.FromPath);
             }
 
-            Open();
+            _open();
         }
 
-        public void Open()
+        private void _open()
         {
             Log("[MainDisplay] Open");
 
-            if (mediaPlayer?.Media != null)
-                mediaPlayer.Media.Dispose();
+            if (Player?.Media != null)
+                Player.Media.Dispose();
 
             var parameters = Args.Parameters;
             Debug.Log($"Opening `{Args.Location}` with {parameters.Length} parameter(s) {string.Join(" ", parameters)}");
@@ -301,12 +277,12 @@ namespace HMD.Scripts.Streaming
                 m.AddOption(parameter);
             }
 
-            mediaPlayer.Media = m;
+            Player.Media = m;
 
             Task.Run(async () =>
             {
-                var result = await mediaPlayer.Media.ParseAsync(libVLC, MediaParseOptions.ParseNetwork);
-                var trackList = mediaPlayer.Media.TrackList(TrackType.Video);
+                var result = await Player.Media.ParseAsync(libVLC, MediaParseOptions.ParseNetwork);
+                var trackList = Player.Media.TrackList(TrackType.Video);
 
                 Debug.Log($"tracklist of {trackList.Count}");
                 Debug.Log($"projection {trackList[0].Data.Video.Projection}");
@@ -327,21 +303,19 @@ namespace HMD.Scripts.Streaming
 
                 trackList.Dispose();
             });
-
-            // Play();
         }
 
         public void Play()
         {
             Task.Run(async () =>
                 {
-                    var isSuccessful = await mediaPlayer.PlayAsync();
+                    var isSuccessful = await Player.PlayAsync();
 
                     Assert.IsTrue(isSuccessful && isPlaying, "should be playing");
 
                     uint height = 0;
                     uint width = 0;
-                    mediaPlayer?.Size(0, ref width, ref height);
+                    Player?.Size(0, ref width, ref height);
 
                     Assert.AreNotEqual(height, 0, "height should not be 0");
                     Assert.AreNotEqual(width, 0, "width should not be 0");
@@ -354,13 +328,13 @@ namespace HMD.Scripts.Streaming
         public void Pause()
         {
             Log("[MainDisplay] Pause");
-            mediaPlayer.Pause();
+            Player.Pause();
         }
 
         public void Stop()
         {
             Log("[MainDisplay] Stop");
-            mediaPlayer?.Stop();
+            Player?.Stop();
 
             // clear to black
             // TextureView?.Destroy();
@@ -384,28 +358,28 @@ namespace HMD.Scripts.Streaming
         public void Seek(long timeDelta)
         {
             Debug.Log("[MainDisplay] Seek " + timeDelta);
-            mediaPlayer.SetTime(mediaPlayer.Time + timeDelta);
+            Player.SetTime(Player.Time + timeDelta);
         }
 
         public void SetTime(long time)
         {
             Log("[MainDisplay] SetTime " + time);
-            mediaPlayer.SetTime(time);
+            Player.SetTime(time);
         }
 
         public void SetVolume(int volume = 100)
         {
             Log("[MainDisplay] SetVolume " + volume);
-            mediaPlayer.SetVolume(volume);
+            Player.SetVolume(volume);
         }
 
         public int Volume
         {
             get
             {
-                if (mediaPlayer == null)
+                if (Player == null)
                     return 0;
-                return mediaPlayer.Volume;
+                return Player.Volume;
             }
         }
 
@@ -413,9 +387,9 @@ namespace HMD.Scripts.Streaming
         {
             get
             {
-                if (mediaPlayer == null)
+                if (Player == null)
                     return false;
-                return mediaPlayer.IsPlaying;
+                return Player.IsPlaying;
             }
         }
 
@@ -423,9 +397,9 @@ namespace HMD.Scripts.Streaming
         {
             get
             {
-                if (mediaPlayer == null || mediaPlayer.Media == null)
+                if (Player == null || Player.Media == null)
                     return 0;
-                return mediaPlayer.Media.Duration;
+                return Player.Media.Duration;
             }
         }
 
@@ -433,9 +407,9 @@ namespace HMD.Scripts.Streaming
         {
             get
             {
-                if (mediaPlayer == null)
+                if (Player == null)
                     return 0;
-                return mediaPlayer.Time;
+                return Player.Time;
             }
         }
 
@@ -453,25 +427,25 @@ namespace HMD.Scripts.Streaming
         public List<MediaTrack> Tracks(TrackType type)
         {
             Log("[MainDisplay] Tracks " + type);
-            return ConvertMediaTrackList(mediaPlayer?.Tracks(type));
+            return ConvertMediaTrackList(Player?.Tracks(type));
         }
 
         public MediaTrack SelectedTrack(TrackType type)
         {
             Log("[MainDisplay] SelectedTrack " + type);
-            return mediaPlayer?.SelectedTrack(type);
+            return Player?.SelectedTrack(type);
         }
 
         public void Select(MediaTrack track)
         {
             Log("[MainDisplay] Select " + track.Name);
-            mediaPlayer?.Select(track);
+            Player?.Select(track);
         }
 
         public void Unselect(TrackType type)
         {
             Log("[MainDisplay] Unselect " + type);
-            mediaPlayer?.Unselect(type);
+            Player?.Unselect(type);
         }
     }
 }

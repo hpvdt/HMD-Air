@@ -9,7 +9,6 @@ using UnityEngine.UI;
 
 public class VLCMainDisplay : MonoBehaviourWithLogging
 {
-    [SerializeField]
     public enum VideoMode
     {
         Mono,
@@ -73,8 +72,6 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
         return new List<GameObject> { leftEyeScreen, rightEyeScreen };
     }
 
-    // private Vector3 _startPosition;
-
     private Renderer _morphDisplayLeftRenderer;
     private Renderer _morphDisplayRightRenderer;
 
@@ -115,64 +112,29 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
     private bool _flipStereo = false;
 
-    // // Flat Left
-    // [SerializeField] public GameObject leftEye;
-    //
-    // // Flat Right
-    // [SerializeField] public GameObject rightEye;
-    //
-    // // Sphere Left
-    // [SerializeField] public GameObject leftEyeSphere;
-    //
-    // // Sphere Right
-    // [SerializeField] public GameObject rightEyeSphere;
-
-    // private Renderer m_lRenderer;
-    // private Renderer m_rRenderer;
-
-    // private Renderer m_l360Renderer;
-    // private Renderer m_r360Renderer;
-
     public Material m_lMaterial;
     public Material m_rMaterial;
     public Material m_monoMaterial;
     public Material m_leftEyeTBMaterial;
     public Material m_rightEyeTBMaterial;
 
-    // deprecated
-    /*public Material m_leftEye360Material;
-    public Material m_rightEye360Material;*/
-
-    // deprecated
-    // TODO: combine 180 and 360 into 2 materials instead of 4?
-    /*public Material m_leftEye180Material;
-    public Material m_rightEye180Material;*/
-
-    // deprecated
-    /*public Material m_3602DSphericalMaterial;
-    public Material m_1802DSphericalMaterial;*/
-
     /// <summary> The NRInput. </summary>
     [SerializeField] private NRInput m_NRInput;
-
-    // private bool _is360 = false;
 
     private float Yaw;
     private float Pitch;
     private float Roll;
 
-    private bool _3DModeLocked = true;
-
     // private int _3DTrialPlaybackStartedAt = 0;
     // private float _MaxTrialPlaybackSeconds = 15.0f;
     // private bool _isTrialing3DMode = false;
 
-    private bool m_updatedARSinceOpen = false;
-    private float _aspectRatioOverride;
-    private string _currentARString;
+    // private bool m_updatedARSinceOpen = false;
+    // private float _aspectRatioOverride;
+    // private string _currentARString;
 
     /// <summary> The previous position. </summary>
-    private Vector2 m_PreviousPos;
+    private Vector2 m_PreviousPos; // TODO: mark for removal, only kept as an example of Android UI
 
     private float fov // 20 for 2D 140 for spherical
     {
@@ -186,6 +148,8 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
     private AndroidJavaClass unityPlayer;
     private AndroidJavaObject activity;
     private AndroidJavaObject context;
+
+    public TextureView Texture;
 
     //Unity Awake, OnDestroy, and Update functions
 
@@ -254,8 +218,6 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
     //     colorGrading.contrast.value = contrastBar.value;
     //     colorGrading.gamma.value = gammaBar.value;*/
     // }
-
-    public TextureView Texture;
 
     private void Update()
     {
@@ -512,7 +474,6 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
         VLC.Play();
     }
 
-
     public void Stop()
     {
         Log("[MainDisplay] Stop");
@@ -525,19 +486,6 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
         pointLight?.SetActive(true);
 
         ClearMaterialTextureLinks();
-
-        // TODO: encapsulate this
-        // if (m_lRenderer?.material is not null)
-        //     m_lRenderer.material.mainTexture = null;
-        //
-        // if (m_rRenderer?.material is not null)
-        //     m_rRenderer.material.mainTexture = null;
-        //
-        // if (m_l360Renderer?.material is not null)
-        //     m_l360Renderer.material.mainTexture = null;
-        //
-        // if (m_r360Renderer?.material is not null)
-        //     m_r360Renderer.material.mainTexture = null;
     }
     #endregion
 
@@ -545,15 +493,15 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
     #region internal
     //Converts MediaTrackList objects to Unity-friendly generic lists. Might not be worth the trouble.
-    private List<MediaTrack> ConvertMediaTrackList(MediaTrackList tracklist)
-    {
-        if (tracklist == null)
-            return new List<MediaTrack>(); //Return an empty list
-
-        var tracks = new List<MediaTrack>((int)tracklist.Count);
-        for (uint i = 0; i < tracklist.Count; i++) tracks.Add(tracklist[i]);
-        return tracks;
-    }
+    // private List<MediaTrack> ConvertMediaTrackList(MediaTrackList tracklist)
+    // {
+    //     if (tracklist == null)
+    //         return new List<MediaTrack>(); //Return an empty list
+    //
+    //     var tracks = new List<MediaTrack>((int)tracklist.Count);
+    //     for (uint i = 0; i < tracklist.Count; i++) tracks.Add(tracklist[i]);
+    //     return tracks;
+    // }
 
     public void ToggleFlipStereo()
     {
@@ -563,9 +511,8 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
     public string GetCurrentAR()
     {
-        return _currentARString;
+        return VLC.Player.AspectRatio;
     }
-
 
     // public void SetAspectRatio(string value) // TODO: marked for removal
     // {
@@ -574,9 +521,9 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
     public void SetCurrentAspectRatio(string currentARString)
     {
-        VLC.mediaPlayer.AspectRatio = currentARString;
+        VLC.Player.AspectRatio = currentARString;
 
-        var split = _currentARString.Split(':');
+        var split = currentARString.Split(':');
         var ar_width = float.Parse(split[0]);
         var ar_height = float.Parse(split[1]);
         var ar_float = ar_width / ar_height;

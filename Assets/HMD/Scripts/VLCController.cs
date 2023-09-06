@@ -83,14 +83,14 @@ public class VLCController : MonoBehaviour
             return;
         }
 
-        if (mainDisplay?.VLC.mediaPlayer is null)
+        if (mainDisplay?.VLC.Player is null)
         {
             Debug.LogError("VLC Player mediaPlayer not found");
             return;
         }
 
         //VLC Event Handlers
-        mainDisplay.VLC.mediaPlayer.Playing += (object sender, EventArgs e) =>
+        mainDisplay.VLC.Player.Playing += (object sender, EventArgs e) =>
         {
             //Always use Try/Catch for VLC Events
             try
@@ -106,7 +106,7 @@ public class VLCController : MonoBehaviour
             }
         };
 
-        mainDisplay.VLC.mediaPlayer.Paused += (object sender, EventArgs e) =>
+        mainDisplay.VLC.Player.Paused += (object sender, EventArgs e) =>
         {
             //Always use Try/Catch for VLC Events
             try
@@ -119,7 +119,7 @@ public class VLCController : MonoBehaviour
             }
         };
 
-        mainDisplay.VLC.mediaPlayer.Stopped += (object sender, EventArgs e) =>
+        mainDisplay.VLC.Player.Stopped += (object sender, EventArgs e) =>
         {
             //Always use Try/Catch for VLC Events
             try
