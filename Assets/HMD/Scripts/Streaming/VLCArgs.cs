@@ -4,7 +4,7 @@ using LibVLCSharp;
 
 namespace HMD.Scripts.Streaming
 {
-
+    // TODO: use Record defined in C# 9.0, but Unity support is limited (https://docs.unity3d.com/2021.2/Documentation/Manual/CSharpCompiler.html)
     public class VLCArgs
     {
         public List<string> Lines;

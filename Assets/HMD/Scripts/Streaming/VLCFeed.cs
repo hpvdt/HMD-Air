@@ -11,7 +11,7 @@ using Application = UnityEngine.Device.Application;
 namespace HMD.Scripts.Streaming
 {
     using JetBrains.Annotations;
-    public class VLCFeed : MonoBehaviourWithLogging
+    public class VLCFeed : MonoBehaviourWithLogging, IFeed
     {
         public VLCArgs Args = new VLCArgs(new List<string> { "https://jakedowns.com/media/sbs2.mp4" }, FromType.FromPath);
 
@@ -20,7 +20,6 @@ namespace HMD.Scripts.Streaming
         //Create a new static LibVLC instance and dispose of the old one. You should only ever have one LibVLC instance.
         private void RefreshLibVLC()
         {
-            Log("[MainDisplay] CreateLibVLC");
             //Dispose of the old libVLC if necessary
             if (_libVLC != null)
             {
@@ -40,11 +39,11 @@ namespace HMD.Scripts.Streaming
                 //LibVLC can freeze Unity if an exception goes unhandled inside an event handler.
                 try
                 {
-                    if (logToConsole) Log(e.FormattedLog);
+                    if (logToConsole) Log("Create LibVLC:\n" + e.FormattedLog);
                 }
                 catch (Exception ex)
                 {
-                    Log("Exception caught in libVLC.Log: \n" + ex);
+                    LogError("Exception caught in libVLC.Log:\n" + ex);
                 }
             };
         }
@@ -82,7 +81,6 @@ namespace HMD.Scripts.Streaming
 
             libVLC?.Dispose();
             libVLC = null;
-
         }
 
         public MediaPlayer Player
@@ -194,7 +192,7 @@ namespace HMD.Scripts.Streaming
         }
 
         //This returns the video orientation for the currently playing video, if there is one
-        public VideoOrientation? GetVideoOrientation()
+        private VideoOrientation? GetVideoOrientation()
         {
             var tracks = Player?.Tracks(TrackType.Video);
 
@@ -305,6 +303,15 @@ namespace HMD.Scripts.Streaming
             });
         }
 
+        public void Stop()
+        {
+            Log("[MainDisplay] Stop");
+            Player?.Stop();
+
+            // clear to black
+            // TextureView?.Destroy();
+        }
+
         public void Play()
         {
             Task.Run(async () =>
@@ -329,15 +336,6 @@ namespace HMD.Scripts.Streaming
         {
             Log("[MainDisplay] Pause");
             Player.Pause();
-        }
-
-        public void Stop()
-        {
-            Log("[MainDisplay] Stop");
-            Player?.Stop();
-
-            // clear to black
-            // TextureView?.Destroy();
         }
 
         public void SeekForward10()

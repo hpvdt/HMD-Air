@@ -24,6 +24,9 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
     public ControlPanel controlPanel;
 
     public VLCFeed VLC;
+    public CameraDeviceFeed CameraDevice;
+
+    private IFeed _activeFeed;
 
     private AndroidJavaClass _brightnessHelper;
 
@@ -226,9 +229,10 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
             EditorWindow.focusedWindow.maximized = !EditorWindow.focusedWindow.maximized;
 #endif
 
-        Texture = VLC.TryGetTexture(Texture);
-        if (Texture != null)
+        var newTexture = VLC.TryGetTexture(Texture);
+        if (newTexture != null && newTexture != Texture)
         {
+            Texture = newTexture;
             SetVideoModeAsap();
         }
     }
@@ -565,7 +569,7 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
         if (Texture == null) throw new VLCException("[SetVideoMode] texture is null!");
 
         var mode = _videoMode;
-        Debug.Log($"[JakeDowns] set video mode {mode}");
+        Log($"set video mode {mode}");
 
         ClearMaterialTextureLinks();
 
@@ -653,13 +657,13 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
         if (permission is not NativeFilePicker.Permission.Granted)
         {
-            _ShowAndroidToastMessage($"Permission result: {permission}");
+            _showAndroidToastMessage($"Permission result: {permission}");
             Debug.Log("Permission result: " + permission);
         }
     }
 
     /// <param name="message">Message string to show in the toast.</param>
-    private void _ShowAndroidToastMessage(string message)
+    private static void _showAndroidToastMessage(string message)
     {
         var unityPlayer = new AndroidJavaClass("com.jakedowns.VLC3D.VLC3DActivity");
         var unityActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");

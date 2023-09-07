@@ -1,4 +1,5 @@
 using System.Reflection;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -6,11 +7,26 @@ public class MonoBehaviourWithLogging : MonoBehaviour
 {
     public bool logToConsole = true; //Log function calls and LibVLC logs to Unity console
 
-    protected static void Log(object message)
+    private string LoggerName
     {
+        get
+        {
+            return this.name;
+        }
+    }
 
-        var name = MethodBase.GetCurrentMethod().DeclaringType;
+    protected void Log(object message)
+    {
+        // var name = MethodBase.GetCurrentMethod().DeclaringType;
         // if (logToConsole)
-        Debug.Log($"[{name}] {message}");
+        Debug.Log($"[{LoggerName}] {message}");
+    }
+
+
+    protected void LogError(object message)
+    {
+        // var name = MethodBase.GetCurrentMethod().DeclaringType;
+        // if (logToConsole)
+        Debug.LogError($"[{LoggerName}] {message}");
     }
 }
