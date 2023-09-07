@@ -25,22 +25,24 @@ public class VLCController : MonoBehaviour
     public Button pauseButton;
     public Button stopButton;
     public Button fileButton;
-    public Button tracksButton;
     public Button volumeButton;
 
     public Button cameraButton;
+
+    public Button tracksButton;
+    public GameObject tracksButtonsGroup; //Group containing buttons to switch video, audio, and subtitle tracks
+    public GameObject trackButtonPrefab;
+    public GameObject trackLabelPrefab;
+    public Color unselectedButtonColor; //Used for unselected track text
+    public Color selectedButtonColor; //Used for selected track text
 
     public Button pathButton;
     public GameObject pathGroup; //Group containing pathInputField and openButton
 
     public InputField pathInputField;
     public Button openButton;
-    public GameObject tracksButtonsGroup; //Group containing buttons to switch video, audio, and subtitle tracks
     public Slider volumeBar;
-    public GameObject trackButtonPrefab;
-    public GameObject trackLabelPrefab;
-    public Color unselectedButtonColor; //Used for unselected track text
-    public Color selectedButtonColor; //Used for selected track text
+
 
     public Text currentTimecode;
 
@@ -144,7 +146,7 @@ public class VLCController : MonoBehaviour
             Debug.Log("FFW10Button");
             mainDisplay.VLC.SeekForward10();
         });
-        pauseButton.onClick.AddListener(() => { mainDisplay.VLC.Pause(); });
+        pauseButton.onClick.AddListener(() => { mainDisplay.Pause(); });
         playButton.onClick.AddListener(() => { mainDisplay.Play(); });
         stopButton.onClick.AddListener(() => { mainDisplay.Stop(); });
         pathButton.onClick.AddListener(() =>
@@ -153,6 +155,7 @@ public class VLCController : MonoBehaviour
                 pathInputField.Select();
         });
         fileButton.onClick.AddListener(() => { mainDisplay.PromptUserFilePicker(); });
+        cameraButton.onClick.AddListener(() => { mainDisplay.NextCamera(); });
         tracksButton.onClick.AddListener(() =>
         {
             ToggleElement(tracksButtonsGroup);

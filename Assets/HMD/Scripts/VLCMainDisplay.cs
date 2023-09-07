@@ -106,6 +106,7 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
     [SerializeField] public Slider focusBar;
 
+    // TODO: group them
     public GameObject cone;
     public GameObject pointLight;
 
@@ -229,14 +230,13 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
             EditorWindow.focusedWindow.maximized = !EditorWindow.focusedWindow.maximized;
 #endif
 
-        var newTexture = VLC.TryGetTexture(Texture);
+        var newTexture = _activeFeed?.TryGetTexture(Texture);
         if (newTexture != null && newTexture != Texture)
         {
             Texture = newTexture;
             SetVideoModeAsap();
         }
     }
-    #endregion
 
     private void OnDisable()
     {
@@ -247,6 +247,25 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
     {
         VLC.DestroyMediaPlayer();
     }
+
+
+    private void OnGUI() // TODO: test on phone
+    {
+        if (!controlPanel.OGMenuVisible()) return;
+        if (NRInput.GetButtonDown(ControllerButton.TRIGGER))
+        {
+            m_PreviousPos = NRInput.GetTouch();
+        }
+        // else if (NRInput.GetButton(ControllerButton.TRIGGER))
+        // {
+        //     //UpdateScroll();
+        // }
+        // else if (NRInput.GetButtonUp(ControllerButton.TRIGGER))
+        // {
+        //     //m_PreviousPos = Vector2.zero;
+        // }
+    }
+    #endregion
 
     private static Vector2 SCALE_RANGE = new(1f, 4.702173720867682f);
 
@@ -448,22 +467,6 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
     private float _sphereScale;
 
-    private void OnGUI() // TODO: test on phone
-    {
-        if (!controlPanel.OGMenuVisible()) return;
-        if (NRInput.GetButtonDown(ControllerButton.TRIGGER))
-        {
-            m_PreviousPos = NRInput.GetTouch();
-        }
-        // else if (NRInput.GetButton(ControllerButton.TRIGGER))
-        // {
-        //     //UpdateScroll();
-        // }
-        // else if (NRInput.GetButtonUp(ControllerButton.TRIGGER))
-        // {
-        //     //m_PreviousPos = Vector2.zero;
-        // }
-    }
 
     //Public functions that expose VLC MediaPlayer functions in a Unity-friendly way. You may want to add more of these.
 
@@ -475,21 +478,30 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
         mainDisplay?.SetActive(true);
 
-        VLC.Play();
+        _activeFeed?.Play();
     }
 
     public void Stop()
     {
         Log("[MainDisplay] Stop");
-        VLC.Stop();
+        _activeFeed?.Stop();
+        _activeFeed = null;
 
+        // clear to black
+        Texture?.Dispose();
         Texture = null;
+
+        ClearMaterialTextureLinks();
 
         mainDisplay.SetActive(false);
         cone?.SetActive(true);
         pointLight?.SetActive(true);
+    }
 
-        ClearMaterialTextureLinks();
+    public void Pause()
+    {
+        Log("Pause");
+        _activeFeed.Pause();
     }
     #endregion
 
@@ -523,11 +535,11 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
     //     mediaPlayer.AspectRatio = value;
     // }
 
-    public void SetCurrentAspectRatio(string currentARString)
+    public void SetCurrentAspectRatio(string arString)
     {
-        VLC.Player.AspectRatio = currentARString;
+        VLC.Player.AspectRatio = arString;
 
-        var split = currentARString.Split(':');
+        var split = arString.Split(':');
         var ar_width = float.Parse(split[0]);
         var ar_height = float.Parse(split[1]);
         var ar_float = ar_width / ar_height;
@@ -651,6 +663,7 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
             {
                 Debug.Log("Picked file: " + path);
                 VLC.Open(path);
+                _activeFeed = VLC;
                 Play();
             }
         }, fileTypes);
@@ -660,6 +673,13 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
             _showAndroidToastMessage($"Permission result: {permission}");
             Debug.Log("Permission result: " + permission);
         }
+    }
+
+    public void NextCamera()
+    {
+        CameraDevice.OpenNextDevice();
+        _activeFeed = CameraDevice;
+        Play();
     }
 
     /// <param name="message">Message string to show in the toast.</param>

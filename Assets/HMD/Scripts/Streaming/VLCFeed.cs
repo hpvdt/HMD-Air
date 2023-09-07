@@ -10,8 +10,7 @@ using Application = UnityEngine.Device.Application;
 
 namespace HMD.Scripts.Streaming
 {
-    using JetBrains.Annotations;
-    public class VLCFeed : MonoBehaviourWithLogging, IFeed
+    public class VLCFeed : FeedLike, IFeed
     {
         public VLCArgs Args = new VLCArgs(new List<string> { "https://jakedowns.com/media/sbs2.mp4" }, FromType.FromPath);
 
@@ -93,46 +92,20 @@ namespace HMD.Scripts.Streaming
             set => _mediaPlayer = value;
         }
 
-        public bool flipTextureX; //No particular reason you'd need this but it is sometimes useful
-        public bool flipTextureY; //Set to false on Android, to true on Windows
-
-        public bool automaticallyFlipOnAndroid = true; //Automatically invert Y on Android
-
         #region unity
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+
             //Setup Media Player
             RefreshMediaPlayer();
 
-// #if UNITY_ANDROID
-//         if (!Application.isEditor)
-//         {
-//             GetContext();
-//
-//
-//
-//             _brightnessHelper = new AndroidJavaClass("com.jakedowns.BrightnessHelper");
-//             if (_brightnessHelper == null)
-//             {
-//                 Debug.Log("error loading _brightnessHelper");
-//             }
-//         }
-// #endif
-
             Debug.Log($"[VLC] LibVLC version and architecture {libVLC.Changeset}");
             Debug.Log($"[VLC] LibVLCSharp version {typeof(LibVLC).Assembly.GetName().Version}");
-
-            //Automatically flip on android
-            if (automaticallyFlipOnAndroid && UnityEngine.Application.platform == RuntimePlatform.Android)
-            {
-                flipTextureX = !flipTextureX;
-                flipTextureY = !flipTextureY;
-            }
         }
         #endregion
 
-        [CanBeNull]
-        public TextureView TryGetTexture([CanBeNull] TextureView existing)
+        public TextureView? TryGetTexture(TextureView? existing)
         {
             //Get size every frame
             uint height = 0;
@@ -143,6 +116,7 @@ namespace HMD.Scripts.Streaming
             var tex = existing;
             if (tex == null || tex.Size.Value != (width, height))
             {
+                tex?.Dispose();
                 tex = TryGenerateTexture(width, height); // may fail if video is not ready
             }
 
@@ -156,8 +130,7 @@ namespace HMD.Scripts.Streaming
                     src.UpdateExternalTexture(texPtr);
 
                     //Copy the vlc texture into the output texture, flipped over
-                    var flip = new Vector2(flipTextureX ? -1 : 1, flipTextureY ? -1 : 1);
-                    Graphics.Blit(src, tex.Cache, flip, Vector2.zero);
+                    Graphics.Blit(src, tex.Cache, Transform, Offset);
                     //If you wanted to do post processing outside of VLC you could use a shader here.
                 }
             }
@@ -166,8 +139,7 @@ namespace HMD.Scripts.Streaming
         }
 
         //Resize the output textures to the size of the video
-        [CanBeNull]
-        private TextureView TryGenerateTexture(uint px, uint py)
+        private TextureView? TryGenerateTexture(uint px, uint py)
         {
             var texptr = Player.GetTexture(px, py, out var updated);
             if (px != 0 && py != 0 && updated && texptr != IntPtr.Zero)
@@ -305,11 +277,8 @@ namespace HMD.Scripts.Streaming
 
         public void Stop()
         {
-            Log("[MainDisplay] Stop");
+            Log("Stop");
             Player?.Stop();
-
-            // clear to black
-            // TextureView?.Destroy();
         }
 
         public void Play()
@@ -334,7 +303,6 @@ namespace HMD.Scripts.Streaming
 
         public void Pause()
         {
-            Log("[MainDisplay] Pause");
             Player.Pause();
         }
 
