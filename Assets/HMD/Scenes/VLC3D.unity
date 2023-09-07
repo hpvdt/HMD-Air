@@ -9071,8 +9071,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   logToConsole: 1
-  flipTextureX: 0
-  flipTextureY: 0
+  flipTextureX: 1
+  flipTextureY: 1
   automaticallyFlipOnAndroid: 1
 --- !u!1 &793580555
 GameObject:
@@ -15375,7 +15375,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   logToConsole: 1
   flipTextureX: 0
-  flipTextureY: 1
+  flipTextureY: 0
   automaticallyFlipOnAndroid: 1
 --- !u!1 &1296571881
 GameObject:

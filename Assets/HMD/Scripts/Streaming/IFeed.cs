@@ -31,7 +31,7 @@ namespace HMD.Scripts.Streaming
         protected Vector2 Offset
         {
             get;
-        } = Vector2.zero;
+        } = Vector2.one;
 
         protected virtual void Awake()
         {

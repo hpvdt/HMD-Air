@@ -39,10 +39,10 @@ public class MainDisplay : MonoBehaviourWithLogging
     }
 
     private IFeed _activeFeed;
-    private void ActivateFeed(Func<IFeed>? feed)
+    private void ActivateFeed(IFeed feed)
     {
         // _stopAllFeeds();
-        _activeFeed = feed?.Invoke();
+        _activeFeed = feed;
     }
 
     private AndroidJavaClass _brightnessHelper;
@@ -690,7 +690,7 @@ public class MainDisplay : MonoBehaviourWithLogging
             {
                 Debug.Log("Picked file: " + path);
 
-                ActivateFeed(() => VLC);
+                ActivateFeed(VLC);
                 VLC.Open(path);
                 Play();
             }
@@ -705,7 +705,7 @@ public class MainDisplay : MonoBehaviourWithLogging
 
     public void NextCamera()
     {
-        ActivateFeed(() => CameraDevice);
+        ActivateFeed(CameraDevice);
         CameraDevice.OpenNextDevice();
         Play();
     }
