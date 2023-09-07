@@ -11,7 +11,7 @@ public class MonoBehaviourWithLogging : MonoBehaviour
     {
         get
         {
-            return this.name;
+            return name;
         }
     }
 

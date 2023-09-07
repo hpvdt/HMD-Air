@@ -1,9 +1,10 @@
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Serialization;
 
 public class IntentHandler : MonoBehaviour
 {
-    public VLCMainDisplay vlcMainDisplay;
+    public MainDisplay mainDisplay;
 
     // Start is called before the first frame update
     private void Start()
@@ -41,7 +42,7 @@ public class IntentHandler : MonoBehaviour
         {
             result = UnityWebRequest.UnEscapeURL(result);
             Debug.Log("On Intent" + result);
-            vlcMainDisplay.VLC.Open(result);
+            mainDisplay.VLC.Open(result);
         }
 
         var extras = intent.Call<AndroidJavaObject>("getExtras");

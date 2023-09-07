@@ -54,19 +54,28 @@ namespace HMD.Scripts.Streaming
                 if (_libVLC == null) RefreshLibVLC();
                 return _libVLC;
             }
-            set => _libVLC = value;
         }
 
-        private MediaPlayer _mediaPlayer;
+        private MediaPlayer _player;
 
         //Create a new MediaPlayer object and dispose of the old one. 
         private void RefreshMediaPlayer()
         {
             Log("[MainDisplay] CreateMediaPlayer");
-            if (_mediaPlayer != null) DestroyMediaPlayer();
-            _mediaPlayer = new MediaPlayer(libVLC);
+            if (_player != null) DestroyMediaPlayer();
+            _player = new MediaPlayer(libVLC);
             Log("Media Player SET!");
         }
+
+        public MediaPlayer Player
+        {
+            get
+            {
+                if (_player == null) RefreshMediaPlayer();
+                return _player;
+            }
+        }
+
 
         //Dispose of the MediaPlayer object. 
         public void DestroyMediaPlayer()
@@ -74,22 +83,17 @@ namespace HMD.Scripts.Streaming
             Stop();
 
             Log("DestroyMediaPlayer");
-            Player?.Stop();
-            Player?.Dispose();
-            Player = null;
+            _player?.Stop();
+            _player?.Dispose();
+            _player = null;
 
-            libVLC?.Dispose();
-            libVLC = null;
+            _libVLC?.Dispose();
+            _libVLC = null;
         }
 
-        public MediaPlayer Player
+        public void Dispose()
         {
-            get
-            {
-                if (_mediaPlayer == null) RefreshMediaPlayer();
-                return _mediaPlayer;
-            }
-            set => _mediaPlayer = value;
+            DestroyMediaPlayer();
         }
 
         #region unity

@@ -10,7 +10,7 @@ using UnityEngine.UI;
 ///This example shows how to safely set up LibVLC events and a simple way to call Unity functions from them
 public class VLCController : MonoBehaviour
 {
-    public VLCMainDisplay mainDisplay;
+    public MainDisplay mainDisplay;
 
     //GUI Elements
     //public RawImage screen;

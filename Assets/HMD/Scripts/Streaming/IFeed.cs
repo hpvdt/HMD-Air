@@ -1,8 +1,8 @@
 namespace HMD.Scripts.Streaming
 {
+    using System;
     using UnityEngine;
-    using UnityEngine.Serialization;
-    public interface IFeed
+    public interface IFeed : IDisposable
     {
         public TextureView? TryGetTexture(TextureView? existing);
 

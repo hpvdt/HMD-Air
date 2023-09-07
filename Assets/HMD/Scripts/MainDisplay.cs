@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using HMD.Scripts.Streaming;
@@ -7,7 +8,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class VLCMainDisplay : MonoBehaviourWithLogging
+public class MainDisplay : MonoBehaviourWithLogging
 {
     public enum VideoMode
     {
@@ -26,7 +27,23 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
     public VLCFeed VLC;
     public CameraDeviceFeed CameraDevice;
 
+    private List<IFeed> _allFeeds
+    {
+        get
+        {
+            return new List<IFeed>
+            {
+                VLC, CameraDevice
+            };
+        }
+    }
+
     private IFeed _activeFeed;
+    private void ActivateFeed(Func<IFeed>? feed)
+    {
+        // _stopAllFeeds();
+        _activeFeed = feed?.Invoke();
+    }
 
     private AndroidJavaClass _brightnessHelper;
 
@@ -198,11 +215,6 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
         SetVideoModeMono();
     }
 
-    private void OnDestroy()
-    {
-        //Dispose of mediaPlayer, or it will stay in nemory and keep playing audio
-        VLC.DestroyMediaPlayer();
-    }
 
     // private void UpdateColorGrade()
     // {
@@ -240,12 +252,21 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
     private void OnDisable()
     {
-        VLC.DestroyMediaPlayer();
+        OnDestroy();
     }
 
     private void OnApplicationQuit()
     {
-        VLC.DestroyMediaPlayer();
+        OnDestroy();
+    }
+
+    private void OnDestroy()
+    {
+        //Dispose of mediaPlayer, or it will stay in nemory and keep playing audio
+        foreach (var feed in _allFeeds)
+        {
+            feed.Dispose();
+        }
     }
 
 
@@ -481,11 +502,17 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
         _activeFeed?.Play();
     }
 
+    private void _stopAllFeeds()
+    {
+        foreach (var ff in _allFeeds) ff.Stop();
+        _activeFeed = null;
+    }
+
     public void Stop()
     {
+        _stopAllFeeds();
+
         Log("[MainDisplay] Stop");
-        _activeFeed?.Stop();
-        _activeFeed = null;
 
         // clear to black
         Texture?.Dispose();
@@ -662,8 +689,9 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
             else
             {
                 Debug.Log("Picked file: " + path);
+
+                ActivateFeed(() => VLC);
                 VLC.Open(path);
-                _activeFeed = VLC;
                 Play();
             }
         }, fileTypes);
@@ -677,8 +705,8 @@ public class VLCMainDisplay : MonoBehaviourWithLogging
 
     public void NextCamera()
     {
+        ActivateFeed(() => CameraDevice);
         CameraDevice.OpenNextDevice();
-        _activeFeed = CameraDevice;
         Play();
     }
 

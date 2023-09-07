@@ -7578,7 +7578,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a206b04ec8125d4eaa37f6d6965b773, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vlcMainDisplay: {fileID: 129841330}
+  mainDisplay: {fileID: 129841330}
 --- !u!1 &594537812
 GameObject:
   m_ObjectHideFlags: 0
@@ -15375,10 +15375,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   logToConsole: 1
   flipTextureX: 0
-  flipTextureY: 0
-  automaticallyFlipOnAndroid: 1
-  flipTextureX: 0
-  flipTextureY: 0
+  flipTextureY: 1
   automaticallyFlipOnAndroid: 1
 --- !u!1 &1296571881
 GameObject:

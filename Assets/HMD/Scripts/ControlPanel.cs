@@ -9,7 +9,7 @@ public class ControlPanel : MonoBehaviour
 {
     /*bool _menu_visible = false;*/
 
-    private VLCMainDisplay _vlcMainDisplay;
+    private MainDisplay _mainDisplay;
 
     private GameObject _menuPanel = null;
     private GameObject _og_menu = null;
@@ -69,9 +69,9 @@ public class ControlPanel : MonoBehaviour
         public MenuID VisibleMenuID;
     }
 
-    public void SetVLC(VLCMainDisplay instance)
+    public void SetVLC(MainDisplay instance)
     {
-        _vlcMainDisplay = instance;
+        _mainDisplay = instance;
     }
 
     // Start is called before the first frame update
@@ -410,7 +410,7 @@ public class ControlPanel : MonoBehaviour
         UpdateCustomARPopupValuePreviewText();
 
         // split and parse float
-        var split = _vlcMainDisplay.GetCurrentAR().Split(':');
+        var split = _mainDisplay.GetCurrentAR().Split(':');
         var ar_width = float.Parse(split[0]);
         var ar_height = float.Parse(split[1]);
 
@@ -424,10 +424,10 @@ public class ControlPanel : MonoBehaviour
 
     public void UpdateCustomARPopupValuePreviewText()
     {
-        GameObject.Find("ARValuePreview").GetComponent<Text>().text = _vlcMainDisplay.GetCurrentAR();
+        GameObject.Find("ARValuePreview").GetComponent<Text>().text = _mainDisplay.GetCurrentAR();
 
         // split and parse float
-        var split = _vlcMainDisplay.GetCurrentAR().Split(':');
+        var split = _mainDisplay.GetCurrentAR().Split(':');
         var ar_width = float.Parse(split[0]);
         var ar_height = float.Parse(split[1]);
 
@@ -441,7 +441,7 @@ public class ControlPanel : MonoBehaviour
     {
         HidePopupByID(PopupID.CUSTOM_AR_POPUP);
         var requested_value = _aspect_popup.transform.Find("ARTextInput").GetComponent<InputField>().text;
-        _vlcMainDisplay.SetCurrentAspectRatio(requested_value);
+        _mainDisplay.SetCurrentAspectRatio(requested_value);
     }
 
     public void HideCustomARPopup()

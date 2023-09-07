@@ -90,6 +90,7 @@ namespace HMD.Scripts.Streaming
 
         public void Stop()
         {
+            Log("Stop");
             _sourceTexture?.Stop();
         }
 
@@ -110,12 +111,21 @@ namespace HMD.Scripts.Streaming
 
         public void Play()
         {
+            Log("Play");
             _sourceTexture?.Play();
         }
 
         public void Pause()
         {
             _sourceTexture?.Pause();
+        }
+
+        public void Dispose()
+        {
+            Stop();
+
+            Log("Destroy Camera Feed");
+            _sourceTexture = null;
         }
     }
 }
