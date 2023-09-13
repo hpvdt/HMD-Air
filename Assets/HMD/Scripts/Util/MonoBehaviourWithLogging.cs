@@ -21,7 +21,7 @@ namespace HMD.Scripts.Util
             // Debug.unityLogger.Log();
             // var name = MethodBase.GetCurrentMethod().DeclaringType;
             // if (logToConsole)
-            Debug.unityLogger.Log($"[{LoggerPrefix}] {message}", actualType);
+            Debug.unityLogger.Log($"[{LoggerPrefix}] {message}", actualType, this);
         }
 
 

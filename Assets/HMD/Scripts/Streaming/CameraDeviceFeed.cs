@@ -38,7 +38,7 @@ namespace HMD.Scripts.Streaming
         {
             if (_device == null) return;
 
-            var resList = _device?.availableResolutions.ToList();
+            var resList = _device?.availableResolutions;
 
             if (res == null)
             {

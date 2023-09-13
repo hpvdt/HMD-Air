@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -706,31 +707,41 @@ public class MainDisplay : MonoBehaviourWithLogging
 
     public void NextCamera(string resText)
     {
+        var res = ParseResolution(resText);
+
+        ActivateFeed(CameraDevice);
+        CameraDevice.OpenNextDevice(res);
+        Play();
+    }
+
+    private static Resolution? ParseResolution(string resText)
+    {
+
+        if (string.IsNullOrEmpty(resText))
+        {
+            return null;
+        }
+
         var parts = resText.Split(":").ToList();
         var nums = parts.Select(x => int.Parse(x)).ToArray();
 
-        Resolution? res;
-        if (nums.Length == 0)
-        {
-            res = null;
-        }
         if (nums.Length == 2)
         {
-            res = new Resolution
+            return new Resolution
             {
                 width = nums[0],
                 height = nums[1]
             };
 
         }
-        else
+        else if (nums.Length == 3)
         {
             var fps = new RefreshRate
             {
                 numerator = (uint)nums[2],
                 denominator = 1
             };
-            res = new Resolution
+            return new Resolution
             {
                 width = nums[0],
                 height = nums[1],
@@ -738,10 +749,7 @@ public class MainDisplay : MonoBehaviourWithLogging
             };
         }
 
-
-        ActivateFeed(CameraDevice);
-        CameraDevice.OpenNextDevice(res);
-        Play();
+        throw new ArgumentException($"Illegal resolution format {resText}");
     }
 
     /// <param name="message">Message string to show in the toast.</param>

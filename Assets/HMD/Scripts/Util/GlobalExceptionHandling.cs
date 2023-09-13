@@ -14,7 +14,8 @@ namespace HMD.Scripts.Util
         {
             if (type == LogType.Exception)
             {
-                LogError(logString + "\n" + stackTrace);
+                // do handling
+                // LogError(logString + "\n" + stackTrace);
             }
         }
     }
