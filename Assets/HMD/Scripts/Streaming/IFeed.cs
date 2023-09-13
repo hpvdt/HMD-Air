@@ -2,6 +2,7 @@ namespace HMD.Scripts.Streaming
 {
     using System;
     using UnityEngine;
+    using Util;
     public interface IFeed : IDisposable
     {
         public TextureView? TryGetTexture(TextureView? existing);

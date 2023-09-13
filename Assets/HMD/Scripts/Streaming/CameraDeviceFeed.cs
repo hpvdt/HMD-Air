@@ -1,6 +1,7 @@
 namespace HMD.Scripts.Streaming
 {
     using System;
+    using System.Linq;
     using Unity.VisualScripting;
     using UnityEngine;
     public class CameraDeviceFeed : FeedLike, IFeed
@@ -21,46 +22,51 @@ namespace HMD.Scripts.Streaming
             }
         }
 
-        private WebCamDevice? _selected1;
-        private Resolution? _selected2;
+        private WebCamDevice? _device;
 
-        public void OpenNextDevice()
+        public void OpenNextDevice(Resolution? res)
         {
             var devices = Devices;
-            var index = Array.IndexOf(devices, _selected1);
+            var index = Array.IndexOf(devices, _device);
             index = (index + 1) % devices.Length;
-            _selected1 = devices[index];
+            _device = devices[index];
 
-            OpenNextResolution();
+            OpenResolution(res);
         }
 
-        public void OpenNextResolution()
+        public void OpenResolution(Resolution? res)
         {
-            if (_selected1 == null) return;
+            if (_device == null) return;
 
-            var resList = _selected1?.availableResolutions;
-            if (resList == null || resList.Length <= 1)
+            var resList = _device?.availableResolutions.ToList();
+
+            if (res == null)
             {
-                Log($"Setting up camera `{_selected1.Value.name}`");
+                Log($"Setting up camera `{_device.Value.name}`");
                 Open(new CameraSelector
                 {
-                    Name = _selected1.Value.name
+                    Name = _device.Value.name
                 });
             }
             else
             {
-                var index = Array.IndexOf(resList, _selected2);
-                index = (index + 1) % resList.Length;
-                _selected2 = resList[index];
+                var _res = res.Value;
+                if (resList != null && !resList.Contains(_res))
+                {
+                    LogWarning(
+                        $"resolution `{_res.ToString()}` may be unsupported:\n"
+                        + $"supported resolutions are [{string.Join(", ", resList.Select(x => x.ToString()))}]"
+                    );
+                }
 
-                Log($"Setting up camera `{_selected1.Value.name}` ({_selected2.Value.ToSafeString()})");
+
+                Log($"Setting up camera `{_device.Value.name}` ({_res.ToSafeString()})");
                 Open(new CameraSelector
                 {
-                    Name = _selected1.Value.name,
-                    Res = _selected2
+                    Name = _device.Value.name,
+                    Res = res
                 });
             }
-
         }
 
         public void Open(CameraSelector selector)

@@ -1,7 +1,8 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using HMD.Scripts.Streaming;
+using HMD.Scripts.Util;
 using LibVLCSharp;
 using NRKernal;
 using UnityEditor;
@@ -703,10 +704,43 @@ public class MainDisplay : MonoBehaviourWithLogging
         }
     }
 
-    public void NextCamera()
+    public void NextCamera(string resText)
     {
+        var parts = resText.Split(":").ToList();
+        var nums = parts.Select(x => int.Parse(x)).ToArray();
+
+        Resolution? res;
+        if (nums.Length == 0)
+        {
+            res = null;
+        }
+        if (nums.Length == 2)
+        {
+            res = new Resolution
+            {
+                width = nums[0],
+                height = nums[1]
+            };
+
+        }
+        else
+        {
+            var fps = new RefreshRate
+            {
+                numerator = (uint)nums[2],
+                denominator = 1
+            };
+            res = new Resolution
+            {
+                width = nums[0],
+                height = nums[1],
+                refreshRateRatio = fps
+            };
+        }
+
+
         ActivateFeed(CameraDevice);
-        CameraDevice.OpenNextDevice();
+        CameraDevice.OpenNextDevice(res);
         Play();
     }
 
@@ -727,36 +761,36 @@ public class MainDisplay : MonoBehaviourWithLogging
         }
     }
 
-    // public void OnSingleTap(string name)
-    // {
-    //     Debug.Log($"[SBSVLC] Single Tap Triggered {name}");
-    //     if (name == "LockScreenButton")
-    //         if (!_screenLocked)
-    //             ToggleScreenLock();
-    // }
+// public void OnSingleTap(string name)
+// {
+//     Debug.Log($"[SBSVLC] Single Tap Triggered {name}");
+//     if (name == "LockScreenButton")
+//         if (!_screenLocked)
+//             ToggleScreenLock();
+// }
 
-    // we require a double-tap to unlock
-    // public void OnDoubleTap(string name)
-    // {
-    //     Debug.Log($"[SBSVLC] Double Tap Triggered {name}");
-    //     if (name == "LockScreenButton")
-    //         if (_screenLocked)
-    //             ToggleScreenLock();
-    // }
+// we require a double-tap to unlock
+// public void OnDoubleTap(string name)
+// {
+//     Debug.Log($"[SBSVLC] Double Tap Triggered {name}");
+//     if (name == "LockScreenButton")
+//         if (_screenLocked)
+//             ToggleScreenLock();
+// }
 
-    // private void GetContext()
-    // {
-    //     unityPlayer = new AndroidJavaClass("com.jakedowns.VLC3D.VLC3DActivity");
-    //     try
-    //     {
-    //         activity = unityPlayer?.GetStatic<AndroidJavaObject>("currentActivity");
-    //         context = activity?.Call<AndroidJavaObject>("getApplicationContext");
-    //     }
-    //     catch (Exception e)
-    //     {
-    //         Debug.Log("error getting context " + e);
-    //     }
-    // }
+// private void GetContext()
+// {
+//     unityPlayer = new AndroidJavaClass("com.jakedowns.VLC3D.VLC3DActivity");
+//     try
+//     {
+//         activity = unityPlayer?.GetStatic<AndroidJavaObject>("currentActivity");
+//         context = activity?.Call<AndroidJavaObject>("getApplicationContext");
+//     }
+//     catch (Exception e)
+//     {
+//         Debug.Log("error getting context " + e);
+//     }
+// }
 
 //     public void ToggleScreenLock()
 //     {

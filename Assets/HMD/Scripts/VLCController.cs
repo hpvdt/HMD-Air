@@ -155,7 +155,10 @@ public class VLCController : MonoBehaviour
                 pathInputField.Select();
         });
         fileButton.onClick.AddListener(() => { mainDisplay.PromptUserFilePicker(); });
-        cameraButton.onClick.AddListener(() => { mainDisplay.NextCamera(); });
+        cameraButton.onClick.AddListener(() =>
+        {
+            mainDisplay.NextCamera(pathInputField.text);
+        });
         tracksButton.onClick.AddListener(() =>
         {
             ToggleElement(tracksButtonsGroup);
@@ -262,7 +265,7 @@ public class VLCController : MonoBehaviour
         ARComboBar.onValueChanged.AddListener((value) => { UpdateARWidthAndHeightFromCombo(); });
 
         //Path Input
-        pathInputField.text = mainDisplay.VLC.Args.Location;
+        // pathInputField.text = mainDisplay.VLC.Args.Location;
         pathGroup.SetActive(false);
 
         //Track Selection Buttons

@@ -12,7 +12,7 @@ namespace HMD.Scripts.Streaming
 {
     public class VLCFeed : FeedLike, IFeed
     {
-        public VLCArgs Args = new VLCArgs(new List<string> { "https://jakedowns.com/media/sbs2.mp4" }, FromType.FromPath);
+        public VLCArgs Args;
 
         private LibVLC _libVLC;
 
@@ -229,10 +229,10 @@ namespace HMD.Scripts.Streaming
                 Args = new VLCArgs(new List<string> { path }, FromType.FromPath);
             }
 
-            _open();
+            _openArgs();
         }
 
-        private void _open()
+        private void _openArgs()
         {
             Log("[MainDisplay] Open");
 
