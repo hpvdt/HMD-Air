@@ -8,6 +8,7 @@ using LibVLCSharp;
 using NRKernal;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class MainDisplay : MonoBehaviourWithLogging
@@ -24,7 +25,8 @@ public class MainDisplay : MonoBehaviourWithLogging
 
     [SerializeField] public VideoMode _videoMode = VideoMode.Mono; // 2d by default
 
-    public ControlPanel controlPanel;
+    [FormerlySerializedAs("controlPanel")]
+    public DashPanel dashPanel;
 
     public VLCFeed VLC;
     public CameraDeviceFeed CameraDevice;
@@ -189,7 +191,7 @@ public class MainDisplay : MonoBehaviourWithLogging
         //     mainDisplay.transform.position.z
         // );
 
-        controlPanel.SetVLC(this);
+        dashPanel.SetVLC(this);
 
         // UpdateCameraReferences();
 
@@ -274,7 +276,7 @@ public class MainDisplay : MonoBehaviourWithLogging
 
     private void OnGUI() // TODO: test on phone
     {
-        if (!controlPanel.OGMenuVisible()) return;
+        if (!dashPanel.OGMenuVisible()) return;
         if (NRInput.GetButtonDown(ControllerButton.TRIGGER))
         {
             m_PreviousPos = NRInput.GetTouch();

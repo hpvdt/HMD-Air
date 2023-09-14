@@ -5,7 +5,7 @@ using NRKernal;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ControlPanel : MonoBehaviour
+public class DashPanel : MonoBehaviour
 {
     /*bool _menu_visible = false;*/
 
