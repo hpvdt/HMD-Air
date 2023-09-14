@@ -1,4 +1,4 @@
-﻿namespace LookingGlassExamples
+namespace LookingGlassExamples
 {
     using UnityEngine;
     using UnityEngine.Serialization;

@@ -1,4 +1,4 @@
-﻿#cvlc -v v4l2:///dev/video0 \
+#cvlc -v v4l2:///dev/video0 \
 #  --sout \
 #   "#transcode{vcodec=h264, vb=800, acodec=none}
 #    :rtp{sdp=rtp://@:5600/}"
