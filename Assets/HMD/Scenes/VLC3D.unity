@@ -435,9 +435,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: JakesRemoteController, Assembly-CSharp
-        m_MethodName: HideAllPopups
+      - m_Target: {fileID: 2089846052}
+        m_TargetAssemblyTypeName: DashPanel, Assembly-CSharp
+        m_MethodName: HideDisplayPopup
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1014,8 +1014,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: JakesRemoteController, Assembly-CSharp
+      - m_Target: {fileID: 2089846052}
+        m_TargetAssemblyTypeName: DashPanel, Assembly-CSharp
         m_MethodName: ShowDisplayPopup
         m_Mode: 1
         m_Arguments:
@@ -3969,8 +3969,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: JakesRemoteController, Assembly-CSharp
+      - m_Target: {fileID: 2089846052}
+        m_TargetAssemblyTypeName: DashPanel, Assembly-CSharp
         m_MethodName: ShowPictureSettingsPopup
         m_Mode: 1
         m_Arguments:
@@ -9575,8 +9575,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: JakesRemoteController, Assembly-CSharp
+      - m_Target: {fileID: 2089846052}
+        m_TargetAssemblyTypeName: DashPanel, Assembly-CSharp
         m_MethodName: ShowFormatPopup
         m_Mode: 1
         m_Arguments:
@@ -10347,9 +10347,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: JakesRemoteController, Assembly-CSharp
-        m_MethodName: HideAllPopups
+      - m_Target: {fileID: 2089846052}
+        m_TargetAssemblyTypeName: DashPanel, Assembly-CSharp
+        m_MethodName: HideCustomARPopup
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10915,8 +10915,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: JakesRemoteController, Assembly-CSharp
+      - m_Target: {fileID: 2089846052}
+        m_TargetAssemblyTypeName: DashPanel, Assembly-CSharp
         m_MethodName: ShowCustomARPopup
         m_Mode: 1
         m_Arguments:
@@ -17445,9 +17445,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: JakesRemoteController, Assembly-CSharp
-        m_MethodName: HideAllPopups
+      - m_Target: {fileID: 2089846052}
+        m_TargetAssemblyTypeName: DashPanel, Assembly-CSharp
+        m_MethodName: HidePictureSettingsPopup
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -18795,9 +18795,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: JakesRemoteController, Assembly-CSharp
-        m_MethodName: HideAllPopups
+      - m_Target: {fileID: 2089846052}
+        m_TargetAssemblyTypeName: DashPanel, Assembly-CSharp
+        m_MethodName: HideFormatPopup
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -26201,10 +26201,6 @@ PrefabInstance:
     - target: {fileID: 4279751068700536, guid: e0f440c4bb94be641af5dc113d3248f5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 20382818417725918, guid: e0f440c4bb94be641af5dc113d3248f5, type: 3}
-      propertyPath: m_TargetDisplay
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
