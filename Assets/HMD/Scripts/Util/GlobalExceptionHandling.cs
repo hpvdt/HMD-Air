@@ -4,13 +4,14 @@ namespace HMD.Scripts.Util
 {
     public class GlobalExceptionHandling : MonoBehaviourWithLogging
     {
-        void Awake()
+        protected void Awake()
         {
+            base.Awake();
             Application.logMessageReceived += HandleException;
             DontDestroyOnLoad(gameObject);
         }
 
-        void HandleException(string logString, string stackTrace, LogType type)
+        private void HandleException(string logString, string stackTrace, LogType type)
         {
             if (type == LogType.Exception)
             {

@@ -15,8 +15,14 @@ namespace LookingGlassExamples
 
         public Vector3 AngularVelocity
         {
-            get => angularVelocity;
-            set => angularVelocity = value;
+            get
+            {
+                return angularVelocity;
+            }
+            set
+            {
+                angularVelocity = value;
+            }
         }
 
         private void Update()

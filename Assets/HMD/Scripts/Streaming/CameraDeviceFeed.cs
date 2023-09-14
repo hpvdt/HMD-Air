@@ -12,7 +12,7 @@ namespace HMD.Scripts.Streaming
             public Resolution? Res;
         }
 
-        private WebCamTexture _sourceTexture;
+        private WebCamTexture _webCamTex;
         private static WebCamDevice[] Devices
         {
             get
@@ -59,8 +59,6 @@ namespace HMD.Scripts.Streaming
                     );
                 }
 
-
-                Log($"Setting up camera `{_device.Value.name}` ({_res.ToSafeString()})");
                 Open(new CameraSelector
                 {
                     Name = _device.Value.name,
@@ -77,37 +75,51 @@ namespace HMD.Scripts.Streaming
             if (selector.Res.HasValue)
             {
                 var res = selector.Res.Value;
-                var fps = (int)Math.Round(selector.Res.Value.refreshRateRatio.value);
-                _sourceTexture = new WebCamTexture(
+                var fps = selector.Res.Value.refreshRate;
+                _webCamTex = new WebCamTexture(
                     selector.Name,
                     res.height,
                     res.width,
                     fps
                 );
+
+                // _sourceTexture.requestedWidth = res.width;
+                // _sourceTexture.requestedHeight = res.height;
+                // _sourceTexture.requestedFPS = fps;
             }
             else
             {
-                _sourceTexture = new WebCamTexture(
+                _webCamTex = new WebCamTexture(
                     selector.Name
                 );
             }
+
+            Play();
+            _webCamTex.GetPixels(); // otherwise width and height will always be 16x16
+
+            Log(
+                $"Setting up camera:\n"
+                + $"    Seleccted: `{selector.Name}` ({selector.Res.ToSafeString()})\n"
+                + $"    Actual: `{_webCamTex.deviceName}` ({_webCamTex.width}x{_webCamTex.height} @ {_webCamTex.requestedFPS}fps)"
+            );
 
         }
 
         public void Stop()
         {
             Log("Stop");
-            _sourceTexture?.Stop();
+            _webCamTex?.Stop();
         }
 
         public TextureView? TryGetTexture(TextureView? existing)
         {
 
             var tex = existing;
-            if (_sourceTexture == null || existing?.Source != _sourceTexture)
+            if (_webCamTex == null || existing?.Source != _webCamTex)
             {
+                LogWarning("existing texture is not from this feed, creating new texture");
                 existing?.Dispose();
-                tex = new TextureView(_sourceTexture);
+                tex = new TextureView(_webCamTex);
             }
 
             Graphics.Blit(tex.Source, tex.Cache, Transform, Offset);
@@ -118,12 +130,12 @@ namespace HMD.Scripts.Streaming
         public void Play()
         {
             Log("Play");
-            _sourceTexture?.Play();
+            _webCamTex?.Play();
         }
 
         public void Pause()
         {
-            _sourceTexture?.Pause();
+            _webCamTex?.Pause();
         }
 
         public void Dispose()
@@ -131,7 +143,7 @@ namespace HMD.Scripts.Streaming
             Stop();
 
             Log("Destroy Camera Feed");
-            _sourceTexture = null;
+            _webCamTex = null;
         }
     }
 }

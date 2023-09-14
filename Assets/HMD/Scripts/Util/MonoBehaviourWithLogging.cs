@@ -2,16 +2,24 @@ using UnityEngine;
 
 namespace HMD.Scripts.Util
 {
+    using System;
     public class MonoBehaviourWithLogging : MonoBehaviour
     {
         public bool logToConsole = true; //Log function calls and LibVLC logs to Unity console
 
-        private string LoggerPrefix
+        private string LoggerPrefix;
+
+        // private string LoggerPrefix
+        // {
+        //     get
+        //     {
+        //         return name;
+        //     }
+        // }
+
+        protected void Awake()
         {
-            get
-            {
-                return name;
-            }
+            LoggerPrefix = name;
         }
 
         protected void Log(object message, LogType? type = null)
@@ -21,9 +29,15 @@ namespace HMD.Scripts.Util
             // Debug.unityLogger.Log();
             // var name = MethodBase.GetCurrentMethod().DeclaringType;
             // if (logToConsole)
-            Debug.unityLogger.Log($"[{LoggerPrefix}] {message}", actualType, this);
+            try
+            {
+                Debug.unityLogger.Log($"[{LoggerPrefix}] {message}", actualType, this);
+            }
+            catch (Exception ee)
+            {
+                Debug.LogError($"[ERROR LOGGING] {message}" + ee.Message, this);
+            }
         }
-
 
         protected void LogWarning(object message)
         {

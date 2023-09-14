@@ -36,6 +36,7 @@ namespace HMD.Scripts.Streaming
 
         protected virtual void Awake()
         {
+            base.Awake();
             //Automatically flip on android
             if (automaticallyFlipOnAndroid && Application.platform == RuntimePlatform.Android)
             {

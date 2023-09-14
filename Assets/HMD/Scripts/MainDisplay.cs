@@ -163,7 +163,10 @@ public class MainDisplay : MonoBehaviourWithLogging
 
     private float fov // 20 for 2D 140 for spherical
     {
-        get => CenterCamera.fieldOfView;
+        get
+        {
+            return CenterCamera.fieldOfView;
+        }
         set
         {
             foreach (var c in AllCameras()) c.fieldOfView = value;
@@ -179,8 +182,9 @@ public class MainDisplay : MonoBehaviourWithLogging
     //Unity Awake, OnDestroy, and Update functions
 
     #region unity
-    private void Awake()
+    protected void Awake()
     {
+        base.Awake();
         if (fovBar is not null) fovBar.value = fov;
 
         if (deformBar is not null) deformBar.value = 0.0f;
@@ -292,7 +296,7 @@ public class MainDisplay : MonoBehaviourWithLogging
     }
     #endregion
 
-    private static Vector2 SCALE_RANGE = new(1f, 4.702173720867682f);
+    private static Vector2 SCALE_RANGE = new Vector2(1f, 4.702173720867682f);
 
     public void OnDeformSliderUpdated()
     {
@@ -729,10 +733,17 @@ public class MainDisplay : MonoBehaviourWithLogging
 
         if (nums.Length == 2)
         {
+            var fps = new RefreshRate
+            {
+                numerator = 0,
+                denominator = 1
+            };
+
             return new Resolution
             {
                 width = nums[0],
-                height = nums[1]
+                height = nums[1],
+                refreshRateRatio = fps
             };
 
         }

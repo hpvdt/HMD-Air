@@ -72,9 +72,9 @@ public class VLCController : MonoBehaviour
 
     private bool _shouldClearTracks = false; //Set this to true and the Tracks menu will clear next frame
 
-    private List<Button> _videoTracksButtons = new();
-    private List<Button> _audioTracksButtons = new();
-    private List<Button> _textTracksButtons = new();
+    private List<Button> _videoTracksButtons = new List<Button>();
+    private List<Button> _audioTracksButtons = new List<Button>();
+    private List<Button> _textTracksButtons = new List<Button>();
 
     private void Start()
     {

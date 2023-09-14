@@ -12,8 +12,8 @@ namespace HMD.Scripts.Streaming
 
         public VLCArgs(List<string> lines, FromType fromType)
         {
-            this.Lines = lines;
-            this.FromType = fromType;
+            Lines = lines;
+            FromType = fromType;
         }
 
         public string Location

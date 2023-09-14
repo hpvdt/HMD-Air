@@ -28,7 +28,8 @@ namespace HMD.Scripts.Streaming
 
             Core.Initialize(Application.dataPath); //Load VLC dlls
             _libVLC = new LibVLC(
-                true); //You can customize LibVLC with advanced CLI options here https://wiki.videolan.org/VLC_command-line_help/
+                true
+            ); //You can customize LibVLC with advanced CLI options here https://wiki.videolan.org/VLC_command-line_help/
 
             //Setup Error Logging
             Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
@@ -38,11 +39,11 @@ namespace HMD.Scripts.Streaming
                 //LibVLC can freeze Unity if an exception goes unhandled inside an event handler.
                 try
                 {
-                    if (logToConsole) Log("Create LibVLC:\n" + e.FormattedLog);
+                    Log($"[VLC-{e.Level}] [{s}{e.Module}] " + e.Message);
                 }
                 catch (Exception ex)
                 {
-                    LogError("Exception caught in libVLC.Log:\n" + ex);
+                    LogError("[VLC]Exception caught in libVLC.Log:\n" + ex);
                 }
             };
         }
@@ -61,7 +62,7 @@ namespace HMD.Scripts.Streaming
         //Create a new MediaPlayer object and dispose of the old one. 
         private void RefreshMediaPlayer()
         {
-            Log("[MainDisplay] CreateMediaPlayer");
+            Log("CreateMediaPlayer");
             if (_player != null) DestroyMediaPlayer();
             _player = new MediaPlayer(libVLC);
             Log("Media Player SET!");
@@ -104,8 +105,8 @@ namespace HMD.Scripts.Streaming
             //Setup Media Player
             RefreshMediaPlayer();
 
-            Debug.Log($"[VLC] LibVLC version and architecture {libVLC.Changeset}");
-            Debug.Log($"[VLC] LibVLCSharp version {typeof(LibVLC).Assembly.GetName().Version}");
+            Log($"[VLC] LibVLC version and architecture {libVLC.Changeset}");
+            Log($"[VLC] LibVLCSharp version {typeof(LibVLC).Assembly.GetName().Version}");
         }
         #endregion
 
@@ -154,12 +155,13 @@ namespace HMD.Scripts.Streaming
                     (px, py) = (py, px);
                 }
 
-                var _source = Texture2D.CreateExternalTexture((int)px, (int)py, TextureFormat.RGBA32, false, true, texptr);
+                var _source =
+                    Texture2D.CreateExternalTexture((int)px, (int)py, TextureFormat.RGBA32, false, true, texptr);
                 //Make a texture of the proper size for the video to output to
 
                 var result = new TextureView(_source);
 
-                Debug.Log($"texture size {px} {py} | {result.Size}");
+                Log($"texture size {px} {py} | {result.Size}");
 
                 return result;
             }
@@ -176,7 +178,8 @@ namespace HMD.Scripts.Streaming
                 return null;
 
             var orientation =
-                tracks[0]?.Data.Video.Orientation; //At the moment we're assuming the track we're playing is the first track
+                tracks[0]?.Data.Video
+                    .Orientation; //At the moment we're assuming the track we're playing is the first track
 
             return orientation;
         }
@@ -213,7 +216,7 @@ namespace HMD.Scripts.Streaming
 
         public void Open(string path)
         {
-            Log("[MainDisplay] Open " + path);
+            Log("Open " + path);
             if (path.ToLower().EndsWith(".url") || path.ToLower().EndsWith(".txt"))
             {
                 var urlContent = File.ReadAllText(path);
@@ -234,13 +237,16 @@ namespace HMD.Scripts.Streaming
 
         private void _openArgs()
         {
-            Log("[MainDisplay] Open");
+            Log("Open");
 
             if (Player?.Media != null)
                 Player.Media.Dispose();
 
             var parameters = Args.Parameters;
-            Debug.Log($"Opening `{Args.Location}` with {parameters.Length} parameter(s) {string.Join(" ", parameters)}");
+            Debug.Log(
+                $"Opening `{Args.Location}` with {parameters.Length} parameter(s)"
+                + $" {string.Join(" ", parameters.Select(s => $"`{s}`").ToArray())}"
+            );
 
             // mediaPlayer.Media = new Media(new Uri(Args.Location), parameters);
             // mediaPlayer.Media = new Media(Args.Location, Args.FromType, parameters);
@@ -327,19 +333,19 @@ namespace HMD.Scripts.Streaming
 
         public void Seek(long timeDelta)
         {
-            Debug.Log("[MainDisplay] Seek " + timeDelta);
+            Debug.Log("Seek " + timeDelta);
             Player.SetTime(Player.Time + timeDelta);
         }
 
         public void SetTime(long time)
         {
-            Log("[MainDisplay] SetTime " + time);
+            Log("SetTime " + time);
             Player.SetTime(time);
         }
 
         public void SetVolume(int volume = 100)
         {
-            Log("[MainDisplay] SetVolume " + volume);
+            Log("SetVolume " + volume);
             Player.SetVolume(volume);
         }
 
@@ -396,25 +402,25 @@ namespace HMD.Scripts.Streaming
 
         public List<MediaTrack> Tracks(TrackType type)
         {
-            Log("[MainDisplay] Tracks " + type);
+            Log("Tracks " + type);
             return ConvertMediaTrackList(Player?.Tracks(type));
         }
 
         public MediaTrack SelectedTrack(TrackType type)
         {
-            Log("[MainDisplay] SelectedTrack " + type);
+            Log("SelectedTrack " + type);
             return Player?.SelectedTrack(type);
         }
 
         public void Select(MediaTrack track)
         {
-            Log("[MainDisplay] Select " + track.Name);
+            Log("Select " + track.Name);
             Player?.Select(track);
         }
 
         public void Unselect(TrackType type)
         {
-            Log("[MainDisplay] Unselect " + type);
+            Log("Unselect " + type);
             Player?.Unselect(type);
         }
     }
