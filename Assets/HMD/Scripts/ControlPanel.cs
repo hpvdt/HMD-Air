@@ -183,7 +183,7 @@ public class ControlPanel : MonoBehaviour
         _menu_toggle_button = FindGameObjectsAllFirst("MenuToggleButton");
 
         _menuPanel = FindGameObjectsAllFirst("MyControlPanel");
-        _og_menu = FindGameObjectsAllFirst("BaseButtons");
+        _og_menu = FindGameObjectsAllFirst("Buttons");
         _app_menu = FindGameObjectsAllFirst("AppMenu");
 
         // _unlock_3d_sphere_mode_prompt_popup = FindGameObjectsAllFirst("Unlock3DSphereModePopup");
