@@ -382,7 +382,7 @@ public class DashPanel : MonoBehaviour
         }
     }
 
-    public void HidePopupByID(PopupID popupID)
+    private void HidePopupByID(PopupID popupID)
     {
         switch (popupID)
         {
@@ -444,7 +444,7 @@ public class DashPanel : MonoBehaviour
         _mainDisplay.SetCurrentAspectRatio(requested_value);
     }
 
-    public void HideCustomARPopup()
+    private void HideCustomARPopup()
     {
         _aspect_popup.SetActive(false);
     }
@@ -474,7 +474,7 @@ public class DashPanel : MonoBehaviour
         _display_popup.SetActive(true);
     }
 
-    public void HideDisplayPopup()
+    private void HideDisplayPopup()
     {
         _display_popup.SetActive(false);
     }
@@ -484,7 +484,7 @@ public class DashPanel : MonoBehaviour
         _format_popup.SetActive(true);
     }
 
-    public void HideFormatPopup()
+    private void HideFormatPopup()
     {
         _format_popup.SetActive(false);
     }
@@ -494,7 +494,7 @@ public class DashPanel : MonoBehaviour
         _whats_new_popup.SetActive(true);
     }
 
-    public void HideWhatsNewPopup()
+    private void HideWhatsNewPopup()
     {
         _whats_new_popup.SetActive(false);
     }
@@ -504,7 +504,7 @@ public class DashPanel : MonoBehaviour
         _picture_settings_popup.SetActive(true);
     }
 
-    public void HidePictureSettingsPopup()
+    private void HidePictureSettingsPopup()
     {
         _picture_settings_popup.SetActive(false);
     }

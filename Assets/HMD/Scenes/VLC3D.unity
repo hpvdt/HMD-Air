@@ -437,7 +437,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2089846052}
         m_TargetAssemblyTypeName: DashPanel, Assembly-CSharp
-        m_MethodName: HideDisplayPopup
+        m_MethodName: HideAllPopups
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5859,7 +5859,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2089846052}
         m_TargetAssemblyTypeName: DashPanel, Assembly-CSharp
-        m_MethodName: HideWhatsNewPopup
+        m_MethodName: HideAllPopups
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10349,7 +10349,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2089846052}
         m_TargetAssemblyTypeName: DashPanel, Assembly-CSharp
-        m_MethodName: HideCustomARPopup
+        m_MethodName: HideAllPopups
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -17447,7 +17447,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2089846052}
         m_TargetAssemblyTypeName: DashPanel, Assembly-CSharp
-        m_MethodName: HidePictureSettingsPopup
+        m_MethodName: HideAllPopups
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -18797,7 +18797,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2089846052}
         m_TargetAssemblyTypeName: DashPanel, Assembly-CSharp
-        m_MethodName: HideFormatPopup
+        m_MethodName: HideAllPopups
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
