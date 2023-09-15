@@ -40,7 +40,7 @@ public class DashPanel : MonoBehaviour
     {
         OG_MENU,
         CONTROLLER_MENU,
-        APP_MENU
+        OPTION_MENU
     };
 
     [SerializeField]
@@ -202,7 +202,7 @@ public class DashPanel : MonoBehaviour
         PlayerPrefs.DeleteAll();
     }
 
-    public void ShowOGMenu()
+    private void ShowOGMenu()
     {
         _og_menu.SetActive(true);
         _og_menu_visible = true;
@@ -210,13 +210,13 @@ public class DashPanel : MonoBehaviour
         _menu_toggle_button.SetActive(true);
     }
 
-    public void HideOGMenu()
+    private void HideOGMenu()
     {
         _og_menu.SetActive(false);
         _og_menu_visible = false;
     }
 
-    public void ShowAppMenu()
+    private void ShowOptionMenu()
     {
         UpdateReferences();
 
@@ -227,7 +227,7 @@ public class DashPanel : MonoBehaviour
     }
 
 
-    public void HideAppMenu()
+    private void HideAppMenu()
     {
         _app_menu.SetActive(false);
     }
@@ -276,7 +276,7 @@ public class DashPanel : MonoBehaviour
 
     }*/
 
-    public void ShowControllerMenu()
+    private void ShowControllerMenu()
     {
         _menuPanel?.SetActive(true);
 
@@ -284,7 +284,7 @@ public class DashPanel : MonoBehaviour
         _menu_toggle_button.SetActive(true);
     }
 
-    public void HideControllerMenu()
+    private void HideControllerMenu()
     {
         _menuPanel?.SetActive(false);
     }
@@ -302,9 +302,9 @@ public class DashPanel : MonoBehaviour
         ShowMenuByID(MenuID.CONTROLLER_MENU);
     }
 
-    public void UIShowOptionsMenu()
+    public void UIShowOptionMenu()
     {
-        ShowMenuByID(MenuID.APP_MENU);
+        ShowMenuByID(MenuID.OPTION_MENU);
     }
 
 
@@ -322,34 +322,34 @@ public class DashPanel : MonoBehaviour
             case MenuID.CONTROLLER_MENU:
                 ShowControllerMenu();
                 break;
-            case MenuID.APP_MENU:
-                ShowAppMenu();
+            case MenuID.OPTION_MENU:
+                ShowOptionMenu();
                 break;
         }
     }
 
-    public void HideAllMenus()
+    private void HideAllMenus()
     {
         HideOGMenu();
         HideControllerMenu();
         HideAppMenu();
     }
 
-    public void HideMenuByID(MenuID id)
-    {
-        switch (id)
-        {
-            case MenuID.OG_MENU:
-                HideOGMenu();
-                break;
-            case MenuID.CONTROLLER_MENU:
-                HideControllerMenu();
-                break;
-            case MenuID.APP_MENU:
-                HideAppMenu();
-                break;
-        }
-    }
+    // public void HideMenuByID(MenuID id)
+    // {
+    //     switch (id)
+    //     {
+    //         case MenuID.OG_MENU:
+    //             HideOGMenu();
+    //             break;
+    //         case MenuID.CONTROLLER_MENU:
+    //             HideControllerMenu();
+    //             break;
+    //         case MenuID.OPTION_MENU:
+    //             HideAppMenu();
+    //             break;
+    //     }
+    // }
 
     public void HideAllPopups()
     {
