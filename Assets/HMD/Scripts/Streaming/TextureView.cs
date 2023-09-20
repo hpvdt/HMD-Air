@@ -11,7 +11,7 @@ namespace HMD.Scripts.Streaming
 
         public Lazy<(int, int)> Size;
 
-        public Lazy<float> AspectRatio;
+        public Lazy<string> NativeAspectRatioStr; // width:height
 
         public TextureView(Texture source)
         {
@@ -24,7 +24,7 @@ namespace HMD.Scripts.Streaming
             _cache.Create();
 
             Size = new Lazy<(int, int)>((_source.width, _source.height));
-            AspectRatio = new Lazy<float>((float)_source.width / _source.height);
+            NativeAspectRatioStr = new Lazy<string>(() => $"{Size.Value.Item1}:{Size.Value.Item2}");
         }
 
         public Texture Source

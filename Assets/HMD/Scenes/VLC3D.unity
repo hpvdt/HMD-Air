@@ -1194,13 +1194,14 @@ MonoBehaviour:
   logToConsole: 0
   _videoMode: 0
   dashPanel: {fileID: 2089846052}
+  controller: {fileID: 1213583959}
   VLC: {fileID: 1295873830}
   CameraDevice: {fileID: 790403057}
   LeftCamera: {fileID: 2066632863}
   CenterCamera: {fileID: 1085126938}
   RightCamera: {fileID: 2087385060}
   XRMainCamera: {fileID: 1233077427}
-  mainDisplay: {fileID: 129841328}
+  thisObject: {fileID: 129841328}
   leftEyeScreen: {fileID: 1641766814}
   rightEyeScreen: {fileID: 156391122}
   fovBar: {fileID: 1572876476}
@@ -7795,7 +7796,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &633266094
 Transform:
   m_ObjectHideFlags: 0
@@ -10703,7 +10704,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2089846052}
         m_TargetAssemblyTypeName: DashPanel, Assembly-CSharp
-        m_MethodName: ShowCustomARPopup
+        m_MethodName: ShowAspectRatioPopup
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -26314,6 +26315,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2865fc91b38ed2d4caebdc6ce7c65caf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mainDisplay: {fileID: 129841330}
 --- !u!1 &2089955442
 GameObject:
   m_ObjectHideFlags: 0

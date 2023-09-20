@@ -25,25 +25,25 @@ public class MainDisplay : MonoBehaviourWithLogging
 
     [SerializeField] public VideoMode _videoMode = VideoMode.Mono; // 2d by default
 
-    [FormerlySerializedAs("controlPanel")]
     public DashPanel dashPanel;
+    public VLCController controller;
 
     public VLCFeed VLC;
     public CameraDeviceFeed CameraDevice;
 
-    private List<IFeed> _allFeeds
+    private List<FeedLike> _allFeeds
     {
         get
         {
-            return new List<IFeed>
+            return new List<FeedLike>
             {
                 VLC, CameraDevice
             };
         }
     }
 
-    private IFeed _activeFeed;
-    private void ActivateFeed(IFeed feed)
+    private FeedLike _activeFeed;
+    private void ActivateFeed(FeedLike feed)
     {
         // _stopAllFeeds();
         _activeFeed = feed;
@@ -86,7 +86,7 @@ public class MainDisplay : MonoBehaviourWithLogging
     //
     // private GameObject _logo;
 
-    [SerializeField] private GameObject mainDisplay;
+    [SerializeField] private GameObject thisObject;
 
     [SerializeField] private GameObject leftEyeScreen;
     [SerializeField] private GameObject rightEyeScreen;
@@ -185,6 +185,7 @@ public class MainDisplay : MonoBehaviourWithLogging
     protected void Awake()
     {
         base.Awake();
+
         if (fovBar is not null) fovBar.value = fov;
 
         if (deformBar is not null) deformBar.value = 0.0f;
@@ -195,7 +196,8 @@ public class MainDisplay : MonoBehaviourWithLogging
         //     mainDisplay.transform.position.z
         // );
 
-        dashPanel.SetVLC(this);
+        dashPanel.mainDisplay = this;
+        controller.mainDisplay = this;
 
         // UpdateCameraReferences();
 
@@ -316,7 +318,7 @@ public class MainDisplay : MonoBehaviourWithLogging
                 screen.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(1, value);
             }
 
-        mainDisplay.transform.localScale = new Vector3(scale, scale, scale);
+        thisObject.transform.localScale = new Vector3(scale, scale, scale);
     }
 
     private float lerpDuration = 1; // TODO: dynamic duration based on startValue
@@ -406,9 +408,9 @@ public class MainDisplay : MonoBehaviourWithLogging
     public void OnDistanceSliderUpdated()
     {
         var newDistance = distanceBar.value;
-        mainDisplay.transform.localPosition = new Vector3(
-            mainDisplay.transform.localPosition.x,
-            mainDisplay.transform.localPosition.y,
+        thisObject.transform.localPosition = new Vector3(
+            thisObject.transform.localPosition.x,
+            thisObject.transform.localPosition.y,
             newDistance
         );
     }
@@ -417,10 +419,10 @@ public class MainDisplay : MonoBehaviourWithLogging
     public void OnHorizontalSliderUpdated()
     {
         var newOffset = horizontalBar.value;
-        mainDisplay.transform.localPosition = new Vector3(
+        thisObject.transform.localPosition = new Vector3(
             newOffset,
-            mainDisplay.transform.localPosition.y,
-            mainDisplay.transform.localPosition.z
+            thisObject.transform.localPosition.y,
+            thisObject.transform.localPosition.z
         );
     }
 
@@ -428,10 +430,10 @@ public class MainDisplay : MonoBehaviourWithLogging
     public void OnVerticalSliderUpdated()
     {
         var newOffset = verticalBar.value;
-        mainDisplay.transform.localPosition = new Vector3(
-            mainDisplay.transform.localPosition.x,
+        thisObject.transform.localPosition = new Vector3(
+            thisObject.transform.localPosition.x,
             newOffset,
-            mainDisplay.transform.localPosition.z
+            thisObject.transform.localPosition.z
         );
     }
 
@@ -505,7 +507,7 @@ public class MainDisplay : MonoBehaviourWithLogging
         cone?.SetActive(false); // hide cone logo
         pointLight?.SetActive(false);
 
-        mainDisplay?.SetActive(true);
+        thisObject?.SetActive(true);
 
         _activeFeed?.Play();
     }
@@ -528,7 +530,7 @@ public class MainDisplay : MonoBehaviourWithLogging
 
         ClearMaterialTextureLinks();
 
-        mainDisplay.SetActive(false);
+        thisObject.SetActive(false);
         cone?.SetActive(true);
         pointLight?.SetActive(true);
     }
@@ -560,18 +562,15 @@ public class MainDisplay : MonoBehaviourWithLogging
         SetVideoMode(_videoMode);
     }
 
-    public string GetCurrentAR()
+    public string GetCurrentAspectRatio()
     {
-        return VLC.Player.AspectRatio;
+        if (_activeFeed == null) return "4:3"; // TODO: should not assume default value
+        return _activeFeed.GetAspectRatioStr();
     }
-
-    // public void SetAspectRatio(string value) // TODO: marked for removal
-    // {
-    //     mediaPlayer.AspectRatio = value;
-    // }
 
     public void SetCurrentAspectRatio(string arString)
     {
+        // TODO: can we set AspectRatio of camera feed?
         VLC.Player.AspectRatio = arString;
 
         var split = arString.Split(':');

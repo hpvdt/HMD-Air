@@ -3,24 +3,32 @@ namespace HMD.Scripts.Streaming
     using System;
     using UnityEngine;
     using Util;
-    public interface IFeed : IDisposable
+
+    public abstract class FeedLike : MonoBehaviourWithLogging, IDisposable
     {
-        public TextureView? TryGetTexture(TextureView? existing);
+        public abstract TextureView? TryGetTexture(TextureView? existing);
 
-        public void Stop();
+        public abstract void Stop();
 
-        public void Play();
+        public abstract void Play();
 
-        public void Pause();
-    }
+        public abstract void Pause();
 
-    public abstract class FeedLike : MonoBehaviourWithLogging
-    {
+        public (uint, uint) Size { get; }
+
+        public string NativeAspectRatioStr
+        {
+            get
+            {
+                return $"{Size.Item1}:{Size.Item2}";
+            }
+        }
+
+        public virtual string GetAspectRatioStr() { return NativeAspectRatioStr; }
+
         public bool flipTextureX; //No particular reason you'd need this but it is sometimes useful
         public bool flipTextureY; //Set to false on Android, to true on Windows
-
         public bool automaticallyFlipOnAndroid = true; //Automatically invert Y on Android
-
         protected Vector2 Transform
         {
             get
@@ -28,12 +36,10 @@ namespace HMD.Scripts.Streaming
                 return new Vector2(flipTextureX ? -1 : 1, flipTextureY ? -1 : 1);
             }
         }
-
         protected Vector2 Offset
         {
             get;
         } = Vector2.one;
-
         protected virtual void Awake()
         {
             base.Awake();
@@ -59,5 +65,7 @@ namespace HMD.Scripts.Streaming
 //         }
 // #endif
         }
+
+        public abstract void Dispose();
     }
 }

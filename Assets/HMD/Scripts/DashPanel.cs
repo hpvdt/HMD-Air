@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using NRKernal;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class DashPanel : MonoBehaviour
 {
     /*bool _menu_visible = false;*/
 
-    private MainDisplay _mainDisplay;
+    [HideInInspector]
+    public MainDisplay mainDisplay;
 
     private GameObject _menuPanel = null;
     private GameObject _og_menu = null;
@@ -22,8 +24,9 @@ public class DashPanel : MonoBehaviour
     private GameObject _options_button = null;
 
     // private GameObject _custom_popup = null;
-    private GameObject _aspect_popup;
     private GameObject _lockScreenNotice = null;
+
+    private GameObject _aspect_popup;
     private GameObject _display_popup = null;
     private GameObject _format_popup = null;
     private GameObject _whats_new_popup = null;
@@ -69,10 +72,10 @@ public class DashPanel : MonoBehaviour
         public MenuID VisibleMenuID;
     }
 
-    public void SetVLC(MainDisplay instance)
-    {
-        _mainDisplay = instance;
-    }
+    // public void SetVLC(MainDisplay instance)
+    // {
+    //     mainDisplay = instance;
+    // }
 
     // Start is called before the first frame update
     private void Start()
@@ -188,7 +191,6 @@ public class DashPanel : MonoBehaviour
 
         // _unlock_3d_sphere_mode_prompt_popup = FindGameObjectsAllFirst("Unlock3DSphereModePopup");
 
-        // _custom_popup = FindGameObjectsAllFirst("CustomPopup");
         _aspect_popup = FindGameObjectsAllFirst("AspectRatioPopup");
         _options_button = FindGameObjectsAllFirst("OptionsButton");
         _display_popup = FindGameObjectsAllFirst("DisplayPopup");
@@ -225,7 +227,6 @@ public class DashPanel : MonoBehaviour
 
         _menu_toggle_button.SetActive(false);
     }
-
 
     private void HideAppMenu()
     {
@@ -270,12 +271,6 @@ public class DashPanel : MonoBehaviour
         return _og_menu_visible;
     }
 
-    // Update is called once per frame
-    /*void Update()
-    {
-
-    }*/
-
     private void ShowControllerMenu()
     {
         _menuPanel?.SetActive(true);
@@ -306,7 +301,6 @@ public class DashPanel : MonoBehaviour
     {
         ShowMenuByID(MenuID.OPTION_MENU);
     }
-
 
     public void ShowMenuByID(MenuID id)
     {
@@ -356,7 +350,7 @@ public class DashPanel : MonoBehaviour
         // TODO: just loop
         // HideUnlock3DSphereModePropmptPopup();
         // HideCustomPopup();
-        HideCustomARPopup();
+        HideAspectRatioPopup();
         HideDisplayPopup();
         HideFormatPopup();
         HideWhatsNewPopup();
@@ -393,7 +387,7 @@ public class DashPanel : MonoBehaviour
                 HideCustomPopup();
                 break;*/
             case PopupID.CUSTOM_AR_POPUP:
-                HideCustomARPopup();
+                HideAspectRatioPopup();
                 break;
             case PopupID.PICTURE_SETTINGS_POPUP:
                 HidePictureSettingsPopup();
@@ -403,14 +397,15 @@ public class DashPanel : MonoBehaviour
         RestoreStateBeforePopup();
     }
 
-    public void ShowCustomARPopup()
+    // TODO: aggregate into a view
+    public void ShowAspectRatioPopup()
     {
         _aspect_popup.SetActive(true);
 
-        // UpdateCustomARPopupValuePreviewText();
+        UpdateAspectRatioPopupText();
 
         // split and parse float
-        var ar = _mainDisplay.GetCurrentAR();
+        var ar = mainDisplay.GetCurrentAspectRatio();
         var split = ar.Split(':');
         var ar_width = float.Parse(split[0]);
         var ar_height = float.Parse(split[1]);
@@ -418,34 +413,28 @@ public class DashPanel : MonoBehaviour
         var ar_combo = ar_width / ar_height;
 
         // set sliders to current value
-        _aspect_popup.transform.Find("ARWidthBar").GetComponent<Slider>().value = ar_width;
-        _aspect_popup.transform.Find("ARHeightBar").GetComponent<Slider>().value = ar_height;
-        _aspect_popup.transform.Find("ARComboBar").GetComponent<Slider>().value = ar_combo;
+
+        mainDisplay.controller.ARWidthBar.GetComponent<Slider>().value = ar_width;
+        mainDisplay.controller.ARHeightBar.GetComponent<Slider>().value = ar_height;
+        mainDisplay.controller.ARComboBar.GetComponent<Slider>().value = ar_combo;
     }
 
-    // public void UpdateCustomARPopupValuePreviewText()
-    // {
-    //     GameObject.Find("ARValuePreview").GetComponent<Text>().text = _mainDisplay.GetCurrentAR();
-    //
-    //     // split and parse float
-    //     var split = _mainDisplay.GetCurrentAR().Split(':');
-    //     var ar_width = float.Parse(split[0]);
-    //     var ar_height = float.Parse(split[1]);
-    //
-    //     var ar_combo = ar_width / ar_height;
-    //     ar_combo = Mathf.Round(ar_combo * 100f) / 100f;
-    //
-    //     GameObject.Find("ARValuePreviewDecimal").GetComponent<Text>().text = ar_combo.ToString();
-    // }
+    public void UpdateAspectRatioPopupText()
+    {
+        GameObject.Find("ARValuePreview").GetComponent<Text>().text = mainDisplay.GetCurrentAspectRatio();
 
-    // public void ApplyCustomARPopup()
-    // {
-    //     HidePopupByID(PopupID.CUSTOM_AR_POPUP);
-    //     var requested_value = _aspect_popup.transform.Find("ARTextInput").GetComponent<InputField>().text;
-    //     _mainDisplay.SetCurrentAspectRatio(requested_value);
-    // }
+        // split and parse float
+        var split = mainDisplay.GetCurrentAspectRatio().Split(':');
+        var ar_width = float.Parse(split[0]);
+        var ar_height = float.Parse(split[1]);
 
-    private void HideCustomARPopup()
+        var ar_combo = ar_width / ar_height;
+        ar_combo = Mathf.Round(ar_combo * 100f) / 100f;
+
+        GameObject.Find("ARValuePreviewDecimal").GetComponent<Text>().text = ar_combo.ToString();
+    }
+
+    private void HideAspectRatioPopup()
     {
         _aspect_popup.SetActive(false);
     }

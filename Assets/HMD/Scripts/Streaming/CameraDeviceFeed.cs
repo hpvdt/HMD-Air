@@ -4,7 +4,8 @@ namespace HMD.Scripts.Streaming
     using System.Linq;
     using Unity.VisualScripting;
     using UnityEngine;
-    public class CameraDeviceFeed : FeedLike, IFeed
+
+    public class CameraDeviceFeed : FeedLike
     {
         public struct CameraSelector
         {
@@ -105,20 +106,22 @@ namespace HMD.Scripts.Streaming
 
         }
 
-        public void Stop()
+        public override void Stop()
         {
             Log("Stop");
             _webCamTex?.Stop();
         }
 
-        public TextureView? TryGetTexture(TextureView? existing)
+        public override TextureView? TryGetTexture(TextureView? existing)
         {
 
             var tex = existing;
-            if (_webCamTex == null || existing?.Source != _webCamTex)
+            var feedSize = Size;
+
+            if (tex == null || tex?.Source != _webCamTex || tex.Size.Value != feedSize)
             {
-                LogWarning("existing texture is not from this feed, creating new texture");
-                existing?.Dispose();
+                tex?.Dispose();
+                LogWarning("existing texture is obsolete, creating new one");
                 tex = new TextureView(_webCamTex);
             }
 
@@ -127,18 +130,26 @@ namespace HMD.Scripts.Streaming
             return tex;
         }
 
-        public void Play()
+        public override void Play()
         {
             Log("Play");
             _webCamTex?.Play();
         }
 
-        public void Pause()
+        public override void Pause()
         {
             _webCamTex?.Pause();
         }
 
-        public void Dispose()
+        public (uint, uint) Size
+        {
+            get
+            {
+                return ((uint)_webCamTex.width, (uint)_webCamTex.height);
+            }
+        }
+
+        public override void Dispose()
         {
             Stop();
 

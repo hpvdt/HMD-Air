@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using LibVLCSharp;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
+
 ///This script controls all the GUI for the VLC Unity Canvas Example
 ///It sets up event handlers and updates the GUI every frame
 ///This example shows how to safely set up LibVLC events and a simple way to call Unity functions from them
 public class VLCController : MonoBehaviour
 {
+    [HideInInspector]
     public MainDisplay mainDisplay;
 
     //GUI Elements
@@ -216,13 +217,13 @@ public class VLCController : MonoBehaviour
         arWidthBarPointerUp.eventID = EventTriggerType.PointerUp;
         arWidthBarPointerUp.callback.AddListener((data) =>
         {
-            if (_isDraggingARWidthBar) IngestARWidthHeightInput();
+            if (_isDraggingARWidthBar) UpdateAspectRatioFromFrac();
             _isDraggingARWidthBar = false;
         });
         arWidthBarEvents.triggers.Add(arWidthBarPointerUp);
         ARWidthBar.onValueChanged.AddListener((value) =>
         {
-            if (_isDraggingARWidthBar) IngestARWidthHeightInput();
+            if (_isDraggingARWidthBar) UpdateAspectRatioFromFrac();
         });
 
         // AR Height Bar Events
@@ -237,13 +238,13 @@ public class VLCController : MonoBehaviour
         arHeightBarPointerUp.eventID = EventTriggerType.PointerUp;
         arHeightBarPointerUp.callback.AddListener((data) =>
         {
-            if (_isDraggingARHeightBar) IngestARWidthHeightInput();
+            if (_isDraggingARHeightBar) UpdateAspectRatioFromFrac();
             _isDraggingARHeightBar = false;
         });
         arHeightBarEvents.triggers.Add(arHeightBarPointerUp);
         ARHeightBar.onValueChanged.AddListener((value) =>
         {
-            if (_isDraggingARHeightBar) IngestARWidthHeightInput();
+            if (_isDraggingARHeightBar) UpdateAspectRatioFromFrac();
         });
 
         // AR Combo Bar Events
@@ -258,11 +259,11 @@ public class VLCController : MonoBehaviour
         arComboBarPointerUp.eventID = EventTriggerType.PointerUp;
         arComboBarPointerUp.callback.AddListener((data) =>
         {
-            if (_isDraggingARComboBar) UpdateARWidthAndHeightFromCombo();
+            if (_isDraggingARComboBar) UpdateAspectRatioFromCombo();
             _isDraggingARComboBar = false;
         });
         arComboBarEvents.triggers.Add(arComboBarPointerUp);
-        ARComboBar.onValueChanged.AddListener((value) => { UpdateARWidthAndHeightFromCombo(); });
+        ARComboBar.onValueChanged.AddListener((value) => { UpdateAspectRatioFromCombo(); });
 
         //Path Input
         // pathInputField.text = mainDisplay.VLC.Args.Location;
@@ -279,22 +280,20 @@ public class VLCController : MonoBehaviour
         volumeBar.gameObject.SetActive(false);
     }
 
-    private void IngestARWidthHeightInput()
+
+    private static int GCD(int a, int b)
     {
-        if (_isDraggingARComboBar) return;
-        var width = (float)Math.Round((double)ARWidthBar.value, 2);
-        var height = (float)Math.Round((double)ARHeightBar.value, 2);
+        while (b != 0)
+        {
+            var t = b;
+            b = a % b;
+            a = t;
+        }
 
-        mainDisplay.SetCurrentAspectRatio($"{width}:{height}");
-
-        if (_isDraggingARWidthBar || _isDraggingARHeightBar) return;
-        var ar_combo = Mathf.Round(width / height * 100f) / 100f;
-        ARComboBar.value = ar_combo;
-
-        // mainDisplay.dashPanel.UpdateCustomARPopupValuePreviewText();
+        return a;
     }
 
-    private int[] AspectRatioFractionFromDecimal(float aspectRatio)
+    private static int[] AspectRatioFractionFromDecimal(float aspectRatio)
     {
         // Multiply the aspect ratio by 100 to produce a whole number
         var wholeNumber = (int)(aspectRatio * 100f);
@@ -309,7 +308,22 @@ public class VLCController : MonoBehaviour
         return fraction;
     }
 
-    private void UpdateARWidthAndHeightFromCombo()
+    private void UpdateAspectRatioFromFrac()
+    {
+        if (_isDraggingARComboBar) return;
+        var width = (float)Math.Round((double)ARWidthBar.value, 2);
+        var height = (float)Math.Round((double)ARHeightBar.value, 2);
+
+        mainDisplay.SetCurrentAspectRatio($"{width}:{height}");
+
+        if (_isDraggingARWidthBar || _isDraggingARHeightBar) return;
+        var ar_combo = Mathf.Round(width / height * 100f) / 100f;
+        ARComboBar.value = ar_combo;
+
+        mainDisplay.dashPanel.UpdateAspectRatioPopupText();
+    }
+
+    private void UpdateAspectRatioFromCombo()
     {
         var arDecimal = Mathf.Round(ARComboBar.value * 100f) / 100f;
         // Get the aspect ratio fraction from the decimal
@@ -320,20 +334,7 @@ public class VLCController : MonoBehaviour
         ARHeightBar.value = fraction[1] / 100f;
 
         mainDisplay.SetCurrentAspectRatio($"{fraction[0]}:{fraction[1]}");
-
-        // mainDisplay.dashPanel.UpdateCustomARPopupValuePreviewText();
-    }
-
-    private int GCD(int a, int b)
-    {
-        while (b != 0)
-        {
-            var t = b;
-            b = a % b;
-            a = t;
-        }
-
-        return a;
+        mainDisplay.dashPanel.UpdateAspectRatioPopupText();
     }
 
     private void Update()
