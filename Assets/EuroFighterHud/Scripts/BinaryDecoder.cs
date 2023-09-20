@@ -56,6 +56,8 @@ public class BinaryDecoder : MonoBehaviour
         try
         {
             //string readInput = sp.ReadLine();
+            
+            //gibberish
 
             byte[] bytes = BinaryStringToByteArray(readInput);
 
