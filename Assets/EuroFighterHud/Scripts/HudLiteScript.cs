@@ -11,6 +11,7 @@ public class HudLiteScript : MonoBehaviour
     public bool isActive = false;
 
     public Transform aircraft;
+    public BinaryDecoder sensorReader;
     public Rigidbody aircraftRB;
     //
 
@@ -157,7 +158,10 @@ public class HudLiteScript : MonoBehaviour
         //////////////////////////////////////////// Altitude
         if (useAltitude)
         {
-            altitude = Mathf.Lerp(altitude, altitudeOffSet + altitudeAmplitude * currentPosition.y, speedFilterFactor);
+            //Original Code
+            //altitude = Mathf.Lerp(altitude, altitudeOffSet + altitudeAmplitude * currentPosition.y, speedFilterFactor);
+            
+            altitude = sensorReader.getAltimeter();
 
             //Send values to Gui and Instruments
             if (altitudeTxt != null) altitudeTxt.text = altitude.ToString("0").PadLeft(5);
@@ -169,6 +173,8 @@ public class HudLiteScript : MonoBehaviour
         if (useSpeed)
         {
             speed = Mathf.Lerp(speed, speedOffSet + speedAmplitude * relativeSpeed.z, speedFilterFactor);
+
+            speed = sensorReader.getAirspeed();
 
             //Send values to Gui and Instruments
             if (speedTxt != null) speedTxt.text = speed.ToString("0").PadLeft(5);//.ToString("##0");

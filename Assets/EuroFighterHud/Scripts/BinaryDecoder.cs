@@ -11,13 +11,13 @@ using UnityEngine;
 public class BinaryDecoder : MonoBehaviour
 {
     //Fields/Attributes
-    public static float Airspeed, Altimeter,
-            GyroX, GyroY, GyroZ, GyroW,
-            heading,
-            GPSX, GPSY,
-            totalEnergy, energyLossRate, efficiency,
-            temp, pressure,
-            windX, windY, windZ;
+    public static float Airspeed = 9, Altimeter = 12,
+            GyroX = 0, GyroY = 0, GyroZ = 0, GyroW = 0,
+            heading = 0,
+            GPSX = 0, GPSY = 0,
+            totalEnergy = 0, energyLossRate = 0, efficiency = 0,
+            temp = 0, pressure = 0,
+            windX = 0, windY = 0, windZ = 0;
 
     private Quaternion IMU;
     private Vector3 windDir;
@@ -56,6 +56,8 @@ public class BinaryDecoder : MonoBehaviour
         try
         {
             //string readInput = sp.ReadLine();
+            
+            //gibberish
 
             //byte[] bytes = BinaryStringToByteArray(readInput);
 
@@ -103,10 +105,9 @@ public class BinaryDecoder : MonoBehaviour
 
             
         }
-
         catch
         {
-
+            Debug.Log("Nuh Uh");
         }
     }
 

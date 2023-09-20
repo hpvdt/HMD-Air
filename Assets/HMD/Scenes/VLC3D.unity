@@ -2982,7 +2982,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Device: 0
   m_PoseSource: 2
-  m_PoseProviderComponent: {fileID: 262002727}
+  m_PoseProviderComponent: {fileID: 0}
   m_TrackingType: 1
   m_UpdateType: 0
   m_UseRelativeTransform: 0
@@ -12363,7 +12363,7 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1.5
+  m_Intensity: 0.6
   m_Range: 100
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -12422,7 +12422,7 @@ Transform:
   m_GameObject: {fileID: 1060310524}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 8.78, y: 1.4185306, z: -5.83}
+  m_LocalPosition: {x: 0, y: 1.62, z: -12.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -21796,6 +21796,10 @@ PrefabInstance:
       propertyPath: aircraft
       value: 
       objectReference: {fileID: 262002724}
+    - target: {fileID: 5904243661218039637, guid: 3d381db8fc825b84fb3409b31f9aae4a, type: 3}
+      propertyPath: sensorReader
+      value: 
+      objectReference: {fileID: 262002729}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -26595,7 +26599,7 @@ GameObject:
   - component: {fileID: 3138452449972793498}
   - component: {fileID: 3138452449972793499}
   m_Layer: 0
-  m_Name: FBXheadingHalo
+  m_Name: HeadingHalo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26706,7 +26710,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: cdd02c8d4bb254a10b6fd041318e56ff, type: 2}
+  - {fileID: 2100000, guid: 963a8cee7605f4aad9935655834baa76, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
