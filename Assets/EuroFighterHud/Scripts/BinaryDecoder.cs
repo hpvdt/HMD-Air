@@ -59,7 +59,7 @@ public class BinaryDecoder : MonoBehaviour
             
             //gibberish
 
-            byte[] bytes = BinaryStringToByteArray(readInput);
+            //byte[] bytes = BinaryStringToByteArray(readInput);
 
             //string final = Encoding.UTF8.GetString(bytes);
 
