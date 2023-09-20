@@ -112,17 +112,17 @@ namespace HMD.Scripts.Streaming
             _webCamTex?.Stop();
         }
 
-        public override TextureView? TryGetTexture(TextureView? existing)
+        protected override TextureView? TryGetTextureIfValid(TextureView? existing)
         {
-
             var tex = existing;
-            var feedSize = Size;
+            var srcSize = GetSize();
 
-            if (tex == null || tex?.Source != _webCamTex || tex.Size.Value != feedSize)
+            if (tex == null || tex.Source != _webCamTex || tex.Size.Value != srcSize)
             {
+                var newTex = new TextureView(_webCamTex);
+
                 tex?.Dispose();
-                LogWarning("existing texture is obsolete, creating new one");
-                tex = new TextureView(_webCamTex);
+                tex = newTex;
             }
 
             Graphics.Blit(tex.Source, tex.Cache, Transform, Offset);
@@ -141,13 +141,11 @@ namespace HMD.Scripts.Streaming
             _webCamTex?.Pause();
         }
 
-        public (uint, uint) Size
+        public override (uint, uint) GetSize()
         {
-            get
-            {
-                return ((uint)_webCamTex.width, (uint)_webCamTex.height);
-            }
+            return ((uint)_webCamTex.width, (uint)_webCamTex.height);
         }
+
 
         public override void Dispose()
         {

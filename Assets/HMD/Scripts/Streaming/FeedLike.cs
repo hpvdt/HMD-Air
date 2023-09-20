@@ -6,7 +6,35 @@ namespace HMD.Scripts.Streaming
 
     public abstract class FeedLike : MonoBehaviourWithLogging, IDisposable
     {
-        public abstract TextureView? TryGetTexture(TextureView? existing);
+        public abstract (uint, uint) GetSize();
+
+        public bool isValid()
+        {
+            var size = GetSize();
+            if (size.Item1 == 0 || size.Item2 == 0) return false;
+
+            return true;
+        }
+
+        protected abstract TextureView? TryGetTextureIfValid(TextureView? existing);
+
+        public TextureView? TryGetTexture(TextureView? existing)
+        {
+            if (isValid())
+            {
+                var res = TryGetTextureIfValid(existing);
+
+                if (existing != null && res != null && res != existing)
+                {
+                    LogWarning($"existing texture {existing} is obsolete\n"
+                        + $"creating new one {res}\n");
+                }
+
+                return res;
+            }
+
+            return null;
+        }
 
         public abstract void Stop();
 
@@ -14,17 +42,21 @@ namespace HMD.Scripts.Streaming
 
         public abstract void Pause();
 
-        public (uint, uint) Size { get; }
+        public static string DefaultAspectRatioStr = "16:9";
 
         public string NativeAspectRatioStr
         {
             get
             {
-                return $"{Size.Item1}:{Size.Item2}";
+                var size = GetSize();
+                return $"{size.Item1}:{size.Item2}";
             }
         }
 
-        public virtual string GetAspectRatioStr() { return NativeAspectRatioStr; }
+        public virtual string GetAspectRatioStr()
+        {
+            return NativeAspectRatioStr;
+        }
 
         public bool flipTextureX; //No particular reason you'd need this but it is sometimes useful
         public bool flipTextureY; //Set to false on Android, to true on Windows
@@ -67,5 +99,14 @@ namespace HMD.Scripts.Streaming
         }
 
         public abstract void Dispose();
+
+        // private string? isTextureConforming(TextureView tex, (uint, uint) size)
+        // {
+        //     if (tex == null) return $"initializing texture";
+        //
+        //     if ()
+        //
+        //         return tex.width == size.Item1 && tex.height == size.Item2;
+        // }
     }
 }

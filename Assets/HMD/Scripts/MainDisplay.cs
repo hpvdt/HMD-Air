@@ -564,7 +564,7 @@ public class MainDisplay : MonoBehaviourWithLogging
 
     public string GetCurrentAspectRatio()
     {
-        if (_activeFeed == null) return "4:3"; // TODO: should not assume default value
+        if (_activeFeed == null) return FeedLike.DefaultAspectRatioStr; // TODO: should not assume default value
         return _activeFeed.GetAspectRatioStr();
     }
 

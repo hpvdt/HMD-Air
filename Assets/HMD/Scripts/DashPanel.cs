@@ -414,8 +414,8 @@ public class DashPanel : MonoBehaviour
 
         // set sliders to current value
 
-        mainDisplay.controller.ARWidthBar.GetComponent<Slider>().value = ar_width;
-        mainDisplay.controller.ARHeightBar.GetComponent<Slider>().value = ar_height;
+        // mainDisplay.controller.ARWidthBar.GetComponent<Slider>().value = ar_width;
+        // mainDisplay.controller.ARHeightBar.GetComponent<Slider>().value = ar_height;
         mainDisplay.controller.ARComboBar.GetComponent<Slider>().value = ar_combo;
     }
 

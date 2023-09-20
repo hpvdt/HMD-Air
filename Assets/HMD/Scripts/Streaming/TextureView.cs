@@ -3,6 +3,7 @@ using UnityEngine;
 namespace HMD.Scripts.Streaming
 {
     using System;
+    using Unity.VisualScripting;
     public class TextureView : IDisposable
         // immutable, can only be initialised once, all derivative textures can only be destroyed together
     {
@@ -50,6 +51,18 @@ namespace HMD.Scripts.Streaming
         private TextureView()
         {
             Dispose();
+        }
+
+        public override string ToString()
+        {
+            try
+            {
+                return $"{_source}: {Size.Value.Item1}x{Size.Value.Item2}";
+            }
+            catch (Exception)
+            {
+                return _source.ToSafeString();
+            }
         }
     }
 }

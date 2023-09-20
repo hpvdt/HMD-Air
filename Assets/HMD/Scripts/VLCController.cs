@@ -47,8 +47,8 @@ public class VLCController : MonoBehaviour
 
     public Text currentTimecode;
 
-    public Slider ARWidthBar;
-    public Slider ARHeightBar;
+    // public Slider ARWidthBar;
+    // public Slider ARHeightBar;
     public Slider ARComboBar;
 
     private bool _isDraggingARWidthBar = false;
@@ -206,46 +206,46 @@ public class VLCController : MonoBehaviour
         scaleBarEvents.triggers.Add(scaleBarPointerUp);
         */
         // AR Width Bar Events
-        var arWidthBarEvents = ARWidthBar.GetComponent<EventTrigger>();
+        // var arWidthBarEvents = ARWidthBar.GetComponent<EventTrigger>();
 
-        var arWidthBarPointerDown = new EventTrigger.Entry();
-        arWidthBarPointerDown.eventID = EventTriggerType.PointerDown;
-        arWidthBarPointerDown.callback.AddListener((data) => { _isDraggingARWidthBar = true; });
-        arWidthBarEvents.triggers.Add(arWidthBarPointerDown);
+        // var arWidthBarPointerDown = new EventTrigger.Entry();
+        // arWidthBarPointerDown.eventID = EventTriggerType.PointerDown;
+        // arWidthBarPointerDown.callback.AddListener((data) => { _isDraggingARWidthBar = true; });
+        // arWidthBarEvents.triggers.Add(arWidthBarPointerDown);
 
-        var arWidthBarPointerUp = new EventTrigger.Entry();
-        arWidthBarPointerUp.eventID = EventTriggerType.PointerUp;
-        arWidthBarPointerUp.callback.AddListener((data) =>
-        {
-            if (_isDraggingARWidthBar) UpdateAspectRatioFromFrac();
-            _isDraggingARWidthBar = false;
-        });
-        arWidthBarEvents.triggers.Add(arWidthBarPointerUp);
-        ARWidthBar.onValueChanged.AddListener((value) =>
-        {
-            if (_isDraggingARWidthBar) UpdateAspectRatioFromFrac();
-        });
+        // var arWidthBarPointerUp = new EventTrigger.Entry();
+        // arWidthBarPointerUp.eventID = EventTriggerType.PointerUp;
+        // arWidthBarPointerUp.callback.AddListener((data) =>
+        // {
+        //     if (_isDraggingARWidthBar) UpdateAspectRatioFromFrac();
+        //     _isDraggingARWidthBar = false;
+        // });
+        // arWidthBarEvents.triggers.Add(arWidthBarPointerUp);
+        // ARWidthBar.onValueChanged.AddListener((value) =>
+        // {
+        //     if (_isDraggingARWidthBar) UpdateAspectRatioFromFrac();
+        // });
 
         // AR Height Bar Events
-        var arHeightBarEvents = ARHeightBar.GetComponent<EventTrigger>();
-
-        var arHeightBarPointerDown = new EventTrigger.Entry();
-        arHeightBarPointerDown.eventID = EventTriggerType.PointerDown;
-        arHeightBarPointerDown.callback.AddListener((data) => { _isDraggingARHeightBar = true; });
-        arHeightBarEvents.triggers.Add(arHeightBarPointerDown);
-
-        var arHeightBarPointerUp = new EventTrigger.Entry();
-        arHeightBarPointerUp.eventID = EventTriggerType.PointerUp;
-        arHeightBarPointerUp.callback.AddListener((data) =>
-        {
-            if (_isDraggingARHeightBar) UpdateAspectRatioFromFrac();
-            _isDraggingARHeightBar = false;
-        });
-        arHeightBarEvents.triggers.Add(arHeightBarPointerUp);
-        ARHeightBar.onValueChanged.AddListener((value) =>
-        {
-            if (_isDraggingARHeightBar) UpdateAspectRatioFromFrac();
-        });
+        // var arHeightBarEvents = ARHeightBar.GetComponent<EventTrigger>();
+        //
+        // var arHeightBarPointerDown = new EventTrigger.Entry();
+        // arHeightBarPointerDown.eventID = EventTriggerType.PointerDown;
+        // arHeightBarPointerDown.callback.AddListener((data) => { _isDraggingARHeightBar = true; });
+        // arHeightBarEvents.triggers.Add(arHeightBarPointerDown);
+        //
+        // var arHeightBarPointerUp = new EventTrigger.Entry();
+        // arHeightBarPointerUp.eventID = EventTriggerType.PointerUp;
+        // arHeightBarPointerUp.callback.AddListener((data) =>
+        // {
+        //     if (_isDraggingARHeightBar) UpdateAspectRatioFromFrac();
+        //     _isDraggingARHeightBar = false;
+        // });
+        // arHeightBarEvents.triggers.Add(arHeightBarPointerUp);
+        // ARHeightBar.onValueChanged.AddListener((value) =>
+        // {
+        //     if (_isDraggingARHeightBar) UpdateAspectRatioFromFrac();
+        // });
 
         // AR Combo Bar Events
         var arComboBarEvents = ARComboBar.GetComponent<EventTrigger>();
@@ -308,20 +308,20 @@ public class VLCController : MonoBehaviour
         return fraction;
     }
 
-    private void UpdateAspectRatioFromFrac()
-    {
-        if (_isDraggingARComboBar) return;
-        var width = (float)Math.Round((double)ARWidthBar.value, 2);
-        var height = (float)Math.Round((double)ARHeightBar.value, 2);
-
-        mainDisplay.SetCurrentAspectRatio($"{width}:{height}");
-
-        if (_isDraggingARWidthBar || _isDraggingARHeightBar) return;
-        var ar_combo = Mathf.Round(width / height * 100f) / 100f;
-        ARComboBar.value = ar_combo;
-
-        mainDisplay.dashPanel.UpdateAspectRatioPopupText();
-    }
+    // private void UpdateAspectRatioFromFrac()
+    // {
+    //     if (_isDraggingARComboBar) return;
+    //     var width = (float)Math.Round((double)ARWidthBar.value, 2);
+    //     var height = (float)Math.Round((double)ARHeightBar.value, 2);
+    //
+    //     mainDisplay.SetCurrentAspectRatio($"{width}:{height}");
+    //
+    //     if (_isDraggingARWidthBar || _isDraggingARHeightBar) return;
+    //     var ar_combo = Mathf.Round(width / height * 100f) / 100f;
+    //     ARComboBar.value = ar_combo;
+    //
+    //     mainDisplay.dashPanel.UpdateAspectRatioPopupText();
+    // }
 
     private void UpdateAspectRatioFromCombo()
     {
@@ -330,8 +330,8 @@ public class VLCController : MonoBehaviour
         var fraction = AspectRatioFractionFromDecimal(arDecimal);
 
         // Set the AR width and height bars to the fraction
-        ARWidthBar.value = fraction[0] / 100f;
-        ARHeightBar.value = fraction[1] / 100f;
+        // ARWidthBar.value = fraction[0] / 100f;
+        // ARHeightBar.value = fraction[1] / 100f;
 
         mainDisplay.SetCurrentAspectRatio($"{fraction[0]}:{fraction[1]}");
         mainDisplay.dashPanel.UpdateAspectRatioPopupText();

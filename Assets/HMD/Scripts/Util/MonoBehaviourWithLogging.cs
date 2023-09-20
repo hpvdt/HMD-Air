@@ -31,7 +31,7 @@ namespace HMD.Scripts.Util
             // if (logToConsole)
             try
             {
-                Debug.unityLogger.Log($"[{LoggerPrefix}] {message}", actualType, this);
+                Debug.unityLogger.Log(actualType, LoggerPrefix, $"[{LoggerPrefix}] {message}", this);
             }
             catch (Exception ee)
             {

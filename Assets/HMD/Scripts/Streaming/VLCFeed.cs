@@ -12,6 +12,8 @@ namespace HMD.Scripts.Streaming
 {
     public class VLCFeed : FeedLike
     {
+        public bool DebugVLCPlayer;
+
         public VLCArgs Args;
 
         private LibVLC _libVLC;
@@ -39,7 +41,7 @@ namespace HMD.Scripts.Streaming
                 //LibVLC can freeze Unity if an exception goes unhandled inside an event handler.
                 try
                 {
-                    Log($"[VLC-{e.Level}] [{s}{e.Module}] " + e.Message);
+                    if (DebugVLCPlayer) Log($"[VLC-{e.Level}] [{s}{e.Module}] " + e.Message);
                 }
                 catch (Exception ex)
                 {
@@ -110,24 +112,26 @@ namespace HMD.Scripts.Streaming
         }
         #endregion
 
-        public override TextureView? TryGetTexture(TextureView? existing)
+        protected override TextureView? TryGetTextureIfValid(TextureView? existing)
         {
             //Get size every frame
 
             //Automatically resize output textures if size changes
             var tex = existing;
-            var feedSize = Size;
-            if (tex == null || tex.Source.GetType().IsInstanceOfType(typeof(Texture2D)) || tex.Size.Value != feedSize)
+            var srcSize = GetSize();
+
+            if (tex == null || tex.Source.GetType().IsInstanceOfType(typeof(Texture2D)) || tex.Size.Value != srcSize)
             {
+                var newTex = TryGenerateTexture(srcSize.Item1, srcSize.Item2); // may fail if video is not ready
+
                 tex?.Dispose();
-                LogWarning("existing texture is obsolete, creating new one");
-                tex = TryGenerateTexture(feedSize.Item1, feedSize.Item2); // may fail if video is not ready
+                tex = newTex;
             }
 
             if (tex != null)
             {
                 //Update the vlc texture (tex)
-                var texPtr = Player.GetTexture(feedSize.Item1, feedSize.Item2, out var updated);
+                var texPtr = Player.GetTexture(srcSize.Item1, srcSize.Item2, out var updated);
                 if (updated)
                 {
                     var src = (Texture2D)tex.Source;
@@ -331,15 +335,13 @@ namespace HMD.Scripts.Streaming
             Player.Pause();
         }
 
-        public (uint, uint) Size
+        public override (uint, uint) GetSize()
         {
-            get
-            {
-                uint height = 0;
-                uint width = 0;
-                Player.Size(0, ref width, ref height);
-                return (width, height);
-            }
+            uint height = 0;
+            uint width = 0;
+            Player.Size(0, ref width, ref height);
+
+            return (width, height);
         }
 
         public void SeekForward10()
