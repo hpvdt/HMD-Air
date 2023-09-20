@@ -3,6 +3,7 @@ using UnityEngine;
 namespace HMD.Scripts.Streaming
 {
     using System;
+    using Unity.VisualScripting;
     public class TextureView : IDisposable
         // immutable, can only be initialised once, all derivative textures can only be destroyed together
     {
@@ -11,7 +12,7 @@ namespace HMD.Scripts.Streaming
 
         public Lazy<(int, int)> Size;
 
-        public Lazy<float> AspectRatio;
+        public Lazy<string> NativeAspectRatioText; // width:height
 
         public TextureView(Texture source)
         {
@@ -24,7 +25,7 @@ namespace HMD.Scripts.Streaming
             _cache.Create();
 
             Size = new Lazy<(int, int)>((_source.width, _source.height));
-            AspectRatio = new Lazy<float>((float)_source.width / _source.height);
+            NativeAspectRatioText = new Lazy<string>(() => $"{Size.Value.Item1}:{Size.Value.Item2}");
         }
 
         public Texture Source
@@ -50,6 +51,18 @@ namespace HMD.Scripts.Streaming
         private TextureView()
         {
             Dispose();
+        }
+
+        public override string ToString()
+        {
+            try
+            {
+                return $"{_source}: {Size.Value.Item1}x{Size.Value.Item2}";
+            }
+            catch (Exception)
+            {
+                return _source.ToSafeString();
+            }
         }
     }
 }

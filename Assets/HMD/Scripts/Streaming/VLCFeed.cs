@@ -10,8 +10,11 @@ using Application = UnityEngine.Device.Application;
 
 namespace HMD.Scripts.Streaming
 {
-    public class VLCFeed : FeedLike, IFeed
+    using Util;
+    public class VLCFeed : FeedLike
     {
+        public bool DebugVLCPlayer;
+
         public VLCArgs Args;
 
         private LibVLC _libVLC;
@@ -39,7 +42,7 @@ namespace HMD.Scripts.Streaming
                 //LibVLC can freeze Unity if an exception goes unhandled inside an event handler.
                 try
                 {
-                    Log($"[VLC-{e.Level}] [{s}{e.Module}] " + e.Message);
+                    if (DebugVLCPlayer) Log($"[VLC-{e.Level}] [{s}{e.Module}] " + e.Message);
                 }
                 catch (Exception ex)
                 {
@@ -92,7 +95,7 @@ namespace HMD.Scripts.Streaming
             _libVLC = null;
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             DestroyMediaPlayer();
         }
@@ -110,25 +113,26 @@ namespace HMD.Scripts.Streaming
         }
         #endregion
 
-        public TextureView? TryGetTexture(TextureView? existing)
+        protected override TextureView? TryGetTextureIfValid(TextureView? existing)
         {
             //Get size every frame
-            uint height = 0;
-            uint width = 0;
-            Player?.Size(0, ref width, ref height);
 
             //Automatically resize output textures if size changes
             var tex = existing;
-            if (tex == null || tex.Size.Value != (width, height))
+            var srcSize = GetSize();
+
+            if (tex == null || tex.Source.GetType().IsInstanceOfType(typeof(Texture2D)) || tex.Size.Value != srcSize)
             {
+                var newTex = TryGenerateTexture(srcSize.Item1, srcSize.Item2); // may fail if video is not ready
+
                 tex?.Dispose();
-                tex = TryGenerateTexture(width, height); // may fail if video is not ready
+                tex = newTex;
             }
 
             if (tex != null)
             {
                 //Update the vlc texture (tex)
-                var texPtr = Player.GetTexture(width, height, out var updated);
+                var texPtr = Player.GetTexture(srcSize.Item1, srcSize.Item2, out var updated);
                 if (updated)
                 {
                     var src = (Texture2D)tex.Source;
@@ -146,8 +150,8 @@ namespace HMD.Scripts.Streaming
         //Resize the output textures to the size of the video
         private TextureView? TryGenerateTexture(uint px, uint py)
         {
-            var texptr = Player.GetTexture(px, py, out var updated);
-            if (px != 0 && py != 0 && updated && texptr != IntPtr.Zero)
+            var texPtr = Player.GetTexture(px, py, out var updated);
+            if (px != 0 && py != 0 && updated && texPtr != IntPtr.Zero)
             {
                 //If the currently playing video uses the Bottom Right orientation, we have to do this to avoid stretching it.
                 if (GetVideoOrientation() == VideoOrientation.BottomRight)
@@ -156,10 +160,12 @@ namespace HMD.Scripts.Streaming
                 }
 
                 var _source =
-                    Texture2D.CreateExternalTexture((int)px, (int)py, TextureFormat.RGBA32, false, true, texptr);
+                    Texture2D.CreateExternalTexture((int)px, (int)py, TextureFormat.RGBA32, false, true, texPtr);
                 //Make a texture of the proper size for the video to output to
 
                 var result = new TextureView(_source);
+
+                // Player.AspectRatio = result.AspectRatioStr.Value;
 
                 Log($"texture size {px} {py} | {result.Size}");
 
@@ -184,40 +190,15 @@ namespace HMD.Scripts.Streaming
             return orientation;
         }
 
-        public void SetARNull()
+        #region aspect ratio
+        public override Frac AspectRatio()
         {
-            if (Player is not null)
-                Player.AspectRatio = null;
-        }
+            var text = Player.AspectRatio;
+            if (text == null) return NativeAspectRatio();
 
-        public void SetAR4_3()
-        {
-            if (Player is not null)
-                Player.AspectRatio = "4:3";
+            return Frac.FromRatioText(text);
         }
-
-        public void SetAR16_10()
-        {
-            if (Player is not null)
-                Player.AspectRatio = "16:10";
-        }
-
-        public void SetAR16_9()
-        {
-            if (Player is not null)
-                Player.AspectRatio = "16:9";
-        }
-
-        public void SetAR2_1()
-        {
-            if (Player is not null)
-                Player.AspectRatio = "2:1";
-        }
-        // public void SetAR_2_35_to_1()
-        // {
-        //     if (mediaPlayer is not null)
-        //         mediaPlayer.AspectRatio = "2.35:1";
-        // }
+        #endregion
 
         public void Open(string path)
         {
@@ -292,13 +273,13 @@ namespace HMD.Scripts.Streaming
             });
         }
 
-        public void Stop()
+        public override void Stop()
         {
             Log("Stop");
             Player?.Stop();
         }
 
-        public void Play()
+        public override void Play()
         {
             Task.Run(async () =>
                 {
@@ -306,21 +287,27 @@ namespace HMD.Scripts.Streaming
 
                     Assert.IsTrue(isSuccessful && isPlaying, "should be playing");
 
-                    uint height = 0;
-                    uint width = 0;
-                    Player?.Size(0, ref width, ref height);
-
-                    Assert.AreNotEqual(height, 0, "height should not be 0");
-                    Assert.AreNotEqual(width, 0, "width should not be 0");
+                    // TODO: this should be useless now after VLC DirectShow fix
+                    // Assert.AreNotEqual(height, 0, "height should not be 0");
+                    // Assert.AreNotEqual(width, 0, "width should not be 0");
 
                     Debug.Log("Playing ...");
                 }
             );
         }
 
-        public void Pause()
+        public override void Pause()
         {
             Player.Pause();
+        }
+
+        public override (uint, uint) GetSize()
+        {
+            uint height = 0;
+            uint width = 0;
+            Player.Size(0, ref width, ref height);
+
+            return (width, height);
         }
 
         public void SeekForward10()
@@ -431,4 +418,5 @@ namespace HMD.Scripts.Streaming
             Player?.Unselect(type);
         }
     }
+
 }

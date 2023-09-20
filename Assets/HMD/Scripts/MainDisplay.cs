@@ -25,25 +25,26 @@ public class MainDisplay : MonoBehaviourWithLogging
 
     [SerializeField] public VideoMode _videoMode = VideoMode.Mono; // 2d by default
 
-    [FormerlySerializedAs("controlPanel")]
     public DashPanel dashPanel;
+    public VLCController controller;
 
     public VLCFeed VLC;
     public CameraDeviceFeed CameraDevice;
 
-    private List<IFeed> _allFeeds
+    private List<FeedLike> _allFeeds
     {
         get
         {
-            return new List<IFeed>
+            return new List<FeedLike>
             {
                 VLC, CameraDevice
             };
         }
     }
 
-    private IFeed _activeFeed;
-    private void ActivateFeed(IFeed feed)
+    private FeedLike _activeFeed;
+
+    private void ActivateFeed(FeedLike feed)
     {
         // _stopAllFeeds();
         _activeFeed = feed;
@@ -86,7 +87,7 @@ public class MainDisplay : MonoBehaviourWithLogging
     //
     // private GameObject _logo;
 
-    [SerializeField] private GameObject mainDisplay;
+    [SerializeField] private GameObject thisObject;
 
     [SerializeField] private GameObject leftEyeScreen;
     [SerializeField] private GameObject rightEyeScreen;
@@ -185,6 +186,7 @@ public class MainDisplay : MonoBehaviourWithLogging
     protected void Awake()
     {
         base.Awake();
+
         if (fovBar is not null) fovBar.value = fov;
 
         if (deformBar is not null) deformBar.value = 0.0f;
@@ -195,7 +197,8 @@ public class MainDisplay : MonoBehaviourWithLogging
         //     mainDisplay.transform.position.z
         // );
 
-        dashPanel.SetVLC(this);
+        dashPanel.mainDisplay = this;
+        controller.mainDisplay = this;
 
         // UpdateCameraReferences();
 
@@ -255,6 +258,8 @@ public class MainDisplay : MonoBehaviourWithLogging
         {
             Texture = newTexture;
             SetVideoModeAsap();
+
+            SetARDefault();
         }
     }
 
@@ -271,20 +276,14 @@ public class MainDisplay : MonoBehaviourWithLogging
     private void OnDestroy()
     {
         //Dispose of mediaPlayer, or it will stay in nemory and keep playing audio
-        foreach (var feed in _allFeeds)
-        {
-            feed.Dispose();
-        }
+        foreach (var feed in _allFeeds) feed.Dispose();
     }
 
 
     private void OnGUI() // TODO: test on phone
     {
         if (!dashPanel.OGMenuVisible()) return;
-        if (NRInput.GetButtonDown(ControllerButton.TRIGGER))
-        {
-            m_PreviousPos = NRInput.GetTouch();
-        }
+        if (NRInput.GetButtonDown(ControllerButton.TRIGGER)) m_PreviousPos = NRInput.GetTouch();
         // else if (NRInput.GetButton(ControllerButton.TRIGGER))
         // {
         //     //UpdateScroll();
@@ -316,7 +315,7 @@ public class MainDisplay : MonoBehaviourWithLogging
                 screen.GetComponent<SkinnedMeshRenderer>().SetBlendShapeWeight(1, value);
             }
 
-        mainDisplay.transform.localScale = new Vector3(scale, scale, scale);
+        thisObject.transform.localScale = new Vector3(scale, scale, scale);
     }
 
     private float lerpDuration = 1; // TODO: dynamic duration based on startValue
@@ -406,9 +405,9 @@ public class MainDisplay : MonoBehaviourWithLogging
     public void OnDistanceSliderUpdated()
     {
         var newDistance = distanceBar.value;
-        mainDisplay.transform.localPosition = new Vector3(
-            mainDisplay.transform.localPosition.x,
-            mainDisplay.transform.localPosition.y,
+        thisObject.transform.localPosition = new Vector3(
+            thisObject.transform.localPosition.x,
+            thisObject.transform.localPosition.y,
             newDistance
         );
     }
@@ -417,10 +416,10 @@ public class MainDisplay : MonoBehaviourWithLogging
     public void OnHorizontalSliderUpdated()
     {
         var newOffset = horizontalBar.value;
-        mainDisplay.transform.localPosition = new Vector3(
+        thisObject.transform.localPosition = new Vector3(
             newOffset,
-            mainDisplay.transform.localPosition.y,
-            mainDisplay.transform.localPosition.z
+            thisObject.transform.localPosition.y,
+            thisObject.transform.localPosition.z
         );
     }
 
@@ -428,10 +427,10 @@ public class MainDisplay : MonoBehaviourWithLogging
     public void OnVerticalSliderUpdated()
     {
         var newOffset = verticalBar.value;
-        mainDisplay.transform.localPosition = new Vector3(
-            mainDisplay.transform.localPosition.x,
+        thisObject.transform.localPosition = new Vector3(
+            thisObject.transform.localPosition.x,
             newOffset,
-            mainDisplay.transform.localPosition.z
+            thisObject.transform.localPosition.z
         );
     }
 
@@ -505,7 +504,7 @@ public class MainDisplay : MonoBehaviourWithLogging
         cone?.SetActive(false); // hide cone logo
         pointLight?.SetActive(false);
 
-        mainDisplay?.SetActive(true);
+        thisObject?.SetActive(true);
 
         _activeFeed?.Play();
     }
@@ -528,7 +527,7 @@ public class MainDisplay : MonoBehaviourWithLogging
 
         ClearMaterialTextureLinks();
 
-        mainDisplay.SetActive(false);
+        thisObject.SetActive(false);
         cone?.SetActive(true);
         pointLight?.SetActive(true);
     }
@@ -560,31 +559,73 @@ public class MainDisplay : MonoBehaviourWithLogging
         SetVideoMode(_videoMode);
     }
 
-    public string GetCurrentAR()
+
+    public Frac AspectRatio
     {
-        return VLC.Player.AspectRatio;
+        get
+        {
+            if (_activeFeed == null) return FeedLike.DefaultAspectRatio; // TODO: should not assume default value
+            return _activeFeed.AspectRatio();
+        }
+        set
+        {
+            VLC.Player.AspectRatio = value?.ToRatioText();
+
+            var actual = AspectRatio;
+            if (m_lMaterial is not null)
+                m_lMaterial.SetFloat("AspectRatio", (float)actual.ToDouble());
+
+            // todo: why are they affected instead of other materials?
+            if (m_rMaterial is not null)
+                m_rMaterial.SetFloat("AspectRatio", (float)actual.ToDouble());
+
+            var updater = new DashPanel.AspectRatioUpdater(this);
+            updater.SyncAll();
+        }
     }
 
-    // public void SetAspectRatio(string value) // TODO: marked for removal
-    // {
-    //     mediaPlayer.AspectRatio = value;
-    // }
-
-    public void SetCurrentAspectRatio(string arString)
+    public void SetARNull()
     {
-        VLC.Player.AspectRatio = arString;
+        AspectRatio = null;
+    }
 
-        var split = arString.Split(':');
-        var ar_width = float.Parse(split[0]);
-        var ar_height = float.Parse(split[1]);
-        var ar_float = ar_width / ar_height;
+    public void SetARDefault()
+    {
+        if (_activeFeed == null) { }
+        else
+        {
+            AspectRatio = _activeFeed.NativeAspectRatio();
+        }
+    }
 
-        if (m_lMaterial is not null)
-            m_lMaterial.SetFloat("AspectRatio", ar_float);
+    public void SetAR1_1()
+    {
+        AspectRatio = new Frac(1, 1);
+    }
 
-        // todo: make a combined shader?
-        if (m_rMaterial is not null)
-            m_rMaterial.SetFloat("AspectRatio", ar_float);
+    public void SetAR4_3()
+    {
+        AspectRatio = new Frac(4, 3);
+    }
+
+    public void SetAR16_10()
+    {
+        AspectRatio = new Frac(16, 10);
+    }
+
+    public void SetAR16_9()
+    {
+        AspectRatio = new Frac(16, 9);
+    }
+
+    public void SetAR2_1()
+    {
+        AspectRatio = new Frac(2, 1);
+    }
+
+    public void SetAR_235_to_100()
+    {
+        AspectRatio = new Frac(235, 100);
     }
 
     public void ClearMaterialTextureLinks()
@@ -605,10 +646,7 @@ public class MainDisplay : MonoBehaviourWithLogging
     public void SetVideoMode(VideoMode mode)
     {
         _videoMode = mode;
-        if (Texture != null)
-        {
-            SetVideoModeAsap();
-        }
+        if (Texture != null) SetVideoModeAsap();
     }
 
     private void SetVideoModeAsap()
@@ -654,6 +692,7 @@ public class MainDisplay : MonoBehaviourWithLogging
             _morphDisplayRightRenderer.material.mainTexture = Texture.Effective;
         }
     }
+
 
     // https://answers.unity.com/questions/1549639/enum-as-a-function-param-in-a-button-onclick.html?page=2&pageSize=5&sort=votes
 
@@ -722,11 +761,7 @@ public class MainDisplay : MonoBehaviourWithLogging
 
     private static Resolution? ParseResolution(string resText)
     {
-
-        if (string.IsNullOrEmpty(resText))
-        {
-            return null;
-        }
+        if (string.IsNullOrEmpty(resText)) return null;
 
         var parts = resText.Split(":").ToList();
         var nums = parts.Select(x => int.Parse(x)).ToArray();
@@ -745,7 +780,6 @@ public class MainDisplay : MonoBehaviourWithLogging
                 height = nums[1],
                 refreshRateRatio = fps
             };
-
         }
         else if (nums.Length == 3)
         {

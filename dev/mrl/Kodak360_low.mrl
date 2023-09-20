@@ -2,3 +2,4 @@ dshow://
 :dshow-vdev=PIXPRO ORBIT360 4K
 :dshow-size=1920x960
 :dshow-adev=none
+:live-caching=0
