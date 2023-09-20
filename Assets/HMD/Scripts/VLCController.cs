@@ -282,10 +282,16 @@ public class VLCController : MonoBehaviour
     private void IngestARWidthHeightInput()
     {
         if (_isDraggingARComboBar) return;
-        var width_rounded = (float)Math.Round((double)ARWidthBar.value, 2);
-        var height_rounded = (float)Math.Round((double)ARHeightBar.value, 2);
-        mainDisplay.SetCurrentAspectRatio($"{width_rounded}:{height_rounded}");
-        UpdateARComboFromWidthAndHeight(width_rounded, height_rounded);
+        var width = (float)Math.Round((double)ARWidthBar.value, 2);
+        var height = (float)Math.Round((double)ARHeightBar.value, 2);
+
+        mainDisplay.SetCurrentAspectRatio($"{width}:{height}");
+
+        if (_isDraggingARWidthBar || _isDraggingARHeightBar) return;
+        var ar_combo = Mathf.Round(width / height * 100f) / 100f;
+        ARComboBar.value = ar_combo;
+
+        // mainDisplay.dashPanel.UpdateCustomARPopupValuePreviewText();
     }
 
     private int[] AspectRatioFractionFromDecimal(float aspectRatio)
@@ -301,15 +307,6 @@ public class VLCController : MonoBehaviour
         var denominator = 100 / gcd;
         var fraction = new int[] { numerator, denominator };
         return fraction;
-    }
-
-    private void UpdateARComboFromWidthAndHeight(float width, float height)
-    {
-        if (_isDraggingARWidthBar || _isDraggingARHeightBar) return;
-        var ar_combo = Mathf.Round(width / height * 100f) / 100f;
-        ARComboBar.value = ar_combo;
-
-        // mainDisplay.dashPanel.UpdateCustomARPopupValuePreviewText();
     }
 
     private void UpdateARWidthAndHeightFromCombo()
