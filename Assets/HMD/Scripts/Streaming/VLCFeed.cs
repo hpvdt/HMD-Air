@@ -10,6 +10,7 @@ using Application = UnityEngine.Device.Application;
 
 namespace HMD.Scripts.Streaming
 {
+    using Util;
     public class VLCFeed : FeedLike
     {
         public bool DebugVLCPlayer;
@@ -190,48 +191,13 @@ namespace HMD.Scripts.Streaming
         }
 
         #region aspect ratio
-        public override string GetAspectRatioText()
+        public override Frac AspectRatio()
         {
-            var res = Player.AspectRatio;
-            if (res == null) res = NativeAspectRatioText;
+            var text = Player.AspectRatio;
+            if (text == null) return NativeAspectRatio();
 
-            return res;
+            return Frac.FromRatioText(text);
         }
-
-        public void SetARNull()
-        {
-            if (Player is not null)
-                Player.AspectRatio = null;
-        }
-
-        public void SetAR4_3()
-        {
-            if (Player is not null)
-                Player.AspectRatio = "4:3";
-        }
-
-        public void SetAR16_10()
-        {
-            if (Player is not null)
-                Player.AspectRatio = "16:10";
-        }
-
-        public void SetAR16_9()
-        {
-            if (Player is not null)
-                Player.AspectRatio = "16:9";
-        }
-
-        public void SetAR2_1()
-        {
-            if (Player is not null)
-                Player.AspectRatio = "2:1";
-        }
-        // public void SetAR_2_35_to_1()
-        // {
-        //     if (mediaPlayer is not null)
-        //         mediaPlayer.AspectRatio = "2.35:1";
-        // }
         #endregion
 
         public void Open(string path)

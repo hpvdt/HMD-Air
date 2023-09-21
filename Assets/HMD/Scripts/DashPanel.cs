@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HMD.Scripts.Util;
 using NRKernal;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -402,38 +403,38 @@ public class DashPanel : MonoBehaviour
     {
         _aspect_popup.SetActive(true);
 
-        UpdateAspectRatioPopupText();
+        var updater = new AspectRatioUpdater(mainDisplay);
 
-        // split and parse float
-        var ar = mainDisplay.GetCurrentAspectRatioText();
-        var split = ar.Split(':');
-        var ar_width = float.Parse(split[0]);
-        var ar_height = float.Parse(split[1]);
-
-        var ar_combo = ar_width / ar_height;
-
-        // set sliders to current value
-
-        // mainDisplay.controller.ARWidthBar.GetComponent<Slider>().value = ar_width;
-        // mainDisplay.controller.ARHeightBar.GetComponent<Slider>().value = ar_height;
-        mainDisplay.controller.ARComboBar.GetComponent<Slider>().value = ar_combo;
+        updater.SyncAll();
     }
 
-    public void UpdateAspectRatioPopupText()
+    public class AspectRatioUpdater
     {
+        public MainDisplay display;
+        public Frac value;
 
-        var text = mainDisplay.GetCurrentAspectRatioText();
+        public AspectRatioUpdater(MainDisplay display)
+        {
+            this.display = display;
+            value = display.AspectRatio;
+        }
 
-        // split and parse float
-        var split = text.Split(':');
-        var ar_width = float.Parse(split[0]);
-        var ar_height = float.Parse(split[1]);
+        public void SyncSlider()
+        {
+            display.controller.ARComboBar.GetComponent<Slider>().SetValueWithoutNotify((float)value.ToDouble());
+        }
 
-        var ar_combo = ar_width / ar_height;
-        ar_combo = Mathf.Round(ar_combo * 100f) / 100f;
+        public void SyncText()
+        {
+            GameObject.Find("ARValuePreview").GetComponent<Text>().text = value.ToRatioText();
+            GameObject.Find("ARValuePreviewDecimal").GetComponent<Text>().text = value.ToDouble().ToString();
+        }
 
-        GameObject.Find("ARValuePreview").GetComponent<Text>().text = text;
-        GameObject.Find("ARValuePreviewDecimal").GetComponent<Text>().text = ar_combo.ToString();
+        public void SyncAll()
+        {
+            SyncText();
+            SyncSlider();
+        }
     }
 
     private void HideAspectRatioPopup()

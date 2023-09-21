@@ -42,20 +42,17 @@ namespace HMD.Scripts.Streaming
 
         public abstract void Pause();
 
-        public static string DefaultAspectRatioText = "16:9";
+        public static Frac DefaultAspectRatio = new Frac(16, 9);
 
-        public string NativeAspectRatioText
+        public Frac NativeAspectRatio()
         {
-            get
-            {
-                var size = GetSize();
-                return $"{size.Item1}:{size.Item2}";
-            }
+            var size = GetSize();
+            return new Frac(size.Item1, size.Item2);
         }
 
-        public virtual string GetAspectRatioText()
+        public virtual Frac AspectRatio()
         {
-            return NativeAspectRatioText;
+            return NativeAspectRatio();
         }
 
         public bool flipTextureX; //No particular reason you'd need this but it is sometimes useful

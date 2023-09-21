@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using HMD.Scripts.Util;
 using LibVLCSharp;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -259,11 +260,11 @@ public class VLCController : MonoBehaviour
         arComboBarPointerUp.eventID = EventTriggerType.PointerUp;
         arComboBarPointerUp.callback.AddListener((data) =>
         {
-            if (_isDraggingARComboBar) UpdateAspectRatioFromCombo();
+            if (_isDraggingARComboBar) SyncAspectRatioCombo(ARComboBar.value);
             _isDraggingARComboBar = false;
         });
         arComboBarEvents.triggers.Add(arComboBarPointerUp);
-        ARComboBar.onValueChanged.AddListener((value) => { UpdateAspectRatioFromCombo(); });
+        ARComboBar.onValueChanged.AddListener((value) => { SyncAspectRatioCombo(value); });
 
         //Path Input
         // pathInputField.text = mainDisplay.VLC.Args.Location;
@@ -280,61 +281,20 @@ public class VLCController : MonoBehaviour
         volumeBar.gameObject.SetActive(false);
     }
 
-
-    private static int GCD(int a, int b)
+    private void SyncAspectRatioCombo(float value)
     {
-        while (b != 0)
-        {
-            var t = b;
-            b = a % b;
-            a = t;
-        }
-
-        return a;
-    }
-
-    private static int[] AspectRatioFractionFromDecimal(float aspectRatio)
-    {
-        // Multiply the aspect ratio by 100 to produce a whole number
-        var wholeNumber = (int)(aspectRatio * 100f);
-
-        // Find the GCD of the whole number and 100
-        var gcd = GCD(wholeNumber, 100);
-
-        // Divide the whole number and 100 by the GCD to reduce the fraction to its lowest terms
-        var numerator = wholeNumber / gcd;
-        var denominator = 100 / gcd;
-        var fraction = new int[] { numerator, denominator };
-        return fraction;
-    }
-
-    // private void UpdateAspectRatioFromFrac()
-    // {
-    //     if (_isDraggingARComboBar) return;
-    //     var width = (float)Math.Round((double)ARWidthBar.value, 2);
-    //     var height = (float)Math.Round((double)ARHeightBar.value, 2);
-    //
-    //     mainDisplay.SetCurrentAspectRatio($"{width}:{height}");
-    //
-    //     if (_isDraggingARWidthBar || _isDraggingARHeightBar) return;
-    //     var ar_combo = Mathf.Round(width / height * 100f) / 100f;
-    //     ARComboBar.value = ar_combo;
-    //
-    //     mainDisplay.dashPanel.UpdateAspectRatioPopupText();
-    // }
-
-    private void UpdateAspectRatioFromCombo()
-    {
-        var arDecimal = Mathf.Round(ARComboBar.value * 100f) / 100f;
+        var arDecimal = Mathf.Round(value * 100f) / 100f;
         // Get the aspect ratio fraction from the decimal
-        var fraction = AspectRatioFractionFromDecimal(arDecimal);
+        var frac = Frac.FromDouble(arDecimal);
 
         // Set the AR width and height bars to the fraction
         // ARWidthBar.value = fraction[0] / 100f;
         // ARHeightBar.value = fraction[1] / 100f;
 
-        mainDisplay.SetCurrentAspectRatio($"{fraction[0]}:{fraction[1]}");
-        mainDisplay.dashPanel.UpdateAspectRatioPopupText();
+        mainDisplay.AspectRatio = frac;
+
+        var updater = new DashPanel.AspectRatioUpdater(mainDisplay);
+        updater.SyncText();
     }
 
     private void Update()

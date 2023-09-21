@@ -562,28 +562,53 @@ public class MainDisplay : MonoBehaviourWithLogging
         SetVideoMode(_videoMode);
     }
 
-    public string GetCurrentAspectRatioText()
+    public Frac AspectRatio
     {
-        if (_activeFeed == null) return FeedLike.DefaultAspectRatioText; // TODO: should not assume default value
-        return _activeFeed.GetAspectRatioText();
+        get
+        {
+            if (_activeFeed == null) return FeedLike.DefaultAspectRatio; // TODO: should not assume default value
+            return _activeFeed.AspectRatio();
+        }
+        set
+        {
+            VLC.Player.AspectRatio = value?.ToRatioText();
+
+            var actual = AspectRatio;
+            if (m_lMaterial is not null)
+                m_lMaterial.SetFloat("AspectRatio", (float)actual.ToDouble());
+
+            // todo: make a combined shader?
+            if (m_rMaterial is not null)
+                m_rMaterial.SetFloat("AspectRatio", (float)actual.ToDouble());
+
+            var updater = new DashPanel.AspectRatioUpdater(this);
+            updater.SyncAll();
+        }
     }
 
-    public void SetCurrentAspectRatio(string arString)
+    public void SetARNull()
     {
-        // TODO: can we set AspectRatio of camera feed?
-        VLC.Player.AspectRatio = arString;
-
-        var split = arString.Split(':');
-        var ar_width = float.Parse(split[0]);
-        var ar_height = float.Parse(split[1]);
-        var ar_float = ar_width / ar_height;
-
-        if (m_lMaterial is not null)
-            m_lMaterial.SetFloat("AspectRatio", ar_float);
-
-        // todo: make a combined shader?
-        if (m_rMaterial is not null)
-            m_rMaterial.SetFloat("AspectRatio", ar_float);
+        AspectRatio = null;
+    }
+    public void SetAR4_3()
+    {
+        AspectRatio = new Frac(4, 3);
+    }
+    public void SetAR16_10()
+    {
+        AspectRatio = new Frac(16, 10);
+    }
+    public void SetAR16_9()
+    {
+        AspectRatio = new Frac(16, 9);
+    }
+    public void SetAR2_1()
+    {
+        AspectRatio = new Frac(2, 1);
+    }
+    public void SetAR_2_35_to_1()
+    {
+        AspectRatio = new Frac(2.35, 1);
     }
 
     public void ClearMaterialTextureLinks()
@@ -653,6 +678,9 @@ public class MainDisplay : MonoBehaviourWithLogging
             _morphDisplayRightRenderer.material.mainTexture = Texture.Effective;
         }
     }
+
+
+
 
     // https://answers.unity.com/questions/1549639/enum-as-a-function-param-in-a-button-onclick.html?page=2&pageSize=5&sort=votes
 
