@@ -12,7 +12,7 @@ namespace HMD.Scripts.Streaming
 
         public Lazy<(int, int)> Size;
 
-        public Lazy<string> NativeAspectRatioStr; // width:height
+        public Lazy<string> NativeAspectRatioText; // width:height
 
         public TextureView(Texture source)
         {
@@ -25,7 +25,7 @@ namespace HMD.Scripts.Streaming
             _cache.Create();
 
             Size = new Lazy<(int, int)>((_source.width, _source.height));
-            NativeAspectRatioStr = new Lazy<string>(() => $"{Size.Value.Item1}:{Size.Value.Item2}");
+            NativeAspectRatioText = new Lazy<string>(() => $"{Size.Value.Item1}:{Size.Value.Item2}");
         }
 
         public Texture Source

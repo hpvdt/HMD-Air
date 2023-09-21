@@ -405,7 +405,7 @@ public class DashPanel : MonoBehaviour
         UpdateAspectRatioPopupText();
 
         // split and parse float
-        var ar = mainDisplay.GetCurrentAspectRatio();
+        var ar = mainDisplay.GetCurrentAspectRatioText();
         var split = ar.Split(':');
         var ar_width = float.Parse(split[0]);
         var ar_height = float.Parse(split[1]);
@@ -421,16 +421,18 @@ public class DashPanel : MonoBehaviour
 
     public void UpdateAspectRatioPopupText()
     {
-        GameObject.Find("ARValuePreview").GetComponent<Text>().text = mainDisplay.GetCurrentAspectRatio();
+
+        var text = mainDisplay.GetCurrentAspectRatioText();
 
         // split and parse float
-        var split = mainDisplay.GetCurrentAspectRatio().Split(':');
+        var split = text.Split(':');
         var ar_width = float.Parse(split[0]);
         var ar_height = float.Parse(split[1]);
 
         var ar_combo = ar_width / ar_height;
         ar_combo = Mathf.Round(ar_combo * 100f) / 100f;
 
+        GameObject.Find("ARValuePreview").GetComponent<Text>().text = text;
         GameObject.Find("ARValuePreviewDecimal").GetComponent<Text>().text = ar_combo.ToString();
     }
 

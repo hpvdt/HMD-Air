@@ -42,9 +42,9 @@ namespace HMD.Scripts.Streaming
 
         public abstract void Pause();
 
-        public static string DefaultAspectRatioStr = "16:9";
+        public static string DefaultAspectRatioText = "16:9";
 
-        public string NativeAspectRatioStr
+        public string NativeAspectRatioText
         {
             get
             {
@@ -53,9 +53,9 @@ namespace HMD.Scripts.Streaming
             }
         }
 
-        public virtual string GetAspectRatioStr()
+        public virtual string GetAspectRatioText()
         {
-            return NativeAspectRatioStr;
+            return NativeAspectRatioText;
         }
 
         public bool flipTextureX; //No particular reason you'd need this but it is sometimes useful

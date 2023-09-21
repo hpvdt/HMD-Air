@@ -190,10 +190,10 @@ namespace HMD.Scripts.Streaming
         }
 
         #region aspect ratio
-        public override string GetAspectRatioStr()
+        public override string GetAspectRatioText()
         {
             var res = Player.AspectRatio;
-            if (res == null) res = NativeAspectRatioStr;
+            if (res == null) res = NativeAspectRatioText;
 
             return res;
         }

@@ -562,10 +562,10 @@ public class MainDisplay : MonoBehaviourWithLogging
         SetVideoMode(_videoMode);
     }
 
-    public string GetCurrentAspectRatio()
+    public string GetCurrentAspectRatioText()
     {
-        if (_activeFeed == null) return FeedLike.DefaultAspectRatioStr; // TODO: should not assume default value
-        return _activeFeed.GetAspectRatioStr();
+        if (_activeFeed == null) return FeedLike.DefaultAspectRatioText; // TODO: should not assume default value
+        return _activeFeed.GetAspectRatioText();
     }
 
     public void SetCurrentAspectRatio(string arString)
