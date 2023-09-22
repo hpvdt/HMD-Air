@@ -24,17 +24,19 @@
         public static Frac FromDouble(double d)
         {
             // Multiply the aspect ratio by 100 to produce a whole number
-            var wholeNumber = (int)(d * 1000);
+            var wholeNumber = (int)(d * gcdBase);
 
             // Find the GCD of the whole number and 100
-            var gcd = GCD(wholeNumber, 1000);
+            var gcd = GCD(wholeNumber, gcdBase);
 
             // Divide the whole number and 100 by the GCD to reduce the fraction to its lowest terms
             var numerator = wholeNumber / gcd;
-            var denominator = 1000 / gcd;
+            var denominator = gcdBase / gcd;
 
             return new Frac(numerator, denominator);
         }
+
+        private static int gcdBase = 128;
 
         private static int GCD(int a, int b)
         {
