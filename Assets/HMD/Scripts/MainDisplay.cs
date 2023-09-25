@@ -590,6 +590,10 @@ public class MainDisplay : MonoBehaviourWithLogging
     {
         AspectRatio = null;
     }
+    public void SetAR1_1()
+    {
+        AspectRatio = new Frac(1, 1);
+    }
     public void SetAR4_3()
     {
         AspectRatio = new Frac(4, 3);

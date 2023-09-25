@@ -2,3 +2,4 @@ dshow://
 :dshow-vdev=PIXPRO SP360 4K
 :dshow-size=1440x1440
 :dshow-adev=none
+:live-caching=0

@@ -1,3 +1,4 @@
 dshow://
 :dshow-vdev=USB2.0 HD UVC WebCam
 :dshow-adev=None
+:live-caching=0
