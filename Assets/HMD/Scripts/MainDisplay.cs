@@ -43,6 +43,7 @@ public class MainDisplay : MonoBehaviourWithLogging
     }
 
     private FeedLike _activeFeed;
+
     private void ActivateFeed(FeedLike feed)
     {
         // _stopAllFeeds();
@@ -257,6 +258,8 @@ public class MainDisplay : MonoBehaviourWithLogging
         {
             Texture = newTexture;
             SetVideoModeAsap();
+
+            SetARDefault();
         }
     }
 
@@ -273,20 +276,14 @@ public class MainDisplay : MonoBehaviourWithLogging
     private void OnDestroy()
     {
         //Dispose of mediaPlayer, or it will stay in nemory and keep playing audio
-        foreach (var feed in _allFeeds)
-        {
-            feed.Dispose();
-        }
+        foreach (var feed in _allFeeds) feed.Dispose();
     }
 
 
     private void OnGUI() // TODO: test on phone
     {
         if (!dashPanel.OGMenuVisible()) return;
-        if (NRInput.GetButtonDown(ControllerButton.TRIGGER))
-        {
-            m_PreviousPos = NRInput.GetTouch();
-        }
+        if (NRInput.GetButtonDown(ControllerButton.TRIGGER)) m_PreviousPos = NRInput.GetTouch();
         // else if (NRInput.GetButton(ControllerButton.TRIGGER))
         // {
         //     //UpdateScroll();
@@ -562,6 +559,7 @@ public class MainDisplay : MonoBehaviourWithLogging
         SetVideoMode(_videoMode);
     }
 
+
     public Frac AspectRatio
     {
         get
@@ -577,7 +575,7 @@ public class MainDisplay : MonoBehaviourWithLogging
             if (m_lMaterial is not null)
                 m_lMaterial.SetFloat("AspectRatio", (float)actual.ToDouble());
 
-            // todo: make a combined shader?
+            // todo: why are they affected instead of other materials?
             if (m_rMaterial is not null)
                 m_rMaterial.SetFloat("AspectRatio", (float)actual.ToDouble());
 
@@ -590,29 +588,44 @@ public class MainDisplay : MonoBehaviourWithLogging
     {
         AspectRatio = null;
     }
+
+    public void SetARDefault()
+    {
+        if (_activeFeed == null) { }
+        else
+        {
+            AspectRatio = _activeFeed.NativeAspectRatio();
+        }
+    }
+
     public void SetAR1_1()
     {
         AspectRatio = new Frac(1, 1);
     }
+
     public void SetAR4_3()
     {
         AspectRatio = new Frac(4, 3);
     }
+
     public void SetAR16_10()
     {
         AspectRatio = new Frac(16, 10);
     }
+
     public void SetAR16_9()
     {
         AspectRatio = new Frac(16, 9);
     }
+
     public void SetAR2_1()
     {
         AspectRatio = new Frac(2, 1);
     }
-    public void SetAR_2_35_to_1()
+
+    public void SetAR_235_to_100()
     {
-        AspectRatio = new Frac(2.35, 1);
+        AspectRatio = new Frac(235, 100);
     }
 
     public void ClearMaterialTextureLinks()
@@ -633,10 +646,7 @@ public class MainDisplay : MonoBehaviourWithLogging
     public void SetVideoMode(VideoMode mode)
     {
         _videoMode = mode;
-        if (Texture != null)
-        {
-            SetVideoModeAsap();
-        }
+        if (Texture != null) SetVideoModeAsap();
     }
 
     private void SetVideoModeAsap()
@@ -682,8 +692,6 @@ public class MainDisplay : MonoBehaviourWithLogging
             _morphDisplayRightRenderer.material.mainTexture = Texture.Effective;
         }
     }
-
-
 
 
     // https://answers.unity.com/questions/1549639/enum-as-a-function-param-in-a-button-onclick.html?page=2&pageSize=5&sort=votes
@@ -753,11 +761,7 @@ public class MainDisplay : MonoBehaviourWithLogging
 
     private static Resolution? ParseResolution(string resText)
     {
-
-        if (string.IsNullOrEmpty(resText))
-        {
-            return null;
-        }
+        if (string.IsNullOrEmpty(resText)) return null;
 
         var parts = resText.Split(":").ToList();
         var nums = parts.Select(x => int.Parse(x)).ToArray();
@@ -776,7 +780,6 @@ public class MainDisplay : MonoBehaviourWithLogging
                 height = nums[1],
                 refreshRateRatio = fps
             };
-
         }
         else if (nums.Length == 3)
         {

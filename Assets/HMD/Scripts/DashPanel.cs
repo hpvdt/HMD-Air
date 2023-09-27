@@ -421,13 +421,14 @@ public class DashPanel : MonoBehaviour
 
         public void SyncSlider()
         {
-            display.controller.ARComboBar.GetComponent<Slider>().SetValueWithoutNotify((float)value.ToDouble());
+            display.controller.aspectRatioComboBar.GetComponent<Slider>()
+                .SetValueWithoutNotify((float)value.ToDouble());
         }
 
         public void SyncText()
         {
-            GameObject.Find("ARValuePreview").GetComponent<Text>().text = value.ToRatioText();
-            GameObject.Find("ARValuePreviewDecimal").GetComponent<Text>().text = value.ToDouble().ToString();
+            display.controller.aspectRatioText.GetComponent<Text>().text =
+                $"{value.ToRatioText()} - {value.ToDouble().ToString()}";
         }
 
         public void SyncAll()

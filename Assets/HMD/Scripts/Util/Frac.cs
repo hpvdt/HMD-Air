@@ -3,10 +3,10 @@
     using System;
     public class Frac
     {
-        private double _nominator;
-        private double _denominator;
+        private int _nominator;
+        private int _denominator;
 
-        public Frac(double nominator, double denominator)
+        public Frac(int nominator, int denominator)
         {
             _nominator = nominator;
             _denominator = denominator;
@@ -14,7 +14,7 @@
 
         public double ToDouble()
         {
-            return _nominator / _denominator;
+            return (double)_nominator / _denominator;
         }
         public double ToExp()
         {
@@ -67,8 +67,8 @@
         public static Frac FromRatioText(string text)
         {
             var split = text.Split(':');
-            var a = double.Parse(split[0]);
-            var b = double.Parse(split[1]);
+            var a = int.Parse(split[0]);
+            var b = int.Parse(split[1]);
             return new Frac(a, b);
         }
 

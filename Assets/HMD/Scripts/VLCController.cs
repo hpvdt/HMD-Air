@@ -4,6 +4,7 @@ using HMD.Scripts.Util;
 using LibVLCSharp;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 ///This script controls all the GUI for the VLC Unity Canvas Example
@@ -50,7 +51,8 @@ public class VLCController : MonoBehaviour
 
     // public Slider ARWidthBar;
     // public Slider ARHeightBar;
-    public Slider ARComboBar;
+    public Slider aspectRatioComboBar;
+    public GameObject aspectRatioText;
 
     private bool _isDraggingARWidthBar = false;
     private bool _isDraggingARHeightBar = false;
@@ -249,7 +251,7 @@ public class VLCController : MonoBehaviour
         // });
 
         // AR Combo Bar Events
-        var arComboBarEvents = ARComboBar.GetComponent<EventTrigger>();
+        var arComboBarEvents = aspectRatioComboBar.GetComponent<EventTrigger>();
 
         var arComboBarPointerDown = new EventTrigger.Entry();
         arComboBarPointerDown.eventID = EventTriggerType.PointerDown;
@@ -260,11 +262,11 @@ public class VLCController : MonoBehaviour
         arComboBarPointerUp.eventID = EventTriggerType.PointerUp;
         arComboBarPointerUp.callback.AddListener((data) =>
         {
-            if (_isDraggingARComboBar) SyncAspectRatioCombo(ARComboBar.value);
+            if (_isDraggingARComboBar) SyncAspectRatioCombo(aspectRatioComboBar.value);
             _isDraggingARComboBar = false;
         });
         arComboBarEvents.triggers.Add(arComboBarPointerUp);
-        ARComboBar.onValueChanged.AddListener((value) => { SyncAspectRatioCombo(value); });
+        aspectRatioComboBar.onValueChanged.AddListener((value) => { SyncAspectRatioCombo(value); });
 
         //Path Input
         // pathInputField.text = mainDisplay.VLC.Args.Location;

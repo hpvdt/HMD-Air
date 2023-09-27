@@ -47,7 +47,7 @@ namespace HMD.Scripts.Streaming
         public Frac NativeAspectRatio()
         {
             var size = GetSize();
-            return new Frac(size.Item1, size.Item2);
+            return new Frac((int)size.Item1, (int)size.Item2);
         }
 
         public virtual Frac AspectRatio()
