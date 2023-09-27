@@ -31,7 +31,8 @@ namespace HMD.Scripts.Util
             // if (logToConsole)
             try
             {
-                Debug.unityLogger.Log(actualType, LoggerPrefix, $"[{LoggerPrefix}] {message}", this);
+                Debug.unityLogger.Log(actualType, $"[{LoggerPrefix}]", $"{message}", this);
+                Debug.Assert(LoggerPrefix != null, "Not Awaken! LoggerPrefix != null");
             }
             catch (Exception ee)
             {

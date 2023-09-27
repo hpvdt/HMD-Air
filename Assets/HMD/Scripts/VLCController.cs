@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using HMD.Scripts.Util;
 using LibVLCSharp;
 using UnityEngine;
@@ -12,8 +13,8 @@ using UnityEngine.UI;
 ///This example shows how to safely set up LibVLC events and a simple way to call Unity functions from them
 public class VLCController : MonoBehaviour
 {
-    [HideInInspector]
     public MainDisplay mainDisplay;
+    public DashPanel dashPanel;
 
     //GUI Elements
     //public RawImage screen;
@@ -82,13 +83,16 @@ public class VLCController : MonoBehaviour
 
     private void Start()
     {
-        if (mainDisplay is null)
-        {
-            Debug.LogError(
-                "VLC Player not found. Please assign a VLCMainDisplay component to the vlcPlayer variable in the inspector.");
-            return;
-        }
+        mainDisplay.controller = this;
+        dashPanel.controller = this;
 
+        LinkDisplay();
+
+        mainDisplay.Stop();
+    }
+
+    private void LinkDisplay()
+    {
         if (mainDisplay?.VLC.Player is null)
         {
             Debug.LogError("VLC Player mediaPlayer not found");

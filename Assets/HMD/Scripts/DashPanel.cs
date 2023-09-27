@@ -12,7 +12,7 @@ public class DashPanel : MonoBehaviour
     /*bool _menu_visible = false;*/
 
     [HideInInspector]
-    public MainDisplay mainDisplay;
+    public VLCController controller;
 
     private GameObject _menuPanel = null;
     private GameObject _og_menu = null;
@@ -403,7 +403,7 @@ public class DashPanel : MonoBehaviour
     {
         _aspect_popup.SetActive(true);
 
-        var updater = new AspectRatioUpdater(mainDisplay);
+        var updater = new AspectRatioUpdater(controller.mainDisplay);
 
         updater.SyncAll();
     }

@@ -118,7 +118,8 @@ public class HudLiteScript : MonoBehaviour
             //Send values to Gui and Instruments
             if (compassHSI != null) compassHSI.localRotation = Quaternion.Euler(0, 0, headingAmplitude * heading);
             if (compassBar != null) compassBar.heading = heading;
-            if (headingTxt != null) { if (heading < 0) headingTxt.text = (heading + 360f).ToString("000"); else headingTxt.text = heading.ToString("000"); }
+            if (headingTxt != null) { headingTxt.text = sensorReader.getHeading().ToString("000"); }
+            //if (headingTxt != null) { if (heading < 0) headingTxt.text = (heading + 360f).ToString("000"); else headingTxt.text = heading.ToString("000"); }
 
         }
         //////////////////////////////////////////// Compass, Heading and/or HSI

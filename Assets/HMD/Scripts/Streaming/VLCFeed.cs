@@ -62,20 +62,16 @@ namespace HMD.Scripts.Streaming
 
         private MediaPlayer _player;
 
-        //Create a new MediaPlayer object and dispose of the old one. 
-        private void RefreshMediaPlayer()
-        {
-            Log("CreateMediaPlayer");
-            if (_player != null) DestroyMediaPlayer();
-            _player = new MediaPlayer(libVLC);
-            Log("Media Player SET!");
-        }
-
         public MediaPlayer Player
         {
             get
             {
-                if (_player == null) RefreshMediaPlayer();
+                if (_player == null)
+                {
+                    Log($"LibVLC version and architecture {libVLC.Changeset}");
+                    Log($"LibVLCSharp version {typeof(LibVLC).Assembly.GetName().Version}");
+                    _player = new MediaPlayer(libVLC);
+                }
                 return _player;
             }
         }
@@ -84,34 +80,25 @@ namespace HMD.Scripts.Streaming
         //Dispose of the MediaPlayer object. 
         public void DestroyMediaPlayer()
         {
-            Stop();
+            if (_player != null)
+            {
+                Stop();
 
-            Log("DestroyMediaPlayer");
-            _player?.Stop();
-            _player?.Dispose();
-            _player = null;
+                _player?.Stop();
+                _player?.Dispose();
+                _player = null;
 
-            _libVLC?.Dispose();
-            _libVLC = null;
+                _libVLC?.Dispose();
+                _libVLC = null;
+
+                Log("Destroyed");
+            }
         }
 
         public override void Dispose()
         {
             DestroyMediaPlayer();
         }
-
-        #region unity
-        protected override void Awake()
-        {
-            base.Awake();
-
-            //Setup Media Player
-            RefreshMediaPlayer();
-
-            Log($"[VLC] LibVLC version and architecture {libVLC.Changeset}");
-            Log($"[VLC] LibVLCSharp version {typeof(LibVLC).Assembly.GetName().Version}");
-        }
-        #endregion
 
         protected override TextureView? TryGetTextureIfValid(TextureView? existing)
         {
@@ -202,7 +189,6 @@ namespace HMD.Scripts.Streaming
 
         public void Open(string path)
         {
-            Log("Open " + path);
             var _path = path.ToLower();
 
             if (_path.EndsWith(".url") || _path.EndsWith(".txt") || _path.EndsWith(".mrl"))
@@ -225,13 +211,11 @@ namespace HMD.Scripts.Streaming
 
         private void _openArgs()
         {
-            Log("Open");
-
             if (Player?.Media != null)
                 Player.Media.Dispose();
 
             var parameters = Args.Parameters;
-            Debug.Log(
+            Log(
                 $"Opening `{Args.Location}` with {parameters.Length} parameter(s)"
                 + $" {string.Join(" ", parameters.Select(s => $"`{s}`").ToArray())}"
             );
@@ -253,21 +237,12 @@ namespace HMD.Scripts.Streaming
                 var trackList = Player.Media.TrackList(TrackType.Video);
 
                 Debug.Log($"tracklist of {trackList.Count}");
-                Debug.Log($"projection {trackList[0].Data.Video.Projection}");
 
                 // TODO: add SBS / OU / TB filename recognition
 
-                // if (_is360)
-                // {
-                //     Debug.Log("The video is a 360 video");
-                //     SetVideoMode(VideoMode._360_2D);
-                // }
-                //
-                // else
-                // {
-                //     Debug.Log("The video was not identified as a 360 video by VLC");
-                // SetVideoMode(VideoMode.Mono);
-                // }
+                var projection = trackList[0].Data.Video.Projection;
+
+                Debug.Log($"Video uses {projection} projection");
 
                 trackList.Dispose();
             });

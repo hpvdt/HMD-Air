@@ -8,7 +8,6 @@ using LibVLCSharp;
 using NRKernal;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class MainDisplay : MonoBehaviourWithLogging
@@ -25,7 +24,7 @@ public class MainDisplay : MonoBehaviourWithLogging
 
     [SerializeField] public VideoMode _videoMode = VideoMode.Mono; // 2d by default
 
-    public DashPanel dashPanel;
+    [HideInInspector]
     public VLCController controller;
 
     public VLCFeed VLC;
@@ -188,7 +187,6 @@ public class MainDisplay : MonoBehaviourWithLogging
         base.Awake();
 
         if (fovBar is not null) fovBar.value = fov;
-
         if (deformBar is not null) deformBar.value = 0.0f;
 
         // _startPosition = new Vector3(
@@ -196,9 +194,6 @@ public class MainDisplay : MonoBehaviourWithLogging
         //     mainDisplay.transform.position.y,
         //     mainDisplay.transform.position.z
         // );
-
-        dashPanel.mainDisplay = this;
-        controller.mainDisplay = this;
 
         // UpdateCameraReferences();
 
@@ -263,26 +258,26 @@ public class MainDisplay : MonoBehaviourWithLogging
         }
     }
 
-    private void OnDisable()
-    {
-        OnDestroy();
-    }
-
-    private void OnApplicationQuit()
-    {
-        OnDestroy();
-    }
-
-    private void OnDestroy()
-    {
-        //Dispose of mediaPlayer, or it will stay in nemory and keep playing audio
-        foreach (var feed in _allFeeds) feed.Dispose();
-    }
+    // private void OnDisable()
+    // {
+    //     OnDestroy();
+    // }
+    //
+    // private void OnApplicationQuit()
+    // {
+    //     OnDestroy();
+    // }
+    //
+    // private void OnDestroy()
+    // {
+    //     //Dispose of mediaPlayer, or it will stay in nemory and keep playing audio
+    //     // foreach (var feed in _allFeeds) feed.Dispose();
+    // }
 
 
     private void OnGUI() // TODO: test on phone
     {
-        if (!dashPanel.OGMenuVisible()) return;
+        if (!controller.dashPanel.OGMenuVisible()) return;
         if (NRInput.GetButtonDown(ControllerButton.TRIGGER)) m_PreviousPos = NRInput.GetTouch();
         // else if (NRInput.GetButton(ControllerButton.TRIGGER))
         // {
@@ -501,12 +496,15 @@ public class MainDisplay : MonoBehaviourWithLogging
     #region vlc
     public void Play()
     {
-        cone?.SetActive(false); // hide cone logo
-        pointLight?.SetActive(false);
+        if (_activeFeed != null)
+        {
+            cone.SetActive(false); // hide cone logo
+            pointLight.SetActive(false);
 
-        thisObject?.SetActive(true);
+            thisObject.SetActive(true);
 
-        _activeFeed?.Play();
+            _activeFeed.Play();
+        }
     }
 
     private void _stopAllFeeds()
@@ -528,8 +526,9 @@ public class MainDisplay : MonoBehaviourWithLogging
         ClearMaterialTextureLinks();
 
         thisObject.SetActive(false);
-        cone?.SetActive(true);
-        pointLight?.SetActive(true);
+
+        cone.SetActive(true);
+        pointLight.SetActive(true);
     }
 
     public void Pause()
