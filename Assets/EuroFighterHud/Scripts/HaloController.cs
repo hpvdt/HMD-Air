@@ -20,20 +20,11 @@ public class HaloController : MonoBehaviour
     {
         transform.rotation = Quaternion.Inverse(leader.rotation);
 
-        Vector3 vector = convertAngletoUnitVector3();
-
-        transform.Rotate(vector);
-    }
-
-
-    
-    Vector3 convertAngletoUnitVector3() {
-
         float degree = binaryDecoder.getHeading();
 
-        Vector3 vector = new Vector3(Mathf.Sin(degree), Mathf.Cos(degree), 0);
+        Vector3 vector = new Vector3(0, -degree, 0);
 
-        return vector;
+        transform.Rotate(vector);
     }
 
 

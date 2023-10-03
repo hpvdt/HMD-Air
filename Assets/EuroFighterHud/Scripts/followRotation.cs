@@ -8,6 +8,8 @@ public class followRotation : MonoBehaviour
 
     public Transform leader;
 
+    public bool inverse = false;
+
     void Start()
     {
         
@@ -16,6 +18,15 @@ public class followRotation : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.rotation = leader.rotation;
+
+        if (!inverse)
+        {
+            transform.rotation = leader.rotation;
+        }
+        else
+        {
+            transform.rotation = Quaternion.Inverse(leader.rotation);
+        }
+
     }
 }

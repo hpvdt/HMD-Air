@@ -27,18 +27,6 @@ public class KeyboardRotationController : MonoBehaviour
                 transform.Rotate(Vector3.left, rotationAmount);
             }
 
-            if (Input.GetKey(KeyCode.A))
-            {
-                // Rotate left
-                transform.Rotate(Vector3.down, rotationAmount);
-            }
-
-            if (Input.GetKey(KeyCode.D))
-            {
-                // Rotate right
-                transform.Rotate(Vector3.up, rotationAmount);
-            }
-
             if (Input.GetKey(KeyCode.Q))
             {
                 // Rotate cork screw left

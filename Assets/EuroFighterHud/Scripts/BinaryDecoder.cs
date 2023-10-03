@@ -82,7 +82,7 @@ public class BinaryDecoder : MonoBehaviour
             GyroY = dataArray[3];
             GyroZ = dataArray[4];
             GyroW = dataArray[5];
-            heading = dataArray[6];
+            //heading = dataArray[6];
 
             GPSX = dataArray[7];
             GPSY = dataArray[8];
@@ -102,12 +102,54 @@ public class BinaryDecoder : MonoBehaviour
 
             windDir.Set(windX, windY, windZ);
 
+            if (Input.GetKey(KeyCode.A))
+            {
+                // Rotate left
+                heading -= 0.5f;
+            }
 
-            
+            if (Input.GetKey(KeyCode.D))
+            {
+                // Rotate right
+                heading += 0.5f;
+            }
+
+            if (Input.GetKey(KeyCode.G))
+            {
+                // Rotate right
+                heading = 0f;
+            }
+
+            if (Input.GetKey(KeyCode.H))
+            {
+                // Rotate right
+                heading = 90f;
+            }
+
+            if (Input.GetKey(KeyCode.J))
+            {
+                // Rotate right
+                heading = 180f;
+            }
+
+            if (Input.GetKey(KeyCode.K))
+            {
+                // Rotate right
+                heading = 270f;
+            }
+
+            if (Input.GetKey(KeyCode.L))
+            {
+                // Rotate right
+                heading = 360f;
+            }
+
+            Debug.Log(heading);
+
         }
         catch
         {
-            Debug.Log("Nuh Uh");
+            
         }
     }
 
