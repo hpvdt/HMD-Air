@@ -4,10 +4,12 @@
 
 ## How to compile
 
-- `git clone <this project>`
+- `git clone <this project> --recursive`
 - `git checkout <development branch>`
 - `git submodule update --init --recursive`
 - Open this directory with the latest Unity editor 2022 LTS
+- Select your favourite IDE in menu `Editor/Preferences/External Tools`
+- Open with IDE by selecting `Assets/Open C# Project`
 
 ## How to contribute
 
