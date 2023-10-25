@@ -100,7 +100,7 @@ namespace HMD.Scripts.Streaming
             DestroyMediaPlayer();
         }
 
-        protected override TextureView? TryGetTextureIfValid(TextureView? existing)
+        protected override TextureView? FetchTexture(TextureView? existing)
         {
             //Get size every frame
 

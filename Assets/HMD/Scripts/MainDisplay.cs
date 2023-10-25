@@ -10,7 +10,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MainDisplay : MonoBehaviourWithLogging
+public class MainDisplay : MonoBehaviourWithLogging, IDisposable
 {
     public enum VideoMode
     {
@@ -28,7 +28,7 @@ public class MainDisplay : MonoBehaviourWithLogging
     public VLCController controller;
 
     public VLCFeed VLC;
-    public CameraDeviceFeed CameraDevice;
+    public VCaptureFeed VCapture;
 
     private List<FeedLike> _allFeeds
     {
@@ -36,7 +36,7 @@ public class MainDisplay : MonoBehaviourWithLogging
         {
             return new List<FeedLike>
             {
-                VLC, CameraDevice
+                VLC, VCapture
             };
         }
     }
@@ -258,22 +258,21 @@ public class MainDisplay : MonoBehaviourWithLogging
         }
     }
 
-    // private void OnDisable()
-    // {
-    //     OnDestroy();
-    // }
-    //
-    // private void OnApplicationQuit()
-    // {
-    //     OnDestroy();
-    // }
-    //
-    // private void OnDestroy()
-    // {
-    //     //Dispose of mediaPlayer, or it will stay in nemory and keep playing audio
-    //     // foreach (var feed in _allFeeds) feed.Dispose();
-    // }
+    private void OnApplicationQuit()
+    {
+        Dispose();
+    }
 
+    private void OnDestroy()
+    {
+        Dispose();
+    }
+
+    public void Dispose()
+    {
+        //Dispose of mediaPlayer, or it will stay in nemory and keep playing audio
+        foreach (var feed in _allFeeds) feed.Dispose();
+    }
 
     private void OnGUI() // TODO: test on phone
     {
@@ -753,8 +752,8 @@ public class MainDisplay : MonoBehaviourWithLogging
     {
         var res = ParseResolution(resText);
 
-        ActivateFeed(CameraDevice);
-        CameraDevice.OpenNextDevice(res);
+        ActivateFeed(VCapture);
+        VCapture.OpenNextDevice(res);
         Play();
     }
 

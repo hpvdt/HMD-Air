@@ -5,7 +5,7 @@ namespace HMD.Scripts.Streaming
     using Unity.VisualScripting;
     using UnityEngine;
 
-    public class CameraDeviceFeed : FeedLike
+    public class VCaptureFeed : FeedLike
     {
         public struct CameraSelector
         {
@@ -112,7 +112,7 @@ namespace HMD.Scripts.Streaming
             _webCamTex?.Stop();
         }
 
-        protected override TextureView? TryGetTextureIfValid(TextureView? existing)
+        protected override TextureView? FetchTexture(TextureView? existing)
         {
             var tex = existing;
             var srcSize = GetSize();

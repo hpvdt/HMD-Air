@@ -8,7 +8,7 @@ namespace HMD.Scripts.Streaming
     {
         public abstract (uint, uint) GetSize();
 
-        public bool isValid()
+        private bool CanFetch()
         {
             var size = GetSize();
             if (size.Item1 == 0 || size.Item2 == 0) return false;
@@ -16,13 +16,13 @@ namespace HMD.Scripts.Streaming
             return true;
         }
 
-        protected abstract TextureView? TryGetTextureIfValid(TextureView? existing);
+        protected abstract TextureView? FetchTexture(TextureView? existing);
 
         public TextureView? TryGetTexture(TextureView? existing)
         {
-            if (isValid())
+            if (CanFetch())
             {
-                var res = TryGetTextureIfValid(existing);
+                var res = FetchTexture(existing);
 
                 if (existing != null && res != null && res != existing)
                 {
@@ -58,6 +58,7 @@ namespace HMD.Scripts.Streaming
         public bool flipTextureX; //No particular reason you'd need this but it is sometimes useful
         public bool flipTextureY; //Set to false on Android, to true on Windows
         public bool automaticallyFlipOnAndroid = true; //Automatically invert Y on Android
+
         protected Vector2 Transform
         {
             get
@@ -69,6 +70,7 @@ namespace HMD.Scripts.Streaming
         {
             get;
         } = Vector2.one;
+
         protected virtual void Awake()
         {
             base.Awake();

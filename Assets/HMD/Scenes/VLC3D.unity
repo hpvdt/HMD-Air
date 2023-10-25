@@ -1073,7 +1073,7 @@ MonoBehaviour:
   _videoMode: 0
   controller: {fileID: 1213583959}
   VLC: {fileID: 1295873830}
-  CameraDevice: {fileID: 790403057}
+  VCapture: {fileID: 790403057}
   LeftCamera: {fileID: 2066632863}
   CenterCamera: {fileID: 1085126938}
   RightCamera: {fileID: 2087385060}
@@ -8948,7 +8948,7 @@ GameObject:
   - component: {fileID: 790403056}
   - component: {fileID: 790403057}
   m_Layer: 0
-  m_Name: CameraDeviceFeed
+  m_Name: VCaptureFeed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

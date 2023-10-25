@@ -64,6 +64,6 @@ resharper_wrap_object_and_collection_initializer_style = chop_always
 root = true
 
 # Ignore paths
-[Assets/{NRSDK,VLCUnity}/*]
+[Assets/{NRSDK,VLCUnity}]
 
 generated_code = true
