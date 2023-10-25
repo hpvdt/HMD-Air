@@ -57,15 +57,15 @@ public class BinaryDecoder : MonoBehaviour
         {
             //string readInput = sp.ReadLine();
             
-            //gibberish
-
             //byte[] bytes = BinaryStringToByteArray(readInput);
 
-            //string final = Encoding.UTF8.GetString(bytes);
+            //string deCoded = Encoding.UTF8.GetString(bytes);
 
-            string final = "00110101 00101110 00110000 00100000 00110101 00101110 00110000 00100000 00110001 00101110 00110000 00100000 00110001 00101110 00110000 00100000 00110000 00101110 00110000 00100000 00101101 00110001 00101110 00110000 00100000 00110011 00110000 00101110 00110000 00100000 00110001 00110000 00101110 00110101 00100000 00110010 00110000 00101110 00110011 00100000 00110110 00110000 00110000 00101110 00110000 00100000 00110010 00101110 00110000 00100000 00110001 00101110 00110001 00100000 00110010 00110011 00101110 00110001 00100000 00110011 00110100 00101110 00110010 00100000 00111000 00101110 00111001 00100000 00110011 00101110 00110110 00100000 00110000 00101110 00110000 00110010";
+            // Test input
 
-            string[] stringArray = final.Split(" ");
+            string deCoded = "00110101 00101110 00110000 00100000 00110101 00101110 00110000 00100000 00110001 00101110 00110000 00100000 00110001 00101110 00110000 00100000 00110000 00101110 00110000 00100000 00101101 00110001 00101110 00110000 00100000 00110011 00110000 00101110 00110000 00100000 00110001 00110000 00101110 00110101 00100000 00110010 00110000 00101110 00110011 00100000 00110110 00110000 00110000 00101110 00110000 00100000 00110010 00101110 00110000 00100000 00110001 00101110 00110001 00100000 00110010 00110011 00101110 00110001 00100000 00110011 00110100 00101110 00110010 00100000 00111000 00101110 00111001 00100000 00110011 00101110 00110110 00100000 00110000 00101110 00110000 00110010";
+
+            string[] stringArray = deCoded.Split(" ");
 
             float[] dataArray = new float[stringArray.Length];
 
@@ -82,7 +82,7 @@ public class BinaryDecoder : MonoBehaviour
             GyroY = dataArray[3];
             GyroZ = dataArray[4];
             GyroW = dataArray[5];
-            //heading = dataArray[6];
+            heading = dataArray[6];
 
             GPSX = dataArray[7];
             GPSY = dataArray[8];
@@ -102,49 +102,7 @@ public class BinaryDecoder : MonoBehaviour
 
             windDir.Set(windX, windY, windZ);
 
-            if (Input.GetKey(KeyCode.A))
-            {
-                // Rotate left
-                heading -= 0.5f;
-            }
-
-            if (Input.GetKey(KeyCode.D))
-            {
-                // Rotate right
-                heading += 0.5f;
-            }
-
-            if (Input.GetKey(KeyCode.G))
-            {
-                // Rotate right
-                heading = 0f;
-            }
-
-            if (Input.GetKey(KeyCode.H))
-            {
-                // Rotate right
-                heading = 90f;
-            }
-
-            if (Input.GetKey(KeyCode.J))
-            {
-                // Rotate right
-                heading = 180f;
-            }
-
-            if (Input.GetKey(KeyCode.K))
-            {
-                // Rotate right
-                heading = 270f;
-            }
-
-            if (Input.GetKey(KeyCode.L))
-            {
-                // Rotate right
-                heading = 360f;
-            }
-
-            Debug.Log(heading);
+            
 
         }
         catch
