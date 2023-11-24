@@ -34,4 +34,13 @@
 
 ## Communication
 
-- Issue tracker & project status: https://github.com/orgs/hpvdt/projects/2
+- Project status: https://github.com/orgs/hpvdt/projects/2
+- Feel free to propose new feature & hotfix as task list items
+- Please be nice be respectful, particularly to all test pilots (Calvin, Bill, Claire) who are risking their lives to push the envelop
+
+## How to ask questions
+
+- Go to project status page: https://github.com/orgs/hpvdt/projects/2
+- Select the component you intend to ask about (under `TODO` tab, enclosed in `[]`, e.g. `[Pilot UI]` and `[Telemetry]`)
+- Find the owner/assignee of the component on the same page
+- post your question under the same page, or ask the owner directly via Discord.
