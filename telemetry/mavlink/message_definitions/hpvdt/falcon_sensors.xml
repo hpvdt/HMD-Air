@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<mavlink>
+  <version>3</version>
+  <dialect>0</dialect>
+  <messages>
+    <message id="31" name="ATTITUDE_QUATERNION">
+      <description>The attitude in the aeronautical frame (right-handed, Z-down, X-front, Y-right),
+        expressed as quaternion. Quaternion order is w, x, y, z and a zero rotation would be
+        expressed as (1 0 0 0).</description>
+      <field type="float" name="Airspeed" units="rad/s"> Airspeed</field>
+      <field type="float" name="Altimeter" units="rad/s">Altitude</field>
+      <field type="float" name="Gyroscope_X_axis" units="rad/s">Gyroscope in the X dimension</field>
+      <field type="float" name="Gyroscope_Y_axis" units="rad/s">Gyroscope in the Y dimension</field>
+      <field type="float" name="Gyroscope_Z_axis" units="rad/s">Gyroscope in the Z dimension</field>
+      <field type="float" name="Gyroscope_W_axis" units="rad/s">Scalar of the Gyroscope</field>
+      <field type="float" name="GPS_X_axis" units="rad/s">GPS in the X axis</field>
+      <field type="float" name="GPS_Y_axis" units="rad/s">GPS in the Y axis</field>
+      <field type="float" name="total_energy" units="rad/s">Total energy of Kinetic and Potential
+        Energy added together</field>
+      <field type="float" name="energy_loss_rate" units="rad/s">Loss of total energy</field>
+      <field type="float" name="efficiency" units="rad/s">Efficiency of system</field>
+      <field type="float" name="thermometer" units="rad/s">Measures temperature</field>
+      <field type="float" name="barometer" units="rad/s">Measures pressure</field>
+      <field type="float" name="wind_direction_X_axis" units="rad/s">Direction of wind in X axis</field>
+      <field type="float" name="wind_direction_Y_axis" units="rad/s">Direction of wind in Y axis</field>
+      <field type="float" name="wind_direction_Z_axis" units="rad/s">Direction of wind in Z axis</field>
+      <extensions />
+      <field type="float[4]" name="repr_offset_q">Rotation offset by which the attitude quaternion
+        and angular speed vector should be rotated for user display (quaternion with [w, x, y, z]
+        order, zero-rotation is [1, 0, 0, 0], send [0, 0, 0, 0] if field not supported). This field
+        is intended for systems in which the reference attitude may change during flight. For
+        example, tailsitters VTOLs rotate their reference attitude by 90 degrees between hover mode
+        and fixed wing mode, thus repr_offset_q is equal to [1, 0, 0, 0] in hover mode and equal to
+        [0.7071, 0, 0.7071, 0] in fixed wing mode.</field>
+    </message>
+  </messages>
+</mavlink>
