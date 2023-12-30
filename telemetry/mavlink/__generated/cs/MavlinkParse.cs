@@ -55,13 +55,6 @@ public partial class MAVLink
         public string Text { get; set; }
     }
 
-    public class hasLocation : Attribute
-    {
-        public hasLocation()
-        {
-        }
-    }
-
     public class MavlinkParse
     {
         public int packetcount = 0;
@@ -166,6 +159,7 @@ public partial class MAVLink
 
             if (readcount >= MAVLink.MAVLINK_MAX_PACKET_LEN)
             {
+                return null;
                 throw new InvalidDataException("No header found in data");
             }
 
@@ -173,7 +167,13 @@ public partial class MAVLink
             var headerlengthstx = headerlength + 1;
 
             // read header
-            ReadWithTimeout(BaseStream, buffer, 1, headerlength);
+            try {
+                ReadWithTimeout(BaseStream, buffer, 1, headerlength);
+            }
+            catch (EndOfStreamException)
+            {
+                return null;
+            }
 
             // packet length
             int lengthtoread = 0;
@@ -190,8 +190,15 @@ public partial class MAVLink
                 lengthtoread = buffer[1] + headerlengthstx + 2 - 2; // data + header + checksum - U - length    
             }
 
-            //read rest of packet
-            ReadWithTimeout(BaseStream, buffer, headerlengthstx, lengthtoread - (headerlengthstx-2));
+            try
+            {
+                //read rest of packet
+                ReadWithTimeout(BaseStream, buffer, headerlengthstx, lengthtoread - (headerlengthstx - 2));
+            }
+            catch (EndOfStreamException)
+            {
+                return null;
+            }
 
             // resize the packet to the correct length
             Array.Resize<byte>(ref buffer, lengthtoread + 2);
@@ -343,15 +350,15 @@ public partial class MAVLink
                 {
                     signingKey = new byte[32];
                 }
-
-                using (SHA256 signit = SHA256.Create())
+                
+                using (SHA256CryptoServiceProvider signit = new SHA256CryptoServiceProvider())
                 {
                     MemoryStream ms = new MemoryStream();
                     ms.Write(signingKey, 0, signingKey.Length);
                     ms.Write(packet, 0, i);
                     ms.Write(sig, 0, sig.Length);
 
-                    var ctx = signit.ComputeHash(ms.ToArray());
+                    var ctx = signit.ComputeHash(ms.GetBuffer());
                     // trim to 48
                     Array.Resize(ref ctx, 6);
 

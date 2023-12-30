@@ -29,7 +29,7 @@ map = {
     }
     
 def generate_message_header(f, xml_list):
-    dedup = {}
+    dedupe = {}
     for xml in xml_list:
         print("generate_message_header " + xml.basename)
         if xml.little_endian:
@@ -68,8 +68,8 @@ def generate_message_header(f, xml_list):
             # we sort with primary key msgid, secondary key dialect
             for msgid in sorted(xml.message_names.keys()):
                 name = xml.message_names[msgid]
-                if name not in dedup:
-                    dedup[name] = 1
+                if name not in dedupe:
+                    dedupe[name] = 1
                     xml_list[0].message_infos_array += '        new message_info(%u, "%s", %u, %u, %u, typeof( mavlink_%s_t )),\n' % (msgid,
                                                                         name,
                                                                         xml.message_crcs[msgid],
@@ -82,8 +82,8 @@ def generate_message_header(f, xml_list):
                 crc = xml.message_crcs.get(msgid, None)
                 name = xml.message_names.get(msgid, None)
                 length = xml.message_lengths.get(msgid, None)
-                if name is not None and name not in dedup:
-                    dedup[name] = 1
+                if name is not None and name not in dedupe:
+                    dedupe[name] = 1
                     xml_list[0].message_infos_array += '        new message_info(%u, "%s", %u, %u, %u, typeof( mavlink_%s_t )), // none 24 bit\n' % (msgid, 
                                                                         name,
                                                                         crc,
@@ -214,12 +214,8 @@ def generate_message_enums(f, xml):
             if hasattr(fe, "deprecated") and fe.deprecated is True:
                 fe.name = '''[Obsolete]
         %s''' % fe.name
-            if fe.has_location is True:
-                fe.name = '''[hasLocation()]
-        %s''' % fe.name
-            if hasattr(fe, "isDestination") and fe.isDestination is True:
-                fe.name = '''[isDestination()]
-        %s''' % fe.name
+            for p in fe.param:
+                p.description = cleanText(p.description)
             
     t.write(f, '''
     ${{enum:
@@ -256,30 +252,16 @@ def generate_message_h(f, directory, m):
     ///<summary> ${description} </summary>
     public struct mavlink_${name_lower}_t
     {
-        /// packet ordered constructor
         public mavlink_${name_lower}_t(${{ordered_fields:${type} ${name},}}) 
         {
-            ${{ordered_fields:this.${name} = ${name};
+            ${{ordered_fields:  this.${name} = ${name};
             }}
         }
-        
-        /// packet xml order
-        public static mavlink_${name_lower}_t PopulateXMLOrder(${{fields:${type} ${name},}}) 
-        {
-            var msg = new mavlink_${name_lower}_t();
-
-            ${{fields:msg.${name} = ${name};
-            }}
-            return msg;
-        }
-        
-${{ordered_fields:
-        /// <summary>${description} ${enum} ${units} ${display}</summary>
+${{ordered_fields:        /// <summary>${description} ${enum} ${units} ${display}</summary>
         [Units("${units}")]
         [Description("${description}")]
-        //[FieldOffset(${wire_offset})]
         ${array_prefix} ${type} ${name};
-}}
+    }}
     };
 
 ''', m)
