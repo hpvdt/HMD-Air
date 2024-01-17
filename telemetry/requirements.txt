@@ -1,2 +1,1 @@
-setuptools>=68.2.2
 future>=0.18.3

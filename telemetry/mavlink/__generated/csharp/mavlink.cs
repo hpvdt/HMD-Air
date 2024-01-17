@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 public partial class MAVLink
 {
-    public const string MAVLINK_BUILD_DATE = "Sat Jan 06 2024";
+    public const string MAVLINK_BUILD_DATE = "Tue Jan 16 2024";
     public const string MAVLINK_WIRE_PROTOCOL_VERSION = "2.0";
     public const int MAVLINK_MAX_PAYLOAD_LEN = 255;
 
@@ -325,7 +325,6 @@ public partial class MAVLink
         new message_info(50003, "HERELINK_TELEM", 62, 19, 19, typeof( mavlink_herelink_telem_t )),
         new message_info(50004, "CUBEPILOT_FIRMWARE_UPDATE_START", 240, 10, 10, typeof( mavlink_cubepilot_firmware_update_start_t )),
         new message_info(50005, "CUBEPILOT_FIRMWARE_UPDATE_RESP", 152, 6, 6, typeof( mavlink_cubepilot_firmware_update_resp_t )),
-        new message_info(26900, "VIDEO_STREAM_INFORMATION99", 222, 246, 246, typeof( mavlink_video_stream_information99_t )),
 
     };
 
@@ -650,7 +649,6 @@ public partial class MAVLink
         HERELINK_TELEM = 50003,
         CUBEPILOT_FIRMWARE_UPDATE_START = 50004,
         CUBEPILOT_FIRMWARE_UPDATE_RESP = 50005,
-        VIDEO_STREAM_INFORMATION99 = 26900,
     }
     
     
@@ -2422,7 +2420,6 @@ public partial class MAVLink
         OSD_PARAM_INVALID_PARAMETER=3, 
         
     };
-    
     
     
     ///<summary> These values define the type of firmware release.  These values indicate the first version or release of this type.  For example the first alpha release would be 64, the second would be 65. </summary>
@@ -10032,60 +10029,6 @@ public partial class MAVLink
         [Description("Temperature.")]
         [MarshalAs(UnmanagedType.ByValArray,SizeConst=4)]
 		public byte[] temperature;
-    
-    };
-
-    
-    /// extensions_start 0
-    [StructLayout(LayoutKind.Sequential,Pack=1,Size=246)]
-    ///<summary> Information about video stream </summary>
-    public struct mavlink_video_stream_information99_t
-    {
-        public mavlink_video_stream_information99_t(float framerate,uint bitrate,ushort resolution_h,ushort resolution_v,ushort rotation,byte camera_id,byte status,byte[] uri) 
-        {
-              this.framerate = framerate;
-              this.bitrate = bitrate;
-              this.resolution_h = resolution_h;
-              this.resolution_v = resolution_v;
-              this.rotation = rotation;
-              this.camera_id = camera_id;
-              this.status = status;
-              this.uri = uri;
-            
-        }
-        /// <summary>Frame rate.  [Hz] </summary>
-        [Units("[Hz]")]
-        [Description("Frame rate.")]
-        public  float framerate;
-            /// <summary>Bit rate.  [bits/s] </summary>
-        [Units("[bits/s]")]
-        [Description("Bit rate.")]
-        public  uint bitrate;
-            /// <summary>Horizontal resolution.  [pix] </summary>
-        [Units("[pix]")]
-        [Description("Horizontal resolution.")]
-        public  ushort resolution_h;
-            /// <summary>Vertical resolution.  [pix] </summary>
-        [Units("[pix]")]
-        [Description("Vertical resolution.")]
-        public  ushort resolution_v;
-            /// <summary>Video image rotation clockwise.  [deg] </summary>
-        [Units("[deg]")]
-        [Description("Video image rotation clockwise.")]
-        public  ushort rotation;
-            /// <summary>Video Stream ID (1 for first, 2 for second, etc.)   </summary>
-        [Units("")]
-        [Description("Video Stream ID (1 for first, 2 for second, etc.)")]
-        public  byte camera_id;
-            /// <summary>Number of streams available.   </summary>
-        [Units("")]
-        [Description("Number of streams available.")]
-        public  byte status;
-            /// <summary>Video stream URI (TCP or RTSP URI ground station should connect to) or port number (UDP port ground station should listen to).   </summary>
-        [Units("")]
-        [Description("Video stream URI (TCP or RTSP URI ground station should connect to) or port number (UDP port ground station should listen to).")]
-        [MarshalAs(UnmanagedType.ByValArray,SizeConst=230)]
-		public byte[] uri;
     
     };
 
