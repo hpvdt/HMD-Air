@@ -19,7 +19,6 @@ import serial
 
 serial_port = serial.Serial('COM3', baudrate=9600, timeout=1)
 mav = common.MAVLink(serial_port)
-print('work')
 
 WIRE_PROTOCOL_VERSION = "2.0"
 DIALECT = "python"
@@ -416,7 +415,8 @@ msg = MAVLink_attitude_quaternion_message(
     repr_offset_q = (0,0,0,0)
 )
 
-packed_msg = msg.pack(mav)
+packed_msg = msg._pack(mav, 1, msg)
+print(packed_msg)
 
 mavlink_map: Dict[int, Type[MAVLink_message]] = {
     MAVLINK_MSG_ID_ATTITUDE_QUATERNION: MAVLink_attitude_quaternion_message,
