@@ -290,6 +290,7 @@ class MAVLink_message(object):
 
     def pack(self, mav: "MAVLink", force_mavlink1: bool = False) -> bytes:
         raise NotImplementedError("MAVLink_message cannot be serialized directly")
+    
 
     def __getitem__(self, key: str) -> str:
         """support indexing, allowing for multi-instance sensors in one message"""
@@ -394,29 +395,6 @@ class MAVLink_attitude_quaternion_message(MAVLink_message):
 # Define name on the class for backwards compatibility (it is now msgname).
 # Done with setattr to hide the class variable from mypy.
 setattr(MAVLink_attitude_quaternion_message, "name", mavlink_msg_deprecated_name_property())
-
-msg = MAVLink_attitude_quaternion_message( 
-    Airspeed = 1,
-    Altimeter = 2,
-    Gyroscope_X_axis = 1,
-    Gyroscope_Y_axis = 1,
-    Gyroscope_Z_axis = 1,
-    Gyroscope_W_axis = 1,
-    GPS_X_axis = 1,
-    GPS_Y_axis = 1,
-    total_energy = 1,
-    energy_loss_rate = 1,
-    efficiency = 1,
-    thermometer = 1,
-    barometer = 1,
-    wind_direction_X_axis = 1,
-    wind_direction_Y_axis = 1,
-    wind_direction_Z_axis = 1,
-    repr_offset_q = (0,0,0,0)
-)
-
-packed_msg = msg._pack(mav, 1, msg)
-print(packed_msg)
 
 mavlink_map: Dict[int, Type[MAVLink_message]] = {
     MAVLINK_MSG_ID_ATTITUDE_QUATERNION: MAVLink_attitude_quaternion_message,
@@ -901,3 +879,42 @@ class MAVLink(object):
         self.send(self.attitude_quaternion_encode(Airspeed, Altimeter, Gyroscope_X_axis, Gyroscope_Y_axis, Gyroscope_Z_axis, Gyroscope_W_axis, GPS_X_axis, GPS_Y_axis, total_energy, energy_loss_rate, efficiency, thermometer, barometer, wind_direction_X_axis, wind_direction_Y_axis, wind_direction_Z_axis, repr_offset_q), force_mavlink1=force_mavlink1)
 
 #print(MAVLink.attitude_quaternion_encode(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0))
+
+MAVLink = MAVLink(object)
+
+msg = MAVLink_attitude_quaternion_message( 
+    Airspeed = 1,
+    Altimeter = 2,
+    Gyroscope_X_axis = 1,
+    Gyroscope_Y_axis = 1,
+    Gyroscope_Z_axis = 1,
+    Gyroscope_W_axis = 1,
+    GPS_X_axis = 1,
+    GPS_Y_axis = 1,
+    total_energy = 1,
+    energy_loss_rate = 1,
+    efficiency = 1,
+    thermometer = 1,
+    barometer = 1,
+    wind_direction_X_axis = 1,
+    wind_direction_Y_axis = 1,
+    wind_direction_Z_axis = 1,
+    repr_offset_q = (0,0,0,0)
+)
+
+
+packed_msg = msg.pack(mav)
+
+#print(packed_msg)
+
+'''array1 = bytearray(str(packed_msg), 'utf-8')
+print('bytearray', type(array1))
+print('decoded', type(array1.decode()))'''
+
+#unpacked = MAVLink_message('Peepee', packed_msg)
+#print(unpacked)
+
+deserialize = MAVLink.parse_buffer(packed_msg)
+deserialize = deserialize[0]
+
+print(deserialize)
