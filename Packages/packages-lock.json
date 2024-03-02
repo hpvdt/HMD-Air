@@ -35,7 +35,7 @@
       }
     },
     "com.unity.ide.rider": {
-      "version": "3.0.27",
+      "version": "3.0.28",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -202,11 +202,11 @@
       "url": "https://packages.unity.com"
     },
     "com.yasirkula.nativefilepicker": {
-      "version": "https://github.com/yasirkula/UnityNativeFilePicker.git#v1.3.1",
+      "version": "https://github.com/yasirkula/UnityNativeFilePicker.git#v1.3.3",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "d61e7b23d300828c481621ba7c0c35bc99f0f2f7"
+      "hash": "13a3f2800143c66d02bbe91042a5a814e86b4b42"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",
