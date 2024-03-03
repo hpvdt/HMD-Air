@@ -167,3 +167,4 @@ UserSettings
 
 # Python
 **/venv
+**/__pycache__
