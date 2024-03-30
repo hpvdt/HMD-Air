@@ -8,10 +8,8 @@ public class DisplayMovementController : MonoBehaviour
     public bool keyboardController = false;
     public float rotationSpeed = 10f;
     public float movementSpeed = 10f;
-    public Transform compassHalo;
-    public Transform windHalo;
+    public Transform halo;
     public Transform camera;
-    public float windOscillationSpeed;
 
     Vector3 rotationVector = new Vector3(0, 0, 0);
 
@@ -22,29 +20,32 @@ public class DisplayMovementController : MonoBehaviour
 
         if (keyboardController)
         {
+
+
+
             if (Input.GetKey(KeyCode.W))
             {
-                SerialReader.GPSY += movementAmount;
+                BinaryDecoder.GPSY += movementAmount;
             }
             if (Input.GetKey(KeyCode.A))
             {
-                SerialReader.GPSX += -movementAmount;
+                BinaryDecoder.GPSX += -movementAmount;
             }
             if (Input.GetKey(KeyCode.S))
             {
-                SerialReader.GPSY += -movementAmount;
+                BinaryDecoder.GPSY += -movementAmount;
             }
             if (Input.GetKey(KeyCode.D))
             {
-                SerialReader.GPSX += movementAmount;
+                BinaryDecoder.GPSX += movementAmount;
             }
             if (Input.GetKey(KeyCode.Space))
             {
-                SerialReader.Altimeter += movementAmount;
+                BinaryDecoder.Altimeter += movementAmount;
             }
             if (Input.GetKey(KeyCode.C))
             {
-                SerialReader.Altimeter += -movementAmount;
+                BinaryDecoder.Altimeter += -movementAmount;
             }
 
             // Handle rotation inputs
@@ -53,86 +54,63 @@ public class DisplayMovementController : MonoBehaviour
             if (Input.GetKey(KeyCode.K))
             {
                 // Rotate up
+                //halo.Rotate(Vector3.right, rotationAmount);
                 rotationVector += Vector3.right * rotationAmount;
             }
 
             if (Input.GetKey(KeyCode.I))
             {
                 // Rotate down
+                //halo.Rotate(Vector3.left, rotationAmount);
                 rotationVector += Vector3.left * rotationAmount;
+
             }
 
             if (Input.GetKey(KeyCode.U))
             {
                 // Rotate cork screw left
+                //halo.Rotate(Vector3.forward, rotationAmount);
                 rotationVector += Vector3.forward * rotationAmount;
+
             }
 
             if (Input.GetKey(KeyCode.O))
             {
                 // Rotate cork screw right
+                //halo.Rotate(Vector3.back, rotationAmount);
                 rotationVector += Vector3.back * rotationAmount;
+
             }
 
             if (Input.GetKey(KeyCode.J))
             {
-                SerialReader.heading += rotationAmount;
+                BinaryDecoder.heading += rotationAmount;
             }
             if (Input.GetKey(KeyCode.L))
             {
-                SerialReader.heading -= rotationAmount;
-            }
-
-            if (SerialReader.heading > 360)
-            {
-                SerialReader.heading -= 360;
-            }
-            else if (SerialReader.heading < 0)
-            {
-                SerialReader.heading += 360;
+                BinaryDecoder.heading -= rotationAmount;
             }
 
             Quaternion rotation = Quaternion.Euler(rotationVector);
+            Debug.Log("controller: " + rotation.x + " " + rotation.y + " " + rotation.z + " " + rotation.w);
 
-            SerialReader.IMU = new Quaternion(rotation.x, rotation.y, rotation.z, rotation.w);
-
-            SerialReader.windX = Mathf.Sin(Time.time * windOscillationSpeed);
-            SerialReader.windY = Mathf.Cos(Time.time * windOscillationSpeed);
+            BinaryDecoder.GyroX = rotation.x;
+            BinaryDecoder.GyroY = rotation.y;
+            BinaryDecoder.GyroZ = rotation.z;
+            BinaryDecoder.GyroW = rotation.w;
         }
 
-        Vector3 target = new Vector3(SerialReader.GPSX, SerialReader.Altimeter, SerialReader.GPSY);
+        Vector3 target = new Vector3(BinaryDecoder.GPSX, BinaryDecoder.Altimeter, BinaryDecoder.GPSY);
+
+        Debug.Log("target: " + BinaryDecoder.GPSX + " " + BinaryDecoder.Altimeter + " " + BinaryDecoder.GPSY + "\n");
+        Debug.Log("transform.position: " + transform.position.x + " " + transform.position.y + " " + transform.position.z);
 
         transform.position = Vector3.MoveTowards(transform.position, target, movementAmount);
         camera.position = Vector3.MoveTowards(camera.position, target, movementAmount);
 
-        //Calculate degree of rotation for wind halo
+        halo.rotation = Quaternion.Inverse(BinaryDecoder.IMU);
+        Vector3 vector = new Vector3(0, -BinaryDecoder.heading, 0);
+        halo.Rotate(0, -BinaryDecoder.heading, 0);
 
-        //Perform rotations
-        compassHalo.rotation = Quaternion.Inverse(SerialReader.IMU);
-        windHalo.rotation = Quaternion.Inverse(SerialReader.IMU);
-        compassHalo.Rotate(0, -SerialReader.heading, 0);
-        windHalo.Rotate(0, GetAngleFromVector(SerialReader.windDir), 0);
-        
-    }
-
-    public float GetAngleFromVector(Vector3 vector)
-    {
-        // Calculate the angle in radians
-        float angleInRadians = Mathf.Atan2(vector.y, vector.x);
-
-        // Convert the angle to degrees
-        float angleInDegrees = angleInRadians * Mathf.Rad2Deg;
-
-        // Ensure the angle is between 0 and 360 degrees
-        if (angleInDegrees < 0)
-        {
-            angleInDegrees += 360;
-        }
-        else if (angleInDegrees > 360)
-        {
-            angleInDegrees -= 360;
-        }
-
-        return angleInDegrees;
     }
 }

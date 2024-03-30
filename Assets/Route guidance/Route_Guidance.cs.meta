@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Route guidance/Route_Guidance.cs.meta
 guid: 56d7f4f609baf4ca9b8d50a2756692a1
+========
+guid: fa283c6789c1949769f0c979f82e0829
+>>>>>>>> 94ee699 (keyboard controller):Assets/DisplayMovementController.cs.meta
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
