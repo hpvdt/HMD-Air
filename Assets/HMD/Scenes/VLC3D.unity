@@ -1037,7 +1037,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &129841329
 Transform:
   m_ObjectHideFlags: 0
@@ -10556,6 +10556,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2116009954365681214, guid: 3b9813515d644a3469b2ad285b369f7e, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2126070430149304948, guid: 3b9813515d644a3469b2ad285b369f7e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -10596,9 +10600,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3682038026103223880, guid: 3b9813515d644a3469b2ad285b369f7e, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5058399103362426158, guid: 3b9813515d644a3469b2ad285b369f7e, type: 3}
       propertyPath: m_Name
       value: DataDisplay
+      objectReference: {fileID: 0}
+    - target: {fileID: 8971084687242210654, guid: 3b9813515d644a3469b2ad285b369f7e, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
