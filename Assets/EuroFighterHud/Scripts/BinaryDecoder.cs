@@ -23,11 +23,12 @@ public class BinaryDecoder : MonoBehaviour
         windY = 0,
         windZ = 0;
 
-    private Quaternion IMU;
-    private Vector3 windDir;
+    public static Quaternion IMU;
+    public static Vector3 windDir;
 
     //SerialPort sp = new SerialPort();
 
+    /*
     //getters
     public float      getAirspeed()       { return Airspeed; }
     public float      getAltimeter()      { return Altimeter; }
@@ -41,6 +42,7 @@ public class BinaryDecoder : MonoBehaviour
     public float      getTemp()           { return temp; }
     public float      getAirPressure()    { return pressure; }
     public Vector3    getWinDir()         { return windDir; }
+    */
 
     private void Start()
     {
@@ -78,7 +80,6 @@ public class BinaryDecoder : MonoBehaviour
                 dataArray[i] = float.Parse(stringArray[i]);
             }
 
-
             Airspeed = dataArray[0];
             Altimeter = dataArray[1];
 
@@ -105,7 +106,6 @@ public class BinaryDecoder : MonoBehaviour
             IMU.Set(GyroX, GyroY, GyroZ, GyroW);
 
             windDir.Set(windX, windY, windZ);
-
             
         }
         catch
@@ -132,12 +132,6 @@ public class BinaryDecoder : MonoBehaviour
         }
 
         return byteArray;
-    }
-
-    public void movement()
-    {
-        transform.rotation = IMU;
-
     }
 
     private void OnDestroy()
