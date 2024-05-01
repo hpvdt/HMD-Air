@@ -11,44 +11,46 @@ public class DisplayMovementController : MonoBehaviour
     public Transform halo;
     public Transform camera;
 
+
+
     void Update()
     {
 
         if (keyboardController)
         {
-            //Vector3 inputVector = new Vector3(0, 0, 0);
+
+            float movementAmount = movementSpeed * Time.deltaTime;
+
 
             if (Input.GetKey(KeyCode.W))
             {
-                BinaryDecoder.GPSY += movementSpeed;
+                BinaryDecoder.GPSY += movementAmount;
             }
             if (Input.GetKey(KeyCode.A))
             {
-                BinaryDecoder.GPSX += -movementSpeed;
+                BinaryDecoder.GPSX += -movementAmount;
             }
             if (Input.GetKey(KeyCode.S))
             {
-                BinaryDecoder.GPSY += -movementSpeed;
+                BinaryDecoder.GPSY += -movementAmount;
             }
             if (Input.GetKey(KeyCode.D))
             {
-                BinaryDecoder.GPSX += movementSpeed;
+                BinaryDecoder.GPSX += movementAmount;
             }
             if (Input.GetKey(KeyCode.Q))
             {
-                BinaryDecoder.Altimeter += movementSpeed;
+                BinaryDecoder.Altimeter += movementAmount;
             }
             if (Input.GetKey(KeyCode.C))
             {
-                BinaryDecoder.Altimeter += -movementSpeed;
+                BinaryDecoder.Altimeter += -movementAmount;
             }
 
-            Vector3 target = new Vector3(BinaryDecoder.GPSX, BinaryDecoder.Altimeter, BinaryDecoder.GPSY);
-            //Debug.Log("target: " + BinaryDecoder.GPSX + " " + BinaryDecoder.GPSY + " " + BinaryDecoder.Altimeter + "\n");
-            //Debug.Log("transform.position: " + transform.position.x + " " + transform.position.y + " " + transform.position.z);
-            transform.position = Vector3.MoveTowards(transform.position, target, movementSpeed * Time.deltaTime);
-
-
+            Vector3 target = new Vector3(BinaryDecoder.GPSX, BinaryDecoder.Altimeter, BinaryDecoder.GPSY); 
+            Debug.Log("target: " + BinaryDecoder.GPSX + " " + BinaryDecoder.Altimeter + " " + BinaryDecoder.GPSY + "\n");
+            Debug.Log("transform.position: " + transform.position.x + " " + transform.position.y + " " + transform.position.z);
+            transform.position = Vector3.MoveTowards(transform.position, target, movementAmount);
 
 
             // Handle rotation inputs
@@ -57,7 +59,6 @@ public class DisplayMovementController : MonoBehaviour
             if (Input.GetKey(KeyCode.K))
             {
                 // Rotate up
-
                 halo.Rotate(Vector3.right, rotationAmount);
             }
 

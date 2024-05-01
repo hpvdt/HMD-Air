@@ -6,6 +6,8 @@ using UnityEngine;
 public class BinaryDecoder : MonoBehaviour
 {
     //Fields/Attributes
+    public bool keyboardControl = false;
+
     public static float Airspeed = 9,
         Altimeter = 12,
         GyroX = 0,
@@ -24,8 +26,10 @@ public class BinaryDecoder : MonoBehaviour
         windY = 0,
         windZ = 0;
 
-    public static Quaternion IMU;
-    public static Vector3 windDir;
+    public static Quaternion IMU = new Quaternion(GyroX,GyroY,GyroZ,GyroW);
+    public static Vector3 windDir = new Vector3(windX,windY,windZ);
+
+    
 
     //SerialPort sp = new SerialPort();
 
@@ -39,57 +43,67 @@ public class BinaryDecoder : MonoBehaviour
         {
             Debug.Log("Serial port error!");
         }
+
+        if (keyboardControl)
+        {
+
+        }
     }
 
     // Update is called once per frame
     private void Update()
     {
-        try
+        if (!keyboardControl)
         {
-            //string readInput = sp.ReadLine();
+            try
+            {
+                //string readInput = sp.ReadLine();
 
-            //byte[] bytes = BinaryStringToByteArray(readInput);
+                //byte[] bytes = BinaryStringToByteArray(readInput);
 
-            //string deCoded = Encoding.UTF8.GetString(bytes);
+                //string deCoded = Encoding.UTF8.GetString(bytes);
 
-            // Test input
+                // Test input
 
-            string deCoded = "00110101 00101110 00110000 00100000 00110101 00101110 00110000 00100000 00110001 00101110 00110000 00100000 00110001 00101110 00110000 00100000 00110000 00101110 00110000 00100000 00101101 00110001 00101110 00110000 00100000 00110011 00110000 00101110 00110000 00100000 00110001 00110000 00101110 00110101 00100000 00110010 00110000 00101110 00110011 00100000 00110110 00110000 00110000 00101110 00110000 00100000 00110010 00101110 00110000 00100000 00110001 00101110 00110001 00100000 00110010 00110011 00101110 00110001 00100000 00110011 00110100 00101110 00110010 00100000 00111000 00101110 00111001 00100000 00110011 00101110 00110110 00100000 00110000 00101110 00110000 00110010";
+                string deCoded = "00110101 00101110 00110000 00100000 00110101 00101110 00110000 00100000 00110001 00101110 00110000 00100000 00110001 00101110 00110000 00100000 00110000 00101110 00110000 00100000 00101101 00110001 00101110 00110000 00100000 00110011 00110000 00101110 00110000 00100000 00110001 00110000 00101110 00110101 00100000 00110010 00110000 00101110 00110011 00100000 00110110 00110000 00110000 00101110 00110000 00100000 00110010 00101110 00110000 00100000 00110001 00101110 00110001 00100000 00110010 00110011 00101110 00110001 00100000 00110011 00110100 00101110 00110010 00100000 00111000 00101110 00111001 00100000 00110011 00101110 00110110 00100000 00110000 00101110 00110000 00110010";
 
-            float[] dataArray = binaryDecoder(deCoded);
+                float[] dataArray = binaryDecoder(deCoded);
 
-            Airspeed = dataArray[0];
-            Altimeter = dataArray[1];
+                Airspeed = dataArray[0];
+                Altimeter = dataArray[1];
 
-            GyroX = dataArray[2];
-            GyroY = dataArray[3];
-            GyroZ = dataArray[4];
-            GyroW = dataArray[5];
-            heading = dataArray[6];
+                GyroX = dataArray[2];
+                GyroY = dataArray[3];
+                GyroZ = dataArray[4];
+                GyroW = dataArray[5];
+                heading = dataArray[6];
 
-            GPSX = dataArray[7];
-            GPSY = dataArray[8];
+                GPSX = dataArray[7];
+                GPSY = dataArray[8];
 
-            totalEnergy = dataArray[9];
-            energyLossRate = dataArray[10];
-            efficiency = dataArray[11];
+                totalEnergy = dataArray[9];
+                energyLossRate = dataArray[10];
+                efficiency = dataArray[11];
 
-            temp = dataArray[12];
-            pressure = dataArray[13];
+                temp = dataArray[12];
+                pressure = dataArray[13];
 
-            windX = dataArray[14];
-            windY = dataArray[15];
-            windZ = dataArray[16];
+                windX = dataArray[14];
+                windY = dataArray[15];
+                windZ = dataArray[16];
 
-            IMU.Set(GyroX, GyroY, GyroZ, GyroW);
+                IMU.Set(GyroX, GyroY, GyroZ, GyroW);
 
-            windDir.Set(windX, windY, windZ);
+                windDir.Set(windX, windY, windZ);
 
+            }
+            catch
+            {
+
+            }
         }
-        catch
-        {
 
-        }
+        
     }
 
     public float[] binaryDecoder(string binaryString)
