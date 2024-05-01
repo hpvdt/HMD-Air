@@ -11,47 +11,44 @@ public class DisplayMovementController : MonoBehaviour
     public Transform halo;
     public Transform camera;
 
-
-    void Start()
-    {
-        
-    }
-
     void Update()
     {
 
         if (keyboardController)
         {
-            Vector3 inputVector = new Vector3(0, 0, 0);
+            //Vector3 inputVector = new Vector3(0, 0, 0);
 
             if (Input.GetKey(KeyCode.W))
             {
-                inputVector.z = +1;
+                BinaryDecoder.GPSY += movementSpeed;
             }
             if (Input.GetKey(KeyCode.A))
             {
-                inputVector.x = -1;
+                BinaryDecoder.GPSX += -movementSpeed;
             }
             if (Input.GetKey(KeyCode.S))
             {
-                inputVector.z = -1;
+                BinaryDecoder.GPSY += -movementSpeed;
             }
             if (Input.GetKey(KeyCode.D))
             {
-                inputVector.x = +1;
+                BinaryDecoder.GPSX += movementSpeed;
             }
-
             if (Input.GetKey(KeyCode.Q))
             {
-                inputVector.y = +1;
+                BinaryDecoder.Altimeter += movementSpeed;
             }
             if (Input.GetKey(KeyCode.C))
             {
-                inputVector.y = -1;
+                BinaryDecoder.Altimeter += -movementSpeed;
             }
 
-            transform.Translate(inputVector * movementSpeed * Time.deltaTime);
-            camera.Translate(inputVector * movementSpeed * Time.deltaTime);
+            Vector3 target = new Vector3(BinaryDecoder.GPSX, BinaryDecoder.Altimeter, BinaryDecoder.GPSY);
+            //Debug.Log("target: " + BinaryDecoder.GPSX + " " + BinaryDecoder.GPSY + " " + BinaryDecoder.Altimeter + "\n");
+            //Debug.Log("transform.position: " + transform.position.x + " " + transform.position.y + " " + transform.position.z);
+            transform.position = Vector3.MoveTowards(transform.position, target, movementSpeed * Time.deltaTime);
+
+
 
 
             // Handle rotation inputs
@@ -60,6 +57,7 @@ public class DisplayMovementController : MonoBehaviour
             if (Input.GetKey(KeyCode.K))
             {
                 // Rotate up
+
                 halo.Rotate(Vector3.right, rotationAmount);
             }
 
@@ -90,9 +88,10 @@ public class DisplayMovementController : MonoBehaviour
                 BinaryDecoder.heading -= rotationAmount;
             }
 
-
+            halo.rotation = Quaternion.Inverse(BinaryDecoder.IMU);
+            Vector3 vector = new Vector3(0, -BinaryDecoder.heading, 0);
+            halo.Rotate(0, -BinaryDecoder.heading, 0);
         }
-
 
         else
         {
@@ -100,7 +99,7 @@ public class DisplayMovementController : MonoBehaviour
 
             Vector3 vector = new Vector3(0, -BinaryDecoder.heading, 0);
 
-            halo.Rotate(0,-BinaryDecoder.heading,0);
+            halo.Rotate(0, -BinaryDecoder.heading, 0);
         }
 
     }

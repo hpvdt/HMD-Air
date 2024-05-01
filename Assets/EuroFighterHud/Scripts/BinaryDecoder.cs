@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 
@@ -28,22 +29,6 @@ public class BinaryDecoder : MonoBehaviour
 
     //SerialPort sp = new SerialPort();
 
-    /*
-    //getters
-    public float      getAirspeed()       { return Airspeed; }
-    public float      getAltimeter()      { return Altimeter; }
-    public Quaternion getIMU()            { return IMU; }
-    public float      getHeading()        { return heading; }
-    public float      getGPSX()           { return GPSX; }
-    public float      getGPSY()           { return GPSY; }
-    public float      getTotalEnergy()    { return totalEnergy; }
-    public float      getEnergyLossRate() { return energyLossRate; }
-    public float      getEfficiency()     { return efficiency; }
-    public float      getTemp()           { return temp; }
-    public float      getAirPressure()    { return pressure; }
-    public Vector3    getWinDir()         { return windDir; }
-    */
-
     private void Start()
     {
         try
@@ -62,7 +47,7 @@ public class BinaryDecoder : MonoBehaviour
         try
         {
             //string readInput = sp.ReadLine();
-            
+
             //byte[] bytes = BinaryStringToByteArray(readInput);
 
             //string deCoded = Encoding.UTF8.GetString(bytes);
@@ -71,14 +56,7 @@ public class BinaryDecoder : MonoBehaviour
 
             string deCoded = "00110101 00101110 00110000 00100000 00110101 00101110 00110000 00100000 00110001 00101110 00110000 00100000 00110001 00101110 00110000 00100000 00110000 00101110 00110000 00100000 00101101 00110001 00101110 00110000 00100000 00110011 00110000 00101110 00110000 00100000 00110001 00110000 00101110 00110101 00100000 00110010 00110000 00101110 00110011 00100000 00110110 00110000 00110000 00101110 00110000 00100000 00110010 00101110 00110000 00100000 00110001 00101110 00110001 00100000 00110010 00110011 00101110 00110001 00100000 00110011 00110100 00101110 00110010 00100000 00111000 00101110 00111001 00100000 00110011 00101110 00110110 00100000 00110000 00101110 00110000 00110010";
 
-            string[] stringArray = deCoded.Split(" ");
-
-            var dataArray = new float[stringArray.Length];
-
-            for (var i = 0; i < stringArray.Length; i++)
-            {
-                dataArray[i] = float.Parse(stringArray[i]);
-            }
+            float[] dataArray = binaryDecoder(deCoded);
 
             Airspeed = dataArray[0];
             Altimeter = dataArray[1];
@@ -106,32 +84,31 @@ public class BinaryDecoder : MonoBehaviour
             IMU.Set(GyroX, GyroY, GyroZ, GyroW);
 
             windDir.Set(windX, windY, windZ);
-            
+
         }
         catch
         {
-            
+
         }
     }
 
-    public static byte[] BinaryStringToByteArray(string binaryString)
+    public float[] binaryDecoder(string binaryString)
     {
-        if (binaryString.Length % 8 != 0)
+        string[] binaryNumbers = binaryString.Split(' ');
+        byte[] bytes = new byte[4];
+        float[] floats = new float[binaryNumbers.Length / 8]; // Each float takes 32 bits (4 bytes)
+
+        for (int i = 0; i < floats.Length; i++)
         {
-            throw new ArgumentException("Binary string length must be a multiple of 8.");
+            for (int j = 0; j < 4; j++)
+            {
+                bytes[j] = Convert.ToByte(binaryNumbers[i * 8 + j], 2);
+            }
+
+            floats[i] = BitConverter.ToSingle(bytes, 0);
         }
 
-        var byteCount = binaryString.Length / 8;
-
-        var byteArray = new byte[byteCount];
-
-        for (var i = 0; i < byteCount; i++)
-        {
-            var byteString = binaryString.Substring(i * 8, 8);
-            byteArray[i] = Convert.ToByte(byteString, 2);
-        }
-
-        return byteArray;
+        return floats;
     }
 
     private void OnDestroy()
