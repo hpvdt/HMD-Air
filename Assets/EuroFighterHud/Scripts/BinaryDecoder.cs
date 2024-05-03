@@ -9,7 +9,7 @@ public class BinaryDecoder : MonoBehaviour
     public bool keyboardControl = false;
 
     public static float Airspeed = 9,
-        Altimeter = 12,
+        Altimeter = 0,
         GyroX = 0,
         GyroY = 0,
         GyroZ = 0,
@@ -29,7 +29,10 @@ public class BinaryDecoder : MonoBehaviour
     public static Quaternion IMU = new Quaternion(GyroX,GyroY,GyroZ,GyroW);
     public static Vector3 windDir = new Vector3(windX,windY,windZ);
 
-    
+    public void setKeyboardController(bool value)
+    {
+        keyboardControl = value;
+    }
 
     //SerialPort sp = new SerialPort();
 
@@ -92,9 +95,7 @@ public class BinaryDecoder : MonoBehaviour
                 windY = dataArray[15];
                 windZ = dataArray[16];
 
-                IMU.Set(GyroX, GyroY, GyroZ, GyroW);
-
-                windDir.Set(windX, windY, windZ);
+                
 
             }
             catch
@@ -103,7 +104,8 @@ public class BinaryDecoder : MonoBehaviour
             }
         }
 
-        
+        IMU.Set(GyroX, GyroY, GyroZ, GyroW);
+        windDir.Set(windX, windY, windZ);
     }
 
     public float[] binaryDecoder(string binaryString)

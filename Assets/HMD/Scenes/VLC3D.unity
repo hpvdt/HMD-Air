@@ -25895,7 +25895,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 14471363886203221, guid: e168c7590e45547e8826c12d5fae0dde, type: 3}
       propertyPath: keyboardControl
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1232717268967400607, guid: e168c7590e45547e8826c12d5fae0dde, type: 3}
       propertyPath: m_LocalPosition.x
@@ -25948,6 +25948,10 @@ PrefabInstance:
     - target: {fileID: 3950029252771078774, guid: e168c7590e45547e8826c12d5fae0dde, type: 3}
       propertyPath: m_Name
       value: DataDisplay
+      objectReference: {fileID: 0}
+    - target: {fileID: 6172355221818862766, guid: e168c7590e45547e8826c12d5fae0dde, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5244097100031822337, guid: e168c7590e45547e8826c12d5fae0dde, type: 3}
