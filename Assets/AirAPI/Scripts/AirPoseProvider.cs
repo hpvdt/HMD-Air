@@ -2,10 +2,38 @@ using System;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Experimental.XR.Interaction;
+using UnityEngine.SpatialTracking;
+
 public class AirPoseProvider : BasePoseProvider
 {
+#if UNITY_EDITOR_WIN
     [DllImport("AirAPI_Windows", CallingConvention = CallingConvention.Cdecl)]
     public static extern int StartConnection();
+
+    [DllImport("AirAPI_Windows", CallingConvention = CallingConvention.Cdecl)]
+    public static extern int StopConnection();
+
+    [DllImport("AirAPI_Windows", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr GetQuaternion();
+
+    [DllImport("AirAPI_Windows", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr GetEuler();
+
+#elif UNITY_EDITOR_LINUX
+
+    [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
+    public static extern int StartConnection();
+
+    [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
+    public static extern int StopConnection();
+
+    [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr GetEuler();
+
+    [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr GetQuaternion();
+
+#endif
 
     protected enum ConnectionStates
     {
@@ -36,8 +64,6 @@ public class AirPoseProvider : BasePoseProvider
             Debug.LogError("Connection error: return code " + code);
     }
 
-    [DllImport("AirAPI_Windows", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int StopConnection();
 
     public void TryDisconnect()
     {
@@ -47,31 +73,26 @@ public class AirPoseProvider : BasePoseProvider
             if (code == 1)
             {
                 connectionState = ConnectionStates.Disconnected;
-                Debug.Log("Glass disconnected");
+                Debug.Log("Glassed disconnected");
             }
             else
             {
                 connectionState = ConnectionStates.Offline;
-                Debug.LogWarning("Glass disconnected with error: return code " + code);
+                Debug.LogWarning("Glassed disconnected with error: return code " + code);
             }
         }
         else
         {
-            Debug.Log("Glass not connected, no need to disconnect");
+            Debug.Log("Glassed not connected, no need to disconnect");
         }
     }
-
-    [DllImport("AirAPI_Windows", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr GetQuaternion();
-
-    [DllImport("AirAPI_Windows", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr GetEuler();
 
     public float mouseSensitivity = 100.0f;
 
     protected Quaternion FromGlasses = Quaternion.identity;
 
-    protected static Quaternion NO_READING_Q = Quaternion.Euler(90f, 0, 0);
+    protected static Quaternion ZERO_READING_Q = Quaternion.Euler(90f, 0, 0);
+    // protected static Quaternion ZERO_READING_Q = Quaternion.Euler(0f, 0, 0);
 
     protected Vector3 FromMouse_Euler = Vector3.zero;
     protected Quaternion FromMouse = Quaternion.identity;
@@ -91,30 +112,43 @@ public class AirPoseProvider : BasePoseProvider
     }
 
     // Update Pose
-    public override bool TryGetPoseFromProvider(out Pose output)
+    public override PoseDataFlags GetPoseFromProvider(out Pose output)
     {
         if (IsConnecting()) UpdateFromGlasses();
 
-        if (Input.GetMouseButton(1)) UpdateFromMouse();
+        if (Input.GetMouseButton(1))
+        {
+            UpdateFromMouse();
+        }
 
         var compound = FromMouse * FromZeroing * FromGlasses;
 
         output = new Pose(new Vector3(0, 0, 0), compound);
-        return true;
+        return PoseDataFlags.Rotation;
+    }
+
+    private float[] RawEuler()
+    {
+        var ptr = GetEuler();
+        var r = new float[3];
+        Marshal.Copy(ptr, r, 0, 3);
+        return r;
     }
 
     private void UpdateFromGlasses()
     {
-        var ptr = GetEuler();
-        var arr = new float[3];
-        Marshal.Copy(ptr, arr, 0, 3);
+        // var arr = RawDummy();
 
-        // Debug.Log("glasses input (Euler): " + arr);
+        var arr = RawEuler();
+        var yaw = arr[0];
+        var pitch = arr[1];
+        var roll = arr[2];
 
-        var reading = Quaternion.Euler(-arr[1] + 90.0f, -arr[2], -arr[0]);
+        var reading = ZERO_READING_Q * Quaternion.Euler(-pitch, roll, -yaw);
+
         if (connectionState == ConnectionStates.StandBy)
         {
-            if (!reading.Equals(NO_READING_Q))
+            if (!reading.Equals(ZERO_READING_Q))
             {
                 connectionState = ConnectionStates.Connected;
                 Debug.Log("Glasses connected, start reading");
