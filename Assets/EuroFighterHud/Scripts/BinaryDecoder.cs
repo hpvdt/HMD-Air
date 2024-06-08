@@ -95,8 +95,6 @@ public class BinaryDecoder : MonoBehaviour
                 windY = dataArray[15];
                 windZ = dataArray[16];
 
-                
-
             }
             catch
             {

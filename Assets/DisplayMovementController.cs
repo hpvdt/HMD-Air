@@ -25,27 +25,27 @@ public class DisplayMovementController : MonoBehaviour
 
             if (Input.GetKey(KeyCode.W))
             {
-                BinaryDecoder.GPSY += movementAmount;
+                SerialReader.GPSY += movementAmount;
             }
             if (Input.GetKey(KeyCode.A))
             {
-                BinaryDecoder.GPSX += -movementAmount;
+                SerialReader.GPSX += -movementAmount;
             }
             if (Input.GetKey(KeyCode.S))
             {
-                BinaryDecoder.GPSY += -movementAmount;
+                SerialReader.GPSY += -movementAmount;
             }
             if (Input.GetKey(KeyCode.D))
             {
-                BinaryDecoder.GPSX += movementAmount;
+                SerialReader.GPSX += movementAmount;
             }
             if (Input.GetKey(KeyCode.Space))
             {
-                BinaryDecoder.Altimeter += movementAmount;
+                SerialReader.Altimeter += movementAmount;
             }
             if (Input.GetKey(KeyCode.C))
             {
-                BinaryDecoder.Altimeter += -movementAmount;
+                SerialReader.Altimeter += -movementAmount;
             }
 
             // Handle rotation inputs
@@ -84,33 +84,33 @@ public class DisplayMovementController : MonoBehaviour
 
             if (Input.GetKey(KeyCode.J))
             {
-                BinaryDecoder.heading += rotationAmount;
+                SerialReader.heading += rotationAmount;
             }
             if (Input.GetKey(KeyCode.L))
             {
-                BinaryDecoder.heading -= rotationAmount;
+                SerialReader.heading -= rotationAmount;
             }
 
             Quaternion rotation = Quaternion.Euler(rotationVector);
-            Debug.Log("controller: " + rotation.x + " " + rotation.y + " " + rotation.z + " " + rotation.w);
+            //Debug.Log("controller: " + rotation.x + " " + rotation.y + " " + rotation.z + " " + rotation.w);
 
-            BinaryDecoder.GyroX = rotation.x;
-            BinaryDecoder.GyroY = rotation.y;
-            BinaryDecoder.GyroZ = rotation.z;
-            BinaryDecoder.GyroW = rotation.w;
+            SerialReader.GyroX = rotation.x;
+            SerialReader.GyroY = rotation.y;
+            SerialReader.GyroZ = rotation.z;
+            SerialReader.GyroW = rotation.w;
         }
 
-        Vector3 target = new Vector3(BinaryDecoder.GPSX, BinaryDecoder.Altimeter, BinaryDecoder.GPSY);
+        Vector3 target = new Vector3(SerialReader.GPSX, SerialReader.Altimeter, SerialReader.GPSY);
 
-        Debug.Log("target: " + BinaryDecoder.GPSX + " " + BinaryDecoder.Altimeter + " " + BinaryDecoder.GPSY + "\n");
-        Debug.Log("transform.position: " + transform.position.x + " " + transform.position.y + " " + transform.position.z);
+        //Debug.Log("target: " + SerialReader.GPSX + " " + SerialReader.Altimeter + " " + SerialReader.GPSY + "\n");
+        //Debug.Log("transform.position: " + transform.position.x + " " + transform.position.y + " " + transform.position.z);
 
         transform.position = Vector3.MoveTowards(transform.position, target, movementAmount);
         camera.position = Vector3.MoveTowards(camera.position, target, movementAmount);
 
-        halo.rotation = Quaternion.Inverse(BinaryDecoder.IMU);
-        Vector3 vector = new Vector3(0, -BinaryDecoder.heading, 0);
-        halo.Rotate(0, -BinaryDecoder.heading, 0);
+        halo.rotation = Quaternion.Inverse(SerialReader.IMU);
+        Vector3 vector = new Vector3(0, -SerialReader.heading, 0);
+        halo.Rotate(0, -SerialReader.heading, 0);
 
     }
 }

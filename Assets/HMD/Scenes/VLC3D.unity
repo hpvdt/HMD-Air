@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -21366,6 +21365,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1708840417}
   m_CullTransparentMesh: 0
+--- !u!1 &1708850342 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2818895172848336369, guid: e168c7590e45547e8826c12d5fae0dde, type: 3}
+  m_PrefabInstance: {fileID: 79362529840299737}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1716078559
 GameObject:
   m_ObjectHideFlags: 0
@@ -26028,6 +26032,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 14471363886203221, guid: e168c7590e45547e8826c12d5fae0dde, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 14471363886203221, guid: e168c7590e45547e8826c12d5fae0dde, type: 3}
       propertyPath: keyboardControl
       value: 1
       objectReference: {fileID: 0}
@@ -26097,12 +26105,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5244097100031822337, guid: e168c7590e45547e8826c12d5fae0dde, type: 3}
+    - {fileID: 14471363886203221, guid: e168c7590e45547e8826c12d5fae0dde, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 1232717268967400607, guid: e168c7590e45547e8826c12d5fae0dde, type: 3}
       insertIndex: 2
       addedObject: {fileID: 1505440327}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2818895172848336369, guid: e168c7590e45547e8826c12d5fae0dde, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6527677280768788932}
   m_SourcePrefab: {fileID: 100100000, guid: e168c7590e45547e8826c12d5fae0dde, type: 3}
 --- !u!23 &483058801741003149
 MeshRenderer:
@@ -26348,6 +26360,20 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3325882546548711906, guid: e168c7590e45547e8826c12d5fae0dde, type: 3}
   m_PrefabInstance: {fileID: 79362529840299737}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6527677280768788932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1708850342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cf43011641a64deb99e1082f46de70c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  portName: /dev/tty.usbserial-10
+  baudRate: 115200
 --- !u!4 &6645823804957712177
 Transform:
   m_ObjectHideFlags: 0
