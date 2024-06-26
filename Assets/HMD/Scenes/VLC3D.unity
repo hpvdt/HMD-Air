@@ -5632,6 +5632,11 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!4 &460555927 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6718088644599355408, guid: e168c7590e45547e8826c12d5fae0dde, type: 3}
+  m_PrefabInstance: {fileID: 79362529840299737}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &482070164
 GameObject:
   m_ObjectHideFlags: 0
@@ -26084,6 +26089,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1863977676}
     - target: {fileID: 1275327528654855731, guid: e168c7590e45547e8826c12d5fae0dde, type: 3}
+      propertyPath: windHalo
+      value: 
+      objectReference: {fileID: 1505440327}
+    - target: {fileID: 1275327528654855731, guid: e168c7590e45547e8826c12d5fae0dde, type: 3}
+      propertyPath: compassHalo
+      value: 
+      objectReference: {fileID: 460555927}
+    - target: {fileID: 1275327528654855731, guid: e168c7590e45547e8826c12d5fae0dde, type: 3}
       propertyPath: rotationSpeed
       value: 50
       objectReference: {fileID: 0}
@@ -26101,6 +26114,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6172355221818862766, guid: e168c7590e45547e8826c12d5fae0dde, type: 3}
       propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7320757851126072206, guid: e168c7590e45547e8826c12d5fae0dde, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:

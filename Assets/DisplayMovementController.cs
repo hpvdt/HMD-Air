@@ -8,7 +8,8 @@ public class DisplayMovementController : MonoBehaviour
     public bool keyboardController = false;
     public float rotationSpeed = 10f;
     public float movementSpeed = 10f;
-    public Transform halo;
+    public Transform compassHalo;
+    public Transform windHalo;
     public Transform camera;
 
     Vector3 rotationVector = new Vector3(0, 0, 0);
@@ -20,9 +21,6 @@ public class DisplayMovementController : MonoBehaviour
 
         if (keyboardController)
         {
-
-
-
             if (Input.GetKey(KeyCode.W))
             {
                 SerialReader.GPSY += movementAmount;
@@ -54,32 +52,29 @@ public class DisplayMovementController : MonoBehaviour
             if (Input.GetKey(KeyCode.K))
             {
                 // Rotate up
-                //halo.Rotate(Vector3.right, rotationAmount);
+                //compassHalo.Rotate(Vector3.right, rotationAmount);
                 rotationVector += Vector3.right * rotationAmount;
             }
 
             if (Input.GetKey(KeyCode.I))
             {
                 // Rotate down
-                //halo.Rotate(Vector3.left, rotationAmount);
+                //compassHalo.Rotate(Vector3.left, rotationAmount);
                 rotationVector += Vector3.left * rotationAmount;
-
             }
 
             if (Input.GetKey(KeyCode.U))
             {
                 // Rotate cork screw left
-                //halo.Rotate(Vector3.forward, rotationAmount);
+                //compassHalo.Rotate(Vector3.forward, rotationAmount);
                 rotationVector += Vector3.forward * rotationAmount;
-
             }
 
             if (Input.GetKey(KeyCode.O))
             {
                 // Rotate cork screw right
-                //halo.Rotate(Vector3.back, rotationAmount);
+                //compassHalo.Rotate(Vector3.back, rotationAmount);
                 rotationVector += Vector3.back * rotationAmount;
-
             }
 
             if (Input.GetKey(KeyCode.J))
@@ -94,10 +89,7 @@ public class DisplayMovementController : MonoBehaviour
             Quaternion rotation = Quaternion.Euler(rotationVector);
             //Debug.Log("controller: " + rotation.x + " " + rotation.y + " " + rotation.z + " " + rotation.w);
 
-            SerialReader.GyroX = rotation.x;
-            SerialReader.GyroY = rotation.y;
-            SerialReader.GyroZ = rotation.z;
-            SerialReader.GyroW = rotation.w;
+            SerialReader.IMU = new Quaternion(rotation.x, rotation.y, rotation.z, rotation.w);
         }
 
         Vector3 target = new Vector3(SerialReader.GPSX, SerialReader.Altimeter, SerialReader.GPSY);
@@ -108,9 +100,10 @@ public class DisplayMovementController : MonoBehaviour
         transform.position = Vector3.MoveTowards(transform.position, target, movementAmount);
         camera.position = Vector3.MoveTowards(camera.position, target, movementAmount);
 
-        halo.rotation = Quaternion.Inverse(SerialReader.IMU);
-        Vector3 vector = new Vector3(0, -SerialReader.heading, 0);
-        halo.Rotate(0, -SerialReader.heading, 0);
+        compassHalo.rotation = Quaternion.Inverse(SerialReader.IMU);
+        compassHalo.Rotate(0, -SerialReader.heading, 0);
+
+        windHalo.rotation = compassHalo.rotation;
 
     }
 }
