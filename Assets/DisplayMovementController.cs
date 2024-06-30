@@ -11,6 +11,7 @@ public class DisplayMovementController : MonoBehaviour
     public Transform compassHalo;
     public Transform windHalo;
     public Transform camera;
+    public float windOscillationSpeed;
 
     Vector3 rotationVector = new Vector3(0, 0, 0);
 
@@ -52,28 +53,24 @@ public class DisplayMovementController : MonoBehaviour
             if (Input.GetKey(KeyCode.K))
             {
                 // Rotate up
-                //compassHalo.Rotate(Vector3.right, rotationAmount);
                 rotationVector += Vector3.right * rotationAmount;
             }
 
             if (Input.GetKey(KeyCode.I))
             {
                 // Rotate down
-                //compassHalo.Rotate(Vector3.left, rotationAmount);
                 rotationVector += Vector3.left * rotationAmount;
             }
 
             if (Input.GetKey(KeyCode.U))
             {
                 // Rotate cork screw left
-                //compassHalo.Rotate(Vector3.forward, rotationAmount);
                 rotationVector += Vector3.forward * rotationAmount;
             }
 
             if (Input.GetKey(KeyCode.O))
             {
                 // Rotate cork screw right
-                //compassHalo.Rotate(Vector3.back, rotationAmount);
                 rotationVector += Vector3.back * rotationAmount;
             }
 
@@ -86,24 +83,56 @@ public class DisplayMovementController : MonoBehaviour
                 SerialReader.heading -= rotationAmount;
             }
 
+            if (SerialReader.heading > 360)
+            {
+                SerialReader.heading -= 360;
+            }
+            else if (SerialReader.heading < 0)
+            {
+                SerialReader.heading += 360;
+            }
+
             Quaternion rotation = Quaternion.Euler(rotationVector);
-            //Debug.Log("controller: " + rotation.x + " " + rotation.y + " " + rotation.z + " " + rotation.w);
 
             SerialReader.IMU = new Quaternion(rotation.x, rotation.y, rotation.z, rotation.w);
+
+            SerialReader.windX = Mathf.Sin(Time.time * windOscillationSpeed);
+            SerialReader.windY = Mathf.Cos(Time.time * windOscillationSpeed);
         }
 
         Vector3 target = new Vector3(SerialReader.GPSX, SerialReader.Altimeter, SerialReader.GPSY);
 
-        //Debug.Log("target: " + SerialReader.GPSX + " " + SerialReader.Altimeter + " " + SerialReader.GPSY + "\n");
-        //Debug.Log("transform.position: " + transform.position.x + " " + transform.position.y + " " + transform.position.z);
-
         transform.position = Vector3.MoveTowards(transform.position, target, movementAmount);
         camera.position = Vector3.MoveTowards(camera.position, target, movementAmount);
 
+        //Calculate degree of rotation for wind halo
+
+        //Perform rotations
         compassHalo.rotation = Quaternion.Inverse(SerialReader.IMU);
+        windHalo.rotation = Quaternion.Inverse(SerialReader.IMU);
         compassHalo.Rotate(0, -SerialReader.heading, 0);
+        windHalo.Rotate(0, GetAngleFromVector(SerialReader.windDir), 0);
+        
+    }
 
-        windHalo.rotation = compassHalo.rotation;
+    public float GetAngleFromVector(Vector3 vector)
+    {
+        // Calculate the angle in radians
+        float angleInRadians = Mathf.Atan2(vector.y, vector.x);
 
+        // Convert the angle to degrees
+        float angleInDegrees = angleInRadians * Mathf.Rad2Deg;
+
+        // Ensure the angle is between 0 and 360 degrees
+        if (angleInDegrees < 0)
+        {
+            angleInDegrees += 360;
+        }
+        else if (angleInDegrees > 360)
+        {
+            angleInDegrees -= 360;
+        }
+
+        return angleInDegrees;
     }
 }
