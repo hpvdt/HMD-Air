@@ -7,3 +7,6 @@
 [submodule "serial_stream_test"]
 	path = serial_stream_test
 	url = https://github.com/hpvdt/serial_stream_test
+[submodule "ar-drivers-rs"]
+	path = ar-drivers-rs
+	url = https://github.com/hpvdt/ar-drivers-rs
