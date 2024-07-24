@@ -8,7 +8,7 @@ using Vector3 = UnityEngine.Vector3;
 
 public class AirPoseProvider : BasePoseProvider
 {
-#if UNITY_EDITOR_WIN
+#if (UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN)
     [DllImport("AirAPI_Windows", CallingConvention = CallingConvention.Cdecl)]
     public static extern int StartConnection();
 
@@ -21,7 +21,7 @@ public class AirPoseProvider : BasePoseProvider
     [DllImport("AirAPI_Windows", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr GetEuler();
 
-#elif UNITY_EDITOR_OSX
+#elif (UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX)
     [DllImport("libar_drivers.dylib", CallingConvention = CallingConvention.Cdecl)]
     public static extern int StartConnection();
 
