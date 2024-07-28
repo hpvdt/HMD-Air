@@ -4,7 +4,7 @@ namespace HMD.Scripts.Util
 {
     public class GlobalExceptionHandling : MonoBehaviourWithLogging
     {
-        protected void Awake()
+        protected new void Awake()
         {
             base.Awake();
             Application.logMessageReceived += HandleException;

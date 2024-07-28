@@ -1,4 +1,4 @@
-namespace LookingGlassExamples
+namespace HMD.Scripts.Util
 {
     using UnityEngine;
     using UnityEngine.Serialization;
@@ -28,7 +28,7 @@ namespace LookingGlassExamples
         private void Update()
         {
             var dt = Time.deltaTime;
-            transform.localEulerAngles += angularVelocity * dt;
+            transform.localEulerAngles += AngularVelocity * dt;
         }
     }
 }

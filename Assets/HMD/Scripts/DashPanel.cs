@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using HMD.Scripts.Streaming.VLC;
 using HMD.Scripts.Util;
 using NRKernal;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class DashPanel : MonoBehaviour
@@ -12,32 +9,33 @@ public class DashPanel : MonoBehaviour
     /*bool _menu_visible = false;*/
 
     [HideInInspector]
-    public VLCController controller;
+    public VlcController controller;
 
-    private GameObject _menuPanel = null;
-    private GameObject _og_menu = null;
+    private GameObject _menuPanel;
+    
+    private GameObject _baseButtons;
 
-    private GameObject _app_menu = null;
+    private GameObject _appMenu;
 
     // GameObject _unlock_3d_sphere_mode_prompt_popup = null;
-    private GameObject _menu_toggle_button = null;
+    private GameObject _menuToggleButton;
 
-    private GameObject _options_button = null;
+    private GameObject _optionsButton;
 
     // private GameObject _custom_popup = null;
-    private GameObject _lockScreenNotice = null;
+    private GameObject _lockScreenNotice;
 
-    private GameObject _aspect_popup;
-    private GameObject _display_popup = null;
-    private GameObject _format_popup = null;
-    private GameObject _whats_new_popup = null;
-    private GameObject _picture_settings_popup = null;
+    private GameObject _aspectPopup;
+    private GameObject _displayPopup;
+    private GameObject _formatPopup;
+    private GameObject _whatsNewPopup;
+    private GameObject _pictureSettingsPopup;
 
-    private bool _og_menu_visible = true;
+    private bool _baseButtonsVisible = true;
 
-    private MenuID _visible_menu_id;
+    private MenuID _visibleMenuID;
 
-    public UIStateBeforeCustomPopup stateBeforePopup;
+    // public UIStateBeforeCustomPopup stateBeforePopup;
 
     [SerializeField]
     public enum MenuID
@@ -47,31 +45,31 @@ public class DashPanel : MonoBehaviour
         OPTION_MENU
     };
 
-    [SerializeField]
-    public enum PopupID
-    {
-        CUSTOM_AR_POPUP,
+    // [SerializeField]
+    // public enum PopupID
+    // {
+    //     CUSTOM_AR_POPUP,
+    //
+    //     // MODE_LOCKED,
+    //     CUSTOM_POPUP,
+    //     PICTURE_SETTINGS_POPUP,
+    //     FILE_FORMAT_POPUP,
+    //     DISPLAY_SETTINGS_POPUP,
+    //     COLOR_POPUP,
+    //     WHATS_NEW_POPUP
+    // }
 
-        // MODE_LOCKED,
-        CUSTOM_POPUP,
-        PICTURE_SETTINGS_POPUP,
-        FILE_FORMAT_POPUP,
-        DISPLAY_SETTINGS_POPUP,
-        COLOR_POPUP,
-        WHATS_NEW_POPUP
-    }
+    // private PopupID[] popupStack;
 
-    private PopupID[] popupStack;
-
-    public class UIStateBeforeCustomPopup
-    {
-        public UIStateBeforeCustomPopup(MenuID _visible_menu_id)
-        {
-            VisibleMenuID = _visible_menu_id;
-        }
-
-        public MenuID VisibleMenuID;
-    }
+    // public class UIStateBeforeCustomPopup
+    // {
+    //     public UIStateBeforeCustomPopup(MenuID _visible_menu_id)
+    //     {
+    //         VisibleMenuID = _visible_menu_id;
+    //     }
+    //
+    //     public MenuID VisibleMenuID;
+    // }
 
     // public void SetVLC(MainDisplay instance)
     // {
@@ -83,15 +81,15 @@ public class DashPanel : MonoBehaviour
     {
         UpdateReferences();
 
-        _lockScreenNotice = GameObject.Find("LockScreenNotice");
+        _lockScreenNotice = GlobalFinder.Find("LockScreenNotice").Only();
 
         // hide 6dof button if not supported
         if (NRDevice.Subsystem.GetDeviceType() != NRDeviceType.NrealLight)
-            GameObject.Find("ChangeTo6Dof").SetActive(false);
+            GlobalFinder.Find("ChangeTo6Dof").Only().SetActive(false);
 
         var versionName = Application.version;
         var versionCode = Application.buildGUID;
-        GameObject.Find("AppMenu/AppMenuInner/Subtitle").GetComponent<Text>().text = $"{versionName} ({versionCode})";
+        GlobalFinder.Find("AppMenu/AppMenuInner/Subtitle").Only().GetComponent<Text>().text = $"{versionName} ({versionCode})";
 
         // center UI things that i had spread out in Editor
         CenterPopupLocations();
@@ -99,14 +97,14 @@ public class DashPanel : MonoBehaviour
         // Center Menus/Objects
         CenterXY(_lockScreenNotice);
         CenterXY(_menuPanel);
-        CenterXY(_app_menu);
+        CenterXY(_appMenu);
 
         _lockScreenNotice.SetActive(false);
 
         HideAllMenus();
         HideAllPopups();
 
-        ShowOGMenu();
+        ShowOgMenu();
 
         if (PlayerPrefs.GetInt("OnboardingSeen_0_0_5_g") == 1)
         {
@@ -124,7 +122,8 @@ public class DashPanel : MonoBehaviour
     {
         // Get the "Popups" game object, then loop over each of it's top-level children
         // and center them on the screen
-        var popups = GameObject.Find("Canvas/Popups");
+        
+        var popups = GlobalFinder.Find("Canvas/Popups").Only();
         for (var i = 0; i < popups.transform.childCount; i++)
         {
             var childGameObject = popups.transform.GetChild(i).gameObject;
@@ -142,41 +141,6 @@ public class DashPanel : MonoBehaviour
         );
     }
 
-    public static GameObject[] FindGameObjectsAll(string name)
-    {
-        try
-        {
-            var Found = new List<GameObject>();
-            var All = Resources.FindObjectsOfTypeAll<GameObject>();
-            foreach (var entry in All)
-                if (entry.name == name)
-                    Found.Add(entry);
-            return Found.ToArray();
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning("Error finding " + name + " " + e);
-            return null;
-        }
-
-        ;
-    }
-
-    public static GameObject FindGameObjectsAllFirst(string name)
-    {
-        try
-        {
-            return FindGameObjectsAll(name)?.First();
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning("Error finding " + name + " " + e);
-            return null;
-        }
-
-        ;
-    }
-
     private void OnApplicationFocus(bool hasFocus)
     {
         if (hasFocus) UpdateReferences();
@@ -184,20 +148,22 @@ public class DashPanel : MonoBehaviour
 
     public void UpdateReferences()
     {
-        _menu_toggle_button = FindGameObjectsAllFirst("MenuToggleButton");
+        _menuToggleButton = gameObject.ByName("MenuToggleButton").Only();
 
-        _menuPanel = FindGameObjectsAllFirst("MyControlPanel");
-        _og_menu = FindGameObjectsAllFirst("Buttons");
-        _app_menu = FindGameObjectsAllFirst("AppMenu");
+        var basePanel = gameObject.ByName("BaseControllerPanel").Only();
+        _baseButtons = basePanel.ByName("Buttons").Only();
+
+        _menuPanel = gameObject.ByName("RootPanel").Only();
+        _appMenu = gameObject.ByName("AppMenu").Only();
 
         // _unlock_3d_sphere_mode_prompt_popup = FindGameObjectsAllFirst("Unlock3DSphereModePopup");
 
-        _aspect_popup = FindGameObjectsAllFirst("AspectRatioPopup");
-        _options_button = FindGameObjectsAllFirst("OptionsButton");
-        _display_popup = FindGameObjectsAllFirst("DisplayPopup");
-        _format_popup = FindGameObjectsAllFirst("FormatPopup");
-        _whats_new_popup = FindGameObjectsAllFirst("WhatsNewPopup");
-        _picture_settings_popup = FindGameObjectsAllFirst("PictureSettingsPopup");
+        _aspectPopup = gameObject.ByName("AspectRatioPopup").Only();
+        _optionsButton = gameObject.ByName("OptionsButton").Only();
+        _displayPopup = gameObject.ByName("DisplayPopup").Only();
+        _formatPopup = gameObject.ByName("FormatPopup").Only();
+        _whatsNewPopup = gameObject.ByName("WhatsNewPopup").Only();
+        _pictureSettingsPopup = gameObject.ByName("PictureSettingsPopup").Only();
     }
 
     public void ClearPlayerPrefs()
@@ -205,33 +171,33 @@ public class DashPanel : MonoBehaviour
         PlayerPrefs.DeleteAll();
     }
 
-    private void ShowOGMenu()
+    private void ShowOgMenu()
     {
-        _og_menu.SetActive(true);
-        _og_menu_visible = true;
+        _baseButtons.SetActive(true);
+        _baseButtonsVisible = true;
 
-        _menu_toggle_button.SetActive(true);
+        _menuToggleButton.SetActive(true);
     }
 
-    private void HideOGMenu()
+    private void HideOgMenu()
     {
-        _og_menu.SetActive(false);
-        _og_menu_visible = false;
+        _baseButtons.SetActive(false);
+        _baseButtonsVisible = false;
     }
 
     private void ShowOptionMenu()
     {
         UpdateReferences();
 
-        _app_menu.SetActive(true);
-        CenterXY(_app_menu);
+        _appMenu.SetActive(true);
+        CenterXY(_appMenu);
 
-        _menu_toggle_button.SetActive(false);
+        _menuToggleButton.SetActive(false);
     }
 
     private void HideAppMenu()
     {
-        _app_menu.SetActive(false);
+        _appMenu.SetActive(false);
     }
 
     // public void ShowUnlock3DSphereModePropmptPopup()
@@ -243,12 +209,12 @@ public class DashPanel : MonoBehaviour
     //     HideAllMenus();
     // }
 
-    public void RestoreStateBeforePopup()
-    {
-        if (stateBeforePopup == null) return;
-        ShowMenuByID(stateBeforePopup.VisibleMenuID);
-        stateBeforePopup = null;
-    }
+    // public void RestoreStateBeforePopup()
+    // {
+    //     if (stateBeforePopup == null) return;
+    //     ShowMenuByID(stateBeforePopup.VisibleMenuID);
+    //     stateBeforePopup = null;
+    // }
 
     // public void HideUnlock3DSphereModePropmptPopup()
     // {
@@ -267,17 +233,17 @@ public class DashPanel : MonoBehaviour
         return !_menu_visible;
     }*/
 
-    public bool OGMenuVisible()
-    {
-        return _og_menu_visible;
-    }
+    // public bool OGMenuVisible()
+    // {
+    //     return _og_menu_visible;
+    // }
 
     private void ShowControllerMenu()
     {
         _menuPanel?.SetActive(true);
 
-        _options_button.SetActive(true);
-        _menu_toggle_button.SetActive(true);
+        _optionsButton.SetActive(true);
+        _menuToggleButton.SetActive(true);
     }
 
     private void HideControllerMenu()
@@ -287,7 +253,7 @@ public class DashPanel : MonoBehaviour
 
     public void UIToggleControllerMenu()
     {
-        if (_visible_menu_id == MenuID.CONTROLLER_MENU)
+        if (_visibleMenuID == MenuID.CONTROLLER_MENU)
             ShowMenuByID(MenuID.OG_MENU);
         else
             ShowMenuByID(MenuID.CONTROLLER_MENU);
@@ -306,13 +272,13 @@ public class DashPanel : MonoBehaviour
     public void ShowMenuByID(MenuID id)
     {
         HideAllMenus();
-        _visible_menu_id = id;
-        _menu_toggle_button.SetActive(false);
-        _options_button.SetActive(false);
+        _visibleMenuID = id;
+        _menuToggleButton.SetActive(false);
+        _optionsButton.SetActive(false);
         switch (id)
         {
             case MenuID.OG_MENU:
-                ShowOGMenu();
+                ShowOgMenu();
                 break;
             case MenuID.CONTROLLER_MENU:
                 ShowControllerMenu();
@@ -325,191 +291,148 @@ public class DashPanel : MonoBehaviour
 
     private void HideAllMenus()
     {
-        HideOGMenu();
+        HideOgMenu();
         HideControllerMenu();
         HideAppMenu();
     }
 
-    // public void HideMenuByID(MenuID id)
-    // {
-    //     switch (id)
-    //     {
-    //         case MenuID.OG_MENU:
-    //             HideOGMenu();
-    //             break;
-    //         case MenuID.CONTROLLER_MENU:
-    //             HideControllerMenu();
-    //             break;
-    //         case MenuID.OPTION_MENU:
-    //             HideAppMenu();
-    //             break;
-    //     }
-    // }
-
     public void HideAllPopups()
     {
-        // TODO: just loop
         // HideUnlock3DSphereModePropmptPopup();
         // HideCustomPopup();
         HideAspectRatioPopup();
         HideDisplayPopup();
         HideFormatPopup();
         HideWhatsNewPopup();
-        HidePopupByID(PopupID.PICTURE_SETTINGS_POPUP);
+        HidePictureSettingsPopup();
+        // HidePopupByID(PopupID.PICTURE_SETTINGS_POPUP);
     }
 
-    // public void ShowPopupByID(PopupID popupID)
+    // private void HidePopupByID(PopupID popupID)
     // {
-    //     stateBeforePopup = new UIStateBeforeCustomPopup(_visible_menu_id);
-    //     UpdateReferences();
-    //
     //     switch (popupID)
     //     {
     //         // case PopupID.MODE_LOCKED:
-    //         //     ShowUnlock3DSphereModePropmptPopup();
+    //         //     HideUnlock3DSphereModePropmptPopup();
     //         //     break;
     //         /*case PopupID.CUSTOM:
-    //             ShowCustomPopup();
+    //             HideCustomPopup();
     //             break;*/
     //         case PopupID.CUSTOM_AR_POPUP:
-    //             ShowCustomARPopup();
+    //             HideAspectRatioPopup();
+    //             break;
+    //         case PopupID.PICTURE_SETTINGS_POPUP:
+    //             HidePictureSettingsPopup();
     //             break;
     //     }
+    //
+    //     RestoreStateBeforePopup();
     // }
-
-    private void HidePopupByID(PopupID popupID)
-    {
-        switch (popupID)
-        {
-            // case PopupID.MODE_LOCKED:
-            //     HideUnlock3DSphereModePropmptPopup();
-            //     break;
-            /*case PopupID.CUSTOM:
-                HideCustomPopup();
-                break;*/
-            case PopupID.CUSTOM_AR_POPUP:
-                HideAspectRatioPopup();
-                break;
-            case PopupID.PICTURE_SETTINGS_POPUP:
-                HidePictureSettingsPopup();
-                break;
-        }
-
-        RestoreStateBeforePopup();
-    }
 
     // TODO: aggregate into a view
     public void ShowAspectRatioPopup()
     {
-        _aspect_popup.SetActive(true);
+        _aspectPopup.SetActive(true);
 
-        var updater = new AspectRatioUpdater(controller.mainDisplay);
+        var updater = new AspectRatioUpdater(controller.display);
 
         updater.SyncAll();
     }
 
-    public class AspectRatioUpdater
-    {
-        public MainDisplay display;
-        public Frac value;
-
-        public AspectRatioUpdater(MainDisplay display)
-        {
-            this.display = display;
-            value = display.AspectRatio;
-        }
-
-        public void SyncSlider()
-        {
-            display.controller.aspectRatioComboBar.GetComponent<Slider>()
-                .SetValueWithoutNotify((float)value.ToDouble());
-        }
-
-        public void SyncText()
-        {
-            display.controller.aspectRatioText.GetComponent<Text>().text =
-                $"{value.ToRatioText()} - {value.ToDouble().ToString()}";
-        }
-
-        public void SyncAll()
-        {
-            SyncText();
-            SyncSlider();
-        }
-    }
 
     private void HideAspectRatioPopup()
     {
-        _aspect_popup.SetActive(false);
+        _aspectPopup.SetActive(false);
     }
-
-    // public void ShowCustomPopup(string title, string body)
-    // {
-    //     stateBeforePopup = new UIStateBeforeCustomPopup(_visible_menu_id);
-    //     UpdateReferences();
-    //     _custom_popup.SetActive(true);
-    //     _custom_popup.transform.position = new Vector3(
-    //         _custom_popup.transform.position.x,
-    //         _custom_popup.transform.position.y,
-    //         _custom_popup.transform.position.z - 1.0f // TODO: make this dynamic based on popup stack index
-    //     );
-    //     GameObject.Find("CustomPopup/PopupInner/GameObject/Title").GetComponent<Text>().text = title;
-    //     GameObject.Find("CustomPopup/PopupInner/GameObject/Body").GetComponent<Text>().text = body;
-    // }
-
-    // public void HideCustomPopup()
-    // {
-    //     _custom_popup.SetActive(false);
-    //     RestoreStateBeforePopup();
-    // }
 
     public void ShowDisplayPopup()
     {
-        _display_popup.SetActive(true);
+        _displayPopup.SetActive(true);
     }
 
     private void HideDisplayPopup()
     {
-        _display_popup.SetActive(false);
+        _displayPopup.SetActive(false);
     }
 
     public void ShowFormatPopup()
     {
-        _format_popup.SetActive(true);
+        _formatPopup.SetActive(true);
     }
 
     private void HideFormatPopup()
     {
-        _format_popup.SetActive(false);
+        _formatPopup.SetActive(false);
     }
 
     public void ShowWhatsNewPopup()
     {
-        _whats_new_popup.SetActive(true);
+        _whatsNewPopup.SetActive(true);
     }
 
     private void HideWhatsNewPopup()
     {
-        _whats_new_popup.SetActive(false);
+        _whatsNewPopup.SetActive(false);
     }
 
     public void ShowPictureSettingsPopup()
     {
-        _picture_settings_popup.SetActive(true);
+        _pictureSettingsPopup.SetActive(true);
     }
 
     private void HidePictureSettingsPopup()
     {
-        _picture_settings_popup.SetActive(false);
+        _pictureSettingsPopup.SetActive(false);
+    }
+    
+    
+    public class Lock
+    {
+        private bool _screenLocked = false;
+        private float _brightnessOnLock;
+    
+        protected GameObject HideWhenLocked;
+
+        protected GameObject LockScreenNotice;
+        protected GameObject MenuToggleButton;
+        //
+        protected GameObject Logo;
+        
+        // TODO: set the following in editor
+        // _hideWhenLocked = GameObject.Find("HideWhenScreenLocked");
+        // _lockScreenNotice = GameObject.Find("LockScreenNotice");
+        // _logo = GameObject.Find("logo");
+        // _menuToggleButton = GameObject.Find("MenuToggleButton");
+        
+        public void ToggleScreenLock()
+        {
+            _screenLocked = !_screenLocked;
+
+            if (_screenLocked)
+            {
+                // Hide All UI except for the lock button
+                HideWhenLocked.SetActive(false);
+                LockScreenNotice.SetActive(true);
+                Logo.SetActive(false);
+                MenuToggleButton.SetActive(false);
+                // Lower Brightness
+                var unityBrightnessOnLock = Screen.brightness;
+                Debug.Log($"lockbrightness Unity brightness on lock {unityBrightnessOnLock}");
+
+                _brightnessOnLock = Screen.brightness;
+            }
+            else
+            {
+                // Restore Brightness
+                Screen.brightness = _brightnessOnLock;
+
+                // Show All UI when screen is unlocked
+                HideWhenLocked.SetActive(true);
+                LockScreenNotice.SetActive(false);
+                Logo.SetActive(true);
+                MenuToggleButton.SetActive(true);
+            }
+        }
     }
 
-    // Flag UI as unlocked
-    // public void Unlock3DMode()
-    // {
-    //     foreach (GameObject button in FindGameObjectsAll("Unlock3603D"))
-    //     {
-    //         button.GetComponent<Button>().interactable = false;
-    //         button.transform.Find("Text").GetComponent<Text>().text = "Unlocked";
-    //     }
-    // }
 }

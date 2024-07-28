@@ -1,21 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using LibVLCSharp;
-using UnityEngine;
-using UnityEngine.Assertions;
-using Application = UnityEngine.Device.Application;
-
-namespace HMD.Scripts.Streaming
+namespace HMD.Scripts.Streaming.VLC
 {
-    using Util;
-    public class VLCFeed : FeedLike
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using LibVLCSharp;
+    using UnityEngine;
+    using UnityEngine.Assertions;
+    using Application = UnityEngine.Device.Application;
+    public class VlcFeed : FeedLike
     {
         public bool DebugVLCPlayer;
 
-        public VLCArgs Args;
+        public VlcArgs Args;
 
         private LibVLC _libVLC;
 
@@ -60,7 +58,7 @@ namespace HMD.Scripts.Streaming
             }
         }
 
-        private MediaPlayer _player;
+        private volatile MediaPlayer _player;
 
         public MediaPlayer Player
         {
@@ -177,16 +175,6 @@ namespace HMD.Scripts.Streaming
             return orientation;
         }
 
-        #region aspect ratio
-        public override Frac AspectRatio()
-        {
-            var text = Player.AspectRatio;
-            if (text == null) return NativeAspectRatio();
-
-            return Frac.FromRatioText(text);
-        }
-        #endregion
-
         public void Open(string path)
         {
             var _path = path.ToLower();
@@ -199,11 +187,11 @@ namespace HMD.Scripts.Streaming
 
                 if (lines.Count <= 0) throw new IOException($"No line defined in file `${path}`");
 
-                Args = new VLCArgs(lines.ToList(), FromType.FromLocation);
+                Args = new VlcArgs(lines.ToList(), FromType.FromLocation);
             }
             else
             {
-                Args = new VLCArgs(new List<string> { path }, FromType.FromPath);
+                Args = new VlcArgs(new List<string> { path }, FromType.FromPath);
             }
 
             _openArgs();
@@ -276,7 +264,7 @@ namespace HMD.Scripts.Streaming
             Player.Pause();
         }
 
-        public override (uint, uint) GetSize()
+        protected override (uint, uint) GetSize()
         {
             uint height = 0;
             uint width = 0;
