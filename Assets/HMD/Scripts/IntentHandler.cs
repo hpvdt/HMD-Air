@@ -1,3 +1,4 @@
+using HMD.Scripts.Streaming;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Serialization;
@@ -42,7 +43,7 @@ public class IntentHandler : MonoBehaviour
         {
             result = UnityWebRequest.UnEscapeURL(result);
             Debug.Log("On Intent" + result);
-            mainDisplay.VLC.Open(result);
+            // mainDisplay.VLC.Open(result);
         }
 
         var extras = intent.Call<AndroidJavaObject>("getExtras");

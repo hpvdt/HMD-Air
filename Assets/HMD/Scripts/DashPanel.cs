@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using HMD.Scripts.Util;
+using HMD.Scripts.Streaming.VLC;
 using NRKernal;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class DashPanel : MonoBehaviour
@@ -12,32 +10,32 @@ public class DashPanel : MonoBehaviour
     /*bool _menu_visible = false;*/
 
     [HideInInspector]
-    public VLCController controller;
+    public VlcController controller;
 
-    private GameObject _menuPanel = null;
-    private GameObject _og_menu = null;
+    private GameObject _menuPanel;
+    private GameObject _og_menu;
 
-    private GameObject _app_menu = null;
+    private GameObject _app_menu;
 
     // GameObject _unlock_3d_sphere_mode_prompt_popup = null;
-    private GameObject _menu_toggle_button = null;
+    private GameObject _menu_toggle_button;
 
-    private GameObject _options_button = null;
+    private GameObject _options_button;
 
     // private GameObject _custom_popup = null;
-    private GameObject _lockScreenNotice = null;
+    private GameObject _lockScreenNotice;
 
     private GameObject _aspect_popup;
-    private GameObject _display_popup = null;
-    private GameObject _format_popup = null;
-    private GameObject _whats_new_popup = null;
-    private GameObject _picture_settings_popup = null;
+    private GameObject _display_popup;
+    private GameObject _format_popup;
+    private GameObject _whats_new_popup;
+    private GameObject _picture_settings_popup;
 
     private bool _og_menu_visible = true;
 
     private MenuID _visible_menu_id;
 
-    public UIStateBeforeCustomPopup stateBeforePopup;
+    // public UIStateBeforeCustomPopup stateBeforePopup;
 
     [SerializeField]
     public enum MenuID
@@ -47,31 +45,31 @@ public class DashPanel : MonoBehaviour
         OPTION_MENU
     };
 
-    [SerializeField]
-    public enum PopupID
-    {
-        CUSTOM_AR_POPUP,
+    // [SerializeField]
+    // public enum PopupID
+    // {
+    //     CUSTOM_AR_POPUP,
+    //
+    //     // MODE_LOCKED,
+    //     CUSTOM_POPUP,
+    //     PICTURE_SETTINGS_POPUP,
+    //     FILE_FORMAT_POPUP,
+    //     DISPLAY_SETTINGS_POPUP,
+    //     COLOR_POPUP,
+    //     WHATS_NEW_POPUP
+    // }
 
-        // MODE_LOCKED,
-        CUSTOM_POPUP,
-        PICTURE_SETTINGS_POPUP,
-        FILE_FORMAT_POPUP,
-        DISPLAY_SETTINGS_POPUP,
-        COLOR_POPUP,
-        WHATS_NEW_POPUP
-    }
+    // private PopupID[] popupStack;
 
-    private PopupID[] popupStack;
-
-    public class UIStateBeforeCustomPopup
-    {
-        public UIStateBeforeCustomPopup(MenuID _visible_menu_id)
-        {
-            VisibleMenuID = _visible_menu_id;
-        }
-
-        public MenuID VisibleMenuID;
-    }
+    // public class UIStateBeforeCustomPopup
+    // {
+    //     public UIStateBeforeCustomPopup(MenuID _visible_menu_id)
+    //     {
+    //         VisibleMenuID = _visible_menu_id;
+    //     }
+    //
+    //     public MenuID VisibleMenuID;
+    // }
 
     // public void SetVLC(MainDisplay instance)
     // {
@@ -144,37 +142,17 @@ public class DashPanel : MonoBehaviour
 
     public static GameObject[] FindGameObjectsAll(string name)
     {
-        try
-        {
-            var Found = new List<GameObject>();
-            var All = Resources.FindObjectsOfTypeAll<GameObject>();
-            foreach (var entry in All)
-                if (entry.name == name)
-                    Found.Add(entry);
-            return Found.ToArray();
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning("Error finding " + name + " " + e);
-            return null;
-        }
-
-        ;
+        var Found = new List<GameObject>();
+        var All = Resources.FindObjectsOfTypeAll<GameObject>();
+        foreach (var entry in All)
+            if (entry.name == name)
+                Found.Add(entry);
+        return Found.ToArray();
     }
 
     public static GameObject FindGameObjectsAllFirst(string name)
     {
-        try
-        {
-            return FindGameObjectsAll(name)?.First();
-        }
-        catch (Exception e)
-        {
-            Debug.LogWarning("Error finding " + name + " " + e);
-            return null;
-        }
-
-        ;
+        return FindGameObjectsAll(name)?.First();
     }
 
     private void OnApplicationFocus(bool hasFocus)
@@ -243,12 +221,12 @@ public class DashPanel : MonoBehaviour
     //     HideAllMenus();
     // }
 
-    public void RestoreStateBeforePopup()
-    {
-        if (stateBeforePopup == null) return;
-        ShowMenuByID(stateBeforePopup.VisibleMenuID);
-        stateBeforePopup = null;
-    }
+    // public void RestoreStateBeforePopup()
+    // {
+    //     if (stateBeforePopup == null) return;
+    //     ShowMenuByID(stateBeforePopup.VisibleMenuID);
+    //     stateBeforePopup = null;
+    // }
 
     // public void HideUnlock3DSphereModePropmptPopup()
     // {
@@ -267,10 +245,10 @@ public class DashPanel : MonoBehaviour
         return !_menu_visible;
     }*/
 
-    public bool OGMenuVisible()
-    {
-        return _og_menu_visible;
-    }
+    // public bool OGMenuVisible()
+    // {
+    //     return _og_menu_visible;
+    // }
 
     private void ShowControllerMenu()
     {
@@ -330,73 +308,38 @@ public class DashPanel : MonoBehaviour
         HideAppMenu();
     }
 
-    // public void HideMenuByID(MenuID id)
-    // {
-    //     switch (id)
-    //     {
-    //         case MenuID.OG_MENU:
-    //             HideOGMenu();
-    //             break;
-    //         case MenuID.CONTROLLER_MENU:
-    //             HideControllerMenu();
-    //             break;
-    //         case MenuID.OPTION_MENU:
-    //             HideAppMenu();
-    //             break;
-    //     }
-    // }
-
     public void HideAllPopups()
     {
-        // TODO: just loop
         // HideUnlock3DSphereModePropmptPopup();
         // HideCustomPopup();
         HideAspectRatioPopup();
         HideDisplayPopup();
         HideFormatPopup();
         HideWhatsNewPopup();
-        HidePopupByID(PopupID.PICTURE_SETTINGS_POPUP);
+        HidePictureSettingsPopup();
+        // HidePopupByID(PopupID.PICTURE_SETTINGS_POPUP);
     }
 
-    // public void ShowPopupByID(PopupID popupID)
+    // private void HidePopupByID(PopupID popupID)
     // {
-    //     stateBeforePopup = new UIStateBeforeCustomPopup(_visible_menu_id);
-    //     UpdateReferences();
-    //
     //     switch (popupID)
     //     {
     //         // case PopupID.MODE_LOCKED:
-    //         //     ShowUnlock3DSphereModePropmptPopup();
+    //         //     HideUnlock3DSphereModePropmptPopup();
     //         //     break;
     //         /*case PopupID.CUSTOM:
-    //             ShowCustomPopup();
+    //             HideCustomPopup();
     //             break;*/
     //         case PopupID.CUSTOM_AR_POPUP:
-    //             ShowCustomARPopup();
+    //             HideAspectRatioPopup();
+    //             break;
+    //         case PopupID.PICTURE_SETTINGS_POPUP:
+    //             HidePictureSettingsPopup();
     //             break;
     //     }
+    //
+    //     RestoreStateBeforePopup();
     // }
-
-    private void HidePopupByID(PopupID popupID)
-    {
-        switch (popupID)
-        {
-            // case PopupID.MODE_LOCKED:
-            //     HideUnlock3DSphereModePropmptPopup();
-            //     break;
-            /*case PopupID.CUSTOM:
-                HideCustomPopup();
-                break;*/
-            case PopupID.CUSTOM_AR_POPUP:
-                HideAspectRatioPopup();
-                break;
-            case PopupID.PICTURE_SETTINGS_POPUP:
-                HidePictureSettingsPopup();
-                break;
-        }
-
-        RestoreStateBeforePopup();
-    }
 
     // TODO: aggregate into a view
     public void ShowAspectRatioPopup()
@@ -408,60 +351,11 @@ public class DashPanel : MonoBehaviour
         updater.SyncAll();
     }
 
-    public class AspectRatioUpdater
-    {
-        public MainDisplay display;
-        public Frac value;
-
-        public AspectRatioUpdater(MainDisplay display)
-        {
-            this.display = display;
-            value = display.AspectRatio;
-        }
-
-        public void SyncSlider()
-        {
-            display.controller.aspectRatioComboBar.GetComponent<Slider>()
-                .SetValueWithoutNotify((float)value.ToDouble());
-        }
-
-        public void SyncText()
-        {
-            display.controller.aspectRatioText.GetComponent<Text>().text =
-                $"{value.ToRatioText()} - {value.ToDouble().ToString()}";
-        }
-
-        public void SyncAll()
-        {
-            SyncText();
-            SyncSlider();
-        }
-    }
 
     private void HideAspectRatioPopup()
     {
         _aspect_popup.SetActive(false);
     }
-
-    // public void ShowCustomPopup(string title, string body)
-    // {
-    //     stateBeforePopup = new UIStateBeforeCustomPopup(_visible_menu_id);
-    //     UpdateReferences();
-    //     _custom_popup.SetActive(true);
-    //     _custom_popup.transform.position = new Vector3(
-    //         _custom_popup.transform.position.x,
-    //         _custom_popup.transform.position.y,
-    //         _custom_popup.transform.position.z - 1.0f // TODO: make this dynamic based on popup stack index
-    //     );
-    //     GameObject.Find("CustomPopup/PopupInner/GameObject/Title").GetComponent<Text>().text = title;
-    //     GameObject.Find("CustomPopup/PopupInner/GameObject/Body").GetComponent<Text>().text = body;
-    // }
-
-    // public void HideCustomPopup()
-    // {
-    //     _custom_popup.SetActive(false);
-    //     RestoreStateBeforePopup();
-    // }
 
     public void ShowDisplayPopup()
     {
@@ -502,14 +396,4 @@ public class DashPanel : MonoBehaviour
     {
         _picture_settings_popup.SetActive(false);
     }
-
-    // Flag UI as unlocked
-    // public void Unlock3DMode()
-    // {
-    //     foreach (GameObject button in FindGameObjectsAll("Unlock3603D"))
-    //     {
-    //         button.GetComponent<Button>().interactable = false;
-    //         button.transform.Find("Text").GetComponent<Text>().text = "Unlocked";
-    //     }
-    // }
 }

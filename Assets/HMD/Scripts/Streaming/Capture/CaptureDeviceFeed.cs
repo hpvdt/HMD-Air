@@ -1,11 +1,11 @@
-namespace HMD.Scripts.Streaming
+namespace HMD.Scripts.Streaming.Capture
 {
     using System;
     using System.Linq;
     using Unity.VisualScripting;
     using UnityEngine;
 
-    public class CameraDeviceFeed : FeedLike
+    public class CaptureDeviceFeed : FeedLike
     {
         public struct CameraSelector
         {
@@ -32,10 +32,10 @@ namespace HMD.Scripts.Streaming
             index = (index + 1) % devices.Length;
             _device = devices[index];
 
-            OpenResolution(res);
+            OpenWithResolution(res);
         }
 
-        public void OpenResolution(Resolution? res)
+        public void OpenWithResolution(Resolution? res)
         {
             if (_device == null) return;
 

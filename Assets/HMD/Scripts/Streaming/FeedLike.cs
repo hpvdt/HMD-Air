@@ -42,17 +42,12 @@ namespace HMD.Scripts.Streaming
 
         public abstract void Pause();
 
-        public static Frac DefaultAspectRatio = new Frac(16, 9);
+        // public static Frac DefaultAspectRatio = new Frac(16, 9);
 
         public Frac NativeAspectRatio()
         {
             var size = GetSize();
             return new Frac((int)size.Item1, (int)size.Item2);
-        }
-
-        public virtual Frac AspectRatio()
-        {
-            return NativeAspectRatio();
         }
 
         public bool flipTextureX; //No particular reason you'd need this but it is sometimes useful
@@ -69,6 +64,7 @@ namespace HMD.Scripts.Streaming
         {
             get;
         } = Vector2.one;
+        
         protected virtual void Awake()
         {
             base.Awake();

@@ -7,7 +7,7 @@ namespace HMD.Scripts.Util
     {
         public bool logToConsole = true; //Log function calls and LibVLC logs to Unity console
 
-        private string LoggerPrefix;
+        public string LoggerPrefix;
 
         // private string LoggerPrefix
         // {
