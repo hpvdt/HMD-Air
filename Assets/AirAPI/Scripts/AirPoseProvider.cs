@@ -8,6 +8,12 @@ using Vector3 = UnityEngine.Vector3;
 
 public class AirPoseProvider : BasePoseProvider
 {
+    public bool useQuaternion = false;
+
+    public bool verboseLogging = false;
+
+    public float mouseSensitivity = 100.0f;
+    
 #if (UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN)
     [DllImport("AirAPI_Windows", CallingConvention = CallingConvention.Cdecl)]
     public static extern int StartConnection();
@@ -58,11 +64,11 @@ public class AirPoseProvider : BasePoseProvider
         Connected = 3
     }
 
-    protected static ConnectionStates connectionState = ConnectionStates.Disconnected;
+    protected static ConnectionStates ConnectionState = ConnectionStates.Disconnected;
 
     public bool IsConnecting()
     {
-        return connectionState is ConnectionStates.Connected or ConnectionStates.StandBy;
+        return ConnectionState is ConnectionStates.Connected or ConnectionStates.StandBy;
     }
 
     public void TryConnect()
@@ -71,7 +77,7 @@ public class AirPoseProvider : BasePoseProvider
         var code = StartConnection();
         if (code == 1)
         {
-            connectionState = ConnectionStates.StandBy;
+            ConnectionState = ConnectionStates.StandBy;
             Debug.Log("Glasses standing by");
         }
         else
@@ -88,12 +94,12 @@ public class AirPoseProvider : BasePoseProvider
             var code = StopConnection();
             if (code == 1)
             {
-                connectionState = ConnectionStates.Disconnected;
+                ConnectionState = ConnectionStates.Disconnected;
                 Debug.Log("Glassed disconnected");
             }
             else
             {
-                connectionState = ConnectionStates.Offline;
+                ConnectionState = ConnectionStates.Offline;
                 Debug.LogWarning("Glassed disconnected with error: return code " + code);
             }
         }
@@ -103,19 +109,24 @@ public class AirPoseProvider : BasePoseProvider
         }
     }
 
-    private static readonly Quaternion Qid = Quaternion.identity.normalized;
+    private static readonly Quaternion Q_ID = Quaternion.identity.normalized;
 
-    public class Attitude
+    public class Rotation
     {
+        protected readonly AirPoseProvider Outer;
+
+        public Rotation(AirPoseProvider outer)
+        {
+            this.Outer = outer;
+        }
+
         public Quaternion Glasses = Quaternion.identity;
         public Quaternion Mouse = Quaternion.identity;
         public Quaternion Zeroing = Quaternion.identity;
 
-        private Vector3 MouseEuler = Vector3.zero;
+        private Vector3 _mouseEuler = Vector3.zero;
 
-        private Vector3 ZeroingEuler = Vector3.zero;
-
-        private float mouseSensitivity = 100.0f;
+        private Vector3 _zeroingEuler = Vector3.zero;
 
         private float[] GetEulerArray()
         {
@@ -125,7 +136,8 @@ public class AirPoseProvider : BasePoseProvider
             return r;
         }
 
-        private static readonly Quaternion QNeutral = Quaternion.Euler(90f, 0f, 0f).normalized;
+        private static readonly Quaternion Q_Neutral = Quaternion.Euler(90f, 0f, 0f).normalized;
+
 
         // the following rules are chosen to be
         //  compatible with alternative Windows driver (https://github.com/wheaney/OpenVR-xrealAirGlassesHMD)
@@ -141,14 +153,18 @@ public class AirPoseProvider : BasePoseProvider
 
             var qRaw = new Quaternion(-arr[1], -arr[3], -arr[2], arr[0]);
 
-            // Debug.Log($"Quaternion before: {qRaw.x}, {qRaw.y}, {qRaw.z}, {qRaw.w}");
+            if (Outer.verboseLogging) Debug.Log($"Quaternion raw: {qRaw.x}, {qRaw.y}, {qRaw.z}, {qRaw.w}");
 
             // converting to IKJW order (right hand)
             // sequence (1, -3, -2, 0) is for chiral conversion
             // see https://stackoverflow.com/questions/28673777/convert-quaternion-from-right-handed-to-left-handed-coordinate-system
             // neutral position is 90 degree pitch downward
 
-            var q = qRaw * QNeutral;
+            var qNormalised = qRaw.normalized;
+            // some driver may have all 0 reading, which will be converted to identity quaternion
+
+            var q = qNormalised * Q_Neutral;
+            // var q = qRaw * QNeutral;
             // Debug.Log($"Quaternion after: {q.x}, {q.y}, {q.z}, {q.w}");
             return q;
         }
@@ -166,7 +182,7 @@ public class AirPoseProvider : BasePoseProvider
             var yaw = arr[2];
 
             var arr2 = new Vector3(-(pitch - 90f), -yaw, -roll);
-            // Debug.Log($"Euler: {arr2[0]}, {arr2[1]}, {arr2[2]}");
+            if (Outer.verboseLogging) Debug.Log($"Euler raw: {arr2[0]}, {arr2[1]}, {arr2[2]}");
 
             // converting to LDB order (right hand axes, right hand rotation)
             // Left - pitch
@@ -174,15 +190,21 @@ public class AirPoseProvider : BasePoseProvider
             // Backward - roll
             // neutral position is 90 degree pitch downward
 
-            var r = Quaternion.Euler(arr2[0], arr2[1], arr2[2]);
-            return r;
+            var q = Quaternion.Euler(arr2[0], arr2[1], arr2[2]);
+            return q;
         }
 
 
         protected virtual Quaternion Read()
         {
-            var r2 = Read_euler();
-            return r2;
+            if (Outer.useQuaternion)
+            {
+                return Read_direct();
+            }
+            else
+            {
+                return Read_euler();
+            }
         }
 
         public void UpdateFromGlasses()
@@ -192,13 +214,18 @@ public class AirPoseProvider : BasePoseProvider
             var effective = reading;
             // var effective = (reading * Q_NEUTRAL).normalized;
 
-            if (connectionState == ConnectionStates.StandBy)
+            if (ConnectionState == ConnectionStates.StandBy)
             {
-                if (!reading.Equals(Qid))
+                var fromNeutral = Quaternion.Angle(reading, Q_Neutral);
+                if (!(reading.Equals(Q_Neutral) || fromNeutral < 1.0))
                 {
-                    connectionState = ConnectionStates.Connected;
+                    ConnectionState = ConnectionStates.Connected;
                     Debug.Log("Glasses connected, start reading");
                     Glasses = effective;
+                }
+                else
+                {
+                    if (Outer.verboseLogging) Debug.Log("Glasses has no reading");
                 }
             }
             else
@@ -209,26 +236,35 @@ public class AirPoseProvider : BasePoseProvider
 
         public void UpdateFromMouse()
         {
-            var deltaY = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-            var deltaX = -Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+            var deltaY = Input.GetAxis("Mouse X") * Outer.mouseSensitivity * Time.deltaTime;
+            var deltaX = -Input.GetAxis("Mouse Y") * Outer.mouseSensitivity * Time.deltaTime;
             // Mouse & Unity XY axis are opposite
 
-            MouseEuler += new Vector3(deltaX, deltaY, 0.0f);
+            _mouseEuler += new Vector3(deltaX, deltaY, 0.0f);
 
             // Debug.Log("mouse pressed:" + FromMouseXY);
 
-            Mouse = Quaternion.Euler(-MouseEuler);
+            Mouse = Quaternion.Euler(-_mouseEuler);
         }
 
         public void ZeroY()
         {
             var fromGlassesY = (Glasses * Mouse).eulerAngles.y;
-            ZeroingEuler.y = -fromGlassesY;
-            Zeroing = Quaternion.Euler(ZeroingEuler);
+            _zeroingEuler.y = -fromGlassesY;
+            Zeroing = Quaternion.Euler(_zeroingEuler);
         }
     }
 
-    protected Attitude _attitude = new Attitude();
+    protected Rotation AttitudeVar;
+
+    protected virtual Rotation Attitude
+    {
+        get
+        {
+            if (AttitudeVar == null) AttitudeVar = new Rotation(this);
+            return AttitudeVar;
+        }
+    }
 
     public class Translation // TODO: enable it
     {
@@ -251,11 +287,11 @@ public class AirPoseProvider : BasePoseProvider
     // Update Pose
     public override PoseDataFlags GetPoseFromProvider(out Pose output)
     {
-        if (IsConnecting()) _attitude.UpdateFromGlasses();
+        if (IsConnecting()) Attitude.UpdateFromGlasses();
 
-        if (Input.GetMouseButton(1)) _attitude.UpdateFromMouse();
+        if (Input.GetMouseButton(1)) Attitude.UpdateFromMouse();
 
-        var compound = _attitude.Mouse * _attitude.Zeroing * _attitude.Glasses;
+        var compound = Attitude.Mouse * Attitude.Zeroing * Attitude.Glasses;
 
         output = new Pose(new Vector3(0, 0, 0), compound);
         return PoseDataFlags.Rotation;
