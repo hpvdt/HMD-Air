@@ -571,12 +571,13 @@ public class MainDisplay : MonoBehaviourWithLogging
             VLC.Player.AspectRatio = value?.ToRatioText();
 
             var actual = AspectRatio;
+            var n_actual = (float) (actual.ToDouble());
             if (m_lMaterial is not null)
-                m_lMaterial.SetFloat("AspectRatio", (float)actual.ToDouble());
+                m_lMaterial.SetFloat("AspectRatio", n_actual);
 
-            // todo: why are they affected instead of other materials?
+            // todo: are they redundant? why are they affected instead of other materials?
             if (m_rMaterial is not null)
-                m_rMaterial.SetFloat("AspectRatio", (float)actual.ToDouble());
+                m_rMaterial.SetFloat("AspectRatio",  n_actual);
 
             var updater = new DashPanel.AspectRatioUpdater(this);
             updater.SyncAll();
