@@ -6,21 +6,20 @@ namespace HMD.Scripts.Streaming
 
     public abstract class FeedLike : MonoBehaviourWithLogging, IDisposable
     {
-        public abstract (uint, uint) GetSize();
+        protected abstract (uint, uint) GetSize();
 
-        public bool isValid()
+        public (uint, uint)? GetSizeOptional()
         {
             var size = GetSize();
-            if (size.Item1 == 0 || size.Item2 == 0) return false;
-
-            return true;
+            if (size.Item1 == 0 || size.Item2 == 0) return null;
+            return size;
         }
 
         protected abstract TextureView? TryGetTextureIfValid(TextureView? existing);
 
         public TextureView? TryGetTexture(TextureView? existing)
         {
-            if (isValid())
+            if (GetSizeOptional() != null)
             {
                 var res = TryGetTextureIfValid(existing);
 
@@ -46,8 +45,9 @@ namespace HMD.Scripts.Streaming
 
         public Frac NativeAspectRatio()
         {
-            var size = GetSize();
-            return new Frac((int)size.Item1, (int)size.Item2);
+            var s = GetSizeOptional();
+            var _s = s.GetValueOrDefault((1, 1));
+            return new Frac((int)_s.Item1, (int)_s.Item2);
         }
 
         public bool flipTextureX; //No particular reason you'd need this but it is sometimes useful

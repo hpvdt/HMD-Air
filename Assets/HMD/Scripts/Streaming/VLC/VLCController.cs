@@ -5,7 +5,6 @@ namespace HMD.Scripts.Streaming.VLC
     using Util;
     using UnityEngine;
     using UnityEngine.EventSystems;
-    using UnityEngine.Serialization;
     using UnityEngine.UI;
 
     
@@ -202,7 +201,7 @@ namespace HMD.Scripts.Streaming.VLC
                     eventID = EventTriggerType.PointerUp
                 };
             
-            void SyncText(float value)
+            void SyncV(float value)
             {
                 var arDecimal = Mathf.Round(value * 100f) / 100f;
                 // Get the aspect ratio fraction from the decimal
@@ -216,11 +215,11 @@ namespace HMD.Scripts.Streaming.VLC
             
             aspectRatioSliderPointerUp.callback.AddListener((_) =>
             {
-                if (_isDraggingaspectRatioSlider) SyncText(aspectRatioSlider.value);
+                if (_isDraggingaspectRatioSlider) SyncV(aspectRatioSlider.value);
                 _isDraggingaspectRatioSlider = false;
             });
             aspectRatioSliderEvents.triggers.Add(aspectRatioSliderPointerUp);
-            aspectRatioSlider.onValueChanged.AddListener(SyncText);
+            aspectRatioSlider.onValueChanged.AddListener(SyncV);
 
             //Volume Bar
             volumeBar.wholeNumbers = true;

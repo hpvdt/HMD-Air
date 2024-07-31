@@ -141,7 +141,7 @@ namespace HMD.Scripts.Streaming.Capture
             _webCamTex?.Pause();
         }
 
-        public override (uint, uint) GetSize()
+        protected override (uint, uint) GetSize()
         {
             return ((uint)_webCamTex.width, (uint)_webCamTex.height);
         }

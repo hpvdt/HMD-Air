@@ -264,7 +264,7 @@ namespace HMD.Scripts.Streaming.VLC
             Player.Pause();
         }
 
-        public override (uint, uint) GetSize()
+        protected override (uint, uint) GetSize()
         {
             uint height = 0;
             uint width = 0;
