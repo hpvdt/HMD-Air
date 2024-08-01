@@ -7,19 +7,11 @@ namespace HMD.Scripts.Util
     {
         public bool logToConsole = true; //Log function calls and LibVLC logs to Unity console
 
-        public string LoggerPrefix;
-
-        // private string LoggerPrefix
-        // {
-        //     get
-        //     {
-        //         return name;
-        //     }
-        // }
+        public string loggerPrefix;
 
         protected void Awake()
         {
-            LoggerPrefix = name;
+            if (loggerPrefix == "") loggerPrefix = name;
         }
 
         protected void Log(object message, LogType? type = null)
@@ -31,8 +23,8 @@ namespace HMD.Scripts.Util
             // if (logToConsole)
             try
             {
-                Debug.unityLogger.Log(actualType, $"[{LoggerPrefix}]", $"{message}", this);
-                Debug.Assert(LoggerPrefix != null, "Not Awaken! LoggerPrefix != null");
+                Debug.unityLogger.Log(actualType, $"[{loggerPrefix}]", $"{message}", this);
+                Debug.Assert(loggerPrefix != null, "Not Awaken! LoggerPrefix != null");
             }
             catch (Exception ee)
             {

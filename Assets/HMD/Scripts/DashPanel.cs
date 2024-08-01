@@ -1,6 +1,5 @@
-using System.Collections.Generic;
-using System.Linq;
 using HMD.Scripts.Streaming.VLC;
+using HMD.Scripts.Util;
 using NRKernal;
 using UnityEngine;
 using UnityEngine.UI;
@@ -81,15 +80,15 @@ public class DashPanel : MonoBehaviour
     {
         UpdateReferences();
 
-        _lockScreenNotice = GameObject.Find("LockScreenNotice");
+        _lockScreenNotice = GlobalFinder.Find("LockScreenNotice").Exact();
 
         // hide 6dof button if not supported
         if (NRDevice.Subsystem.GetDeviceType() != NRDeviceType.NrealLight)
-            GameObject.Find("ChangeTo6Dof").SetActive(false);
+            GlobalFinder.Find("ChangeTo6Dof").Exact().SetActive(false);
 
         var versionName = Application.version;
         var versionCode = Application.buildGUID;
-        GameObject.Find("AppMenu/AppMenuInner/Subtitle").GetComponent<Text>().text = $"{versionName} ({versionCode})";
+        GlobalFinder.Find("AppMenu/AppMenuInner/Subtitle").Exact().GetComponent<Text>().text = $"{versionName} ({versionCode})";
 
         // center UI things that i had spread out in Editor
         CenterPopupLocations();
@@ -122,7 +121,8 @@ public class DashPanel : MonoBehaviour
     {
         // Get the "Popups" game object, then loop over each of it's top-level children
         // and center them on the screen
-        var popups = GameObject.Find("Canvas/Popups");
+        
+        var popups = GlobalFinder.Find("Canvas/Popups").Exact();
         for (var i = 0; i < popups.transform.childCount; i++)
         {
             var childGameObject = popups.transform.GetChild(i).gameObject;
@@ -140,21 +140,6 @@ public class DashPanel : MonoBehaviour
         );
     }
 
-    public static GameObject[] FindGameObjectsAll(string name)
-    {
-        var Found = new List<GameObject>();
-        var All = Resources.FindObjectsOfTypeAll<GameObject>();
-        foreach (var entry in All)
-            if (entry.name == name)
-                Found.Add(entry);
-        return Found.ToArray();
-    }
-
-    public static GameObject FindGameObjectsAllFirst(string name)
-    {
-        return FindGameObjectsAll(name)?.First();
-    }
-
     private void OnApplicationFocus(bool hasFocus)
     {
         if (hasFocus) UpdateReferences();
@@ -162,20 +147,20 @@ public class DashPanel : MonoBehaviour
 
     public void UpdateReferences()
     {
-        _menu_toggle_button = FindGameObjectsAllFirst("MenuToggleButton");
+        _menu_toggle_button = gameObject.ByName("MenuToggleButton").Exact();
 
-        _menuPanel = FindGameObjectsAllFirst("MyControlPanel");
-        _og_menu = FindGameObjectsAllFirst("Buttons");
-        _app_menu = FindGameObjectsAllFirst("AppMenu");
+        _menuPanel = gameObject.ByName("RootPanel").Exact();
+        _og_menu = gameObject.ByName("Buttons").Exact();
+        _app_menu = gameObject.ByName("AppMenu").Exact();
 
         // _unlock_3d_sphere_mode_prompt_popup = FindGameObjectsAllFirst("Unlock3DSphereModePopup");
 
-        _aspect_popup = FindGameObjectsAllFirst("AspectRatioPopup");
-        _options_button = FindGameObjectsAllFirst("OptionsButton");
-        _display_popup = FindGameObjectsAllFirst("DisplayPopup");
-        _format_popup = FindGameObjectsAllFirst("FormatPopup");
-        _whats_new_popup = FindGameObjectsAllFirst("WhatsNewPopup");
-        _picture_settings_popup = FindGameObjectsAllFirst("PictureSettingsPopup");
+        _aspect_popup = gameObject.ByName("AspectRatioPopup").Exact();
+        _options_button = gameObject.ByName("OptionsButton").Exact();
+        _display_popup = gameObject.ByName("DisplayPopup").Exact();
+        _format_popup = gameObject.ByName("FormatPopup").Exact();
+        _whats_new_popup = gameObject.ByName("WhatsNewPopup").Exact();
+        _picture_settings_popup = gameObject.ByName("PictureSettingsPopup").Exact();
     }
 
     public void ClearPlayerPrefs()

@@ -147,7 +147,7 @@ namespace HMD.Scripts.Streaming
         //Unity Awake, OnDestroy, and Update functions
 
         #region unity
-        protected void Awake()
+        protected new void Awake()
         {
             base.Awake();
 
@@ -265,14 +265,14 @@ namespace HMD.Scripts.Streaming
             gameObject.transform.localScale = new Vector3(scale, scale, scale);
         }
 
-        private float lerpDuration = 1; // TODO: dynamic duration based on startValue
-        private float startValue = 0;
-        private float endValue = 10;
-        private IEnumerator lerpLZero;
-        private IEnumerator lerpLOne;
-        private IEnumerator lerpRZero;
-
-        private IEnumerator lerpROne;
+        // private float lerpDuration = 1; // TODO: dynamic duration based on startValue
+        // private float startValue = 0;
+        // private float endValue = 10;
+        // private IEnumerator lerpLZero;
+        // private IEnumerator lerpLOne;
+        // private IEnumerator lerpRZero;
+        //
+        // private IEnumerator lerpROne;
         //float valueToLerp;
 
         // public void TogglePlaneToSphere() // TODO: cleanup
@@ -387,8 +387,8 @@ namespace HMD.Scripts.Streaming
         //     mainDisplay.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
         // }
 
-        private float leftCameraMinX = -1.5f;
-        private float rightCameraMaxX = 1.5f;
+        // private float leftCameraMinX = -1.5f;
+        // private float rightCameraMaxX = 1.5f;
 
         // public void OnDepthBarUpdated()
         // {
@@ -409,8 +409,8 @@ namespace HMD.Scripts.Streaming
         //         new Vector3(rightCameraX, rightCamera.transform.localPosition.y, rightCamera.transform.localPosition.z);
         // }
 
-        private static float maxFocal = 15.0f;
-        private static float minFocal = -15.0f;
+        // private static float maxFocal = 15.0f;
+        // private static float minFocal = -15.0f;
 
         // public void OnFocusBarUpdated()
         // {

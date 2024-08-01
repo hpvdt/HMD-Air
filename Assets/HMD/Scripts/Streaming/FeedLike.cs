@@ -65,7 +65,7 @@ namespace HMD.Scripts.Streaming
             get;
         } = Vector2.one;
         
-        protected virtual void Awake()
+        protected new virtual void Awake()
         {
             base.Awake();
             //Automatically flip on android

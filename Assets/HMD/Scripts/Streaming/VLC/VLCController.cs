@@ -46,9 +46,9 @@ namespace HMD.Scripts.Streaming.VLC
         public Slider aspectRatioSlider;
         public GameObject aspectRatioText;
 
-        private bool _isDraggingARWidthBar = false;
-        private bool _isDraggingARHeightBar = false;
-        private bool _isDraggingaspectRatioSlider = false;
+        // private bool _isDraggingARWidthBar = false;
+        // private bool _isDraggingARHeightBar = false;
+        private bool _isDraggingAspectRatioSlider = false;
 
         //Configurable Options
         public int maxVolume = 100; //The highest volume the slider can reach. 100 is usually good but you can go higher.
@@ -64,9 +64,9 @@ namespace HMD.Scripts.Streaming.VLC
         ///Unity wants to do everything on the main thread, but VLC events use their own thread.
         ///These variables can be set to true in a VLC event handler indicate that a function should be called next Update.
         ///This is not actually thread safe and should be gone soon!
-        private bool _shouldUpdateTracks = false; //Set this to true and the Tracks menu will regenerate next frame
-
-        private bool _shouldClearTracks = false; //Set this to true and the Tracks menu will clear next frame
+        // private bool _shouldUpdateTracks = false; //Set this to true and the Tracks menu will regenerate next frame
+        //
+        // private bool _shouldClearTracks = false; //Set this to true and the Tracks menu will clear next frame
 
         private List<Button> _videoTracksButtons = new List<Button>();
         private List<Button> _audioTracksButtons = new List<Button>();
@@ -99,7 +99,7 @@ namespace HMD.Scripts.Streaming.VLC
                     //Because many Unity functions can only be used on the main thread, they will fail in VLC event handlers
                     //A simple way around this is to set flag variables which cause functions to be called on the next Update
                     _isPlaying = true; //Switch to the Pause button next update
-                    _shouldUpdateTracks = true; //Regenerate tracks next update
+                    // _shouldUpdateTracks = true; //Regenerate tracks next update
                 }
                 catch (Exception ex)
                 {
@@ -126,7 +126,7 @@ namespace HMD.Scripts.Streaming.VLC
                 try
                 {
                     _isPlaying = false; //Switch to the Play button next update
-                    _shouldClearTracks = true; //Clear tracks next update
+                    // _shouldClearTracks = true; //Clear tracks next update
                 }
                 catch (Exception ex)
                 {
@@ -193,7 +193,7 @@ namespace HMD.Scripts.Streaming.VLC
                 {
                     eventID = EventTriggerType.PointerDown
                 };
-            aspectRatioSliderPointerDown.callback.AddListener((_) => { _isDraggingaspectRatioSlider = true; });
+            aspectRatioSliderPointerDown.callback.AddListener((_) => { _isDraggingAspectRatioSlider = true; });
             aspectRatioSliderEvents.triggers.Add(aspectRatioSliderPointerDown);
 
             var aspectRatioSliderPointerUp = new EventTrigger.Entry
@@ -215,8 +215,8 @@ namespace HMD.Scripts.Streaming.VLC
             
             aspectRatioSliderPointerUp.callback.AddListener((_) =>
             {
-                if (_isDraggingaspectRatioSlider) SyncV(aspectRatioSlider.value);
-                _isDraggingaspectRatioSlider = false;
+                if (_isDraggingAspectRatioSlider) SyncV(aspectRatioSlider.value);
+                _isDraggingAspectRatioSlider = false;
             });
             aspectRatioSliderEvents.triggers.Add(aspectRatioSliderPointerUp);
             aspectRatioSlider.onValueChanged.AddListener(SyncV);
