@@ -17,13 +17,13 @@
         public void SyncSlider()
         {
             Display.controller.aspectRatioSlider.GetComponent<Slider>()
-                .SetValueWithoutNotify((float)Value.ToDouble());
+                .SetValueWithoutNotify((float)Value.ToLn());
         }
 
         public void SyncText()
         {
             Display.controller.aspectRatioText.GetComponent<Text>().text =
-                $"{Value.ToRatioText()} - {Value.ToDouble().ToString()}";
+                $"{Value.ToRatioText()}\n{Value.ToDouble().ToString()}";
         }
 
         public void SyncAll()

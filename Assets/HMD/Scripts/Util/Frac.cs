@@ -16,9 +16,9 @@
         {
             return (double)_nominator / _denominator;
         }
-        public double ToExp()
+        public double ToLn()
         {
-            return Math.Log(ToDouble(), 2d);
+            return Math.Log(ToDouble());
         }
 
         public static Frac FromDouble(double d)
@@ -35,6 +35,11 @@
 
             return new Frac(numerator, denominator);
         }
+        
+        public static Frac FromLn(double d)
+        {
+            return FromDouble(Math.Exp(d));
+        }
 
         private static int gcdBase = 128;
 
@@ -48,11 +53,6 @@
             }
 
             return a;
-        }
-
-        public static Frac FromExp(double d)
-        {
-            return FromDouble(Math.Pow(2d, d));
         }
 
         public override string ToString()

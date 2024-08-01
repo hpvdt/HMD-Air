@@ -201,11 +201,13 @@ namespace HMD.Scripts.Streaming.VLC
                     eventID = EventTriggerType.PointerUp
                 };
             
-            void SyncV(float value)
+            void SyncV(float fromSlider)
             {
-                var arDecimal = Mathf.Round(value * 100f) / 100f;
+                var arDecimal = fromSlider;
+                // var arDecimal = Mathf.Round(fromSlider * 100f) / 100f;
+                
                 // Get the aspect ratio fraction from the decimal
-                var frac = Frac.FromDouble(arDecimal);
+                var frac = Frac.FromLn(arDecimal);
 
                 mainDisplay.AspectRatio = frac;
 
