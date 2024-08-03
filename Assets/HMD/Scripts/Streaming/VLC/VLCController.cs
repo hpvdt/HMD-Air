@@ -26,13 +26,14 @@ namespace HMD.Scripts.Streaming.VLC
         public Button pauseButton;
         public Button stopButton;
         public Button fileButton;
-
-        // public Button tracksButton; // TODO: use this group for other things
         
         public Button consoleButton;
         public GameObject consoleGroup;
         public InputField pathInputField; // TODO: this won't be on the dashUI, will be moved to HUD
         public Button pathEnterButton;
+        
+        public Button trackButton;
+        public GameObject trackGroup;
         
         public Button volumeButton;
         public GameObject volumeGroup;
@@ -49,16 +50,14 @@ namespace HMD.Scripts.Streaming.VLC
         public int maxVolume = 100; //The highest volume the slider can reach. 100 is usually good but you can go higher.
 
         //State variables
-        private bool
-            _isPlaying = false; //We use VLC events to track whether we are playing, rather than relying on IsPlaying 
+        private volatile bool _isPlaying = false; //We use VLC events to track whether we are playing, rather than relying on IsPlaying 
 
-        private bool _isDraggingSeekBar = false; //We advance the seek bar every frame, unless the user is dragging it
+        private volatile bool _isDraggingSeekBar = false; //We advance the seek bar every frame, unless the user is dragging it
 
         ///Unity wants to do everything on the main thread, but VLC events use their own thread.
         ///These variables can be set to true in a VLC event handler indicate that a function should be called next Update.
         ///This is not actually thread safe and should be gone soon!
         // private bool _shouldUpdateTracks = false; //Set this to true and the Tracks menu will regenerate next frame
-        //
         // private bool _shouldClearTracks = false; //Set this to true and the Tracks menu will clear next frame
 
         // private List<Button> _videoTracksButtons = new List<Button>();
@@ -86,7 +85,7 @@ namespace HMD.Scripts.Streaming.VLC
             var player = display.vlcFeed.Player;
             
             //VLC Event Handlers
-            player.Playing += (object _, EventArgs _) =>
+            player.Playing += (_, _) =>
             {
                 //Always use Try/Catch for VLC Events
                 try
@@ -102,7 +101,7 @@ namespace HMD.Scripts.Streaming.VLC
                 }
             };
 
-            player.Paused += (object _, EventArgs _) =>
+            player.Paused += (_, _) =>
             {
                 //Always use Try/Catch for VLC Events
                 try
@@ -115,7 +114,7 @@ namespace HMD.Scripts.Streaming.VLC
                 }
             };
 
-            player.Stopped += (object _, EventArgs _) =>
+            player.Stopped += (_, _) =>
             {
                 //Always use Try/Catch for VLC Events
                 try
@@ -151,11 +150,11 @@ namespace HMD.Scripts.Streaming.VLC
             });
             fileButton.onClick.AddListener(() => { display.PromptUserFilePicker(); });
             
-            // tracksButton.onClick.AddListener(() =>
-            // {
-            //     ToggleElement(tracksButtonsGroup);
-            //     SetupTrackButtons();
-            // });
+            trackButton.onClick.AddListener(() =>
+            {
+                ToggleElement(trackGroup);
+                // SetupTrackButtons();
+            });
             volumeButton.onClick.AddListener(() => { ToggleElement(volumeGroup.gameObject); });
             pathEnterButton.onClick.AddListener(() =>
             {

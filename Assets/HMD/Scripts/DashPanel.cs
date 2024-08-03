@@ -11,9 +11,12 @@ public class DashPanel : MonoBehaviour
     [HideInInspector]
     public VlcController controller;
 
-    private GameObject _menuPanel;
-    
+    public Button playerButton;
+    public GameObject playerGroup;
+
     private GameObject _baseButtons;
+    
+    private GameObject _rootPanel;
 
     private GameObject _appMenu;
 
@@ -25,7 +28,7 @@ public class DashPanel : MonoBehaviour
     // private GameObject _custom_popup = null;
     private GameObject _lockScreenNotice;
 
-    private GameObject _aspectPopup;
+    private GameObject _aspectRatioPopup;
     private GameObject _displayPopup;
     private GameObject _formatPopup;
     private GameObject _whatsNewPopup;
@@ -34,7 +37,7 @@ public class DashPanel : MonoBehaviour
     private bool _baseButtonsVisible = true;
 
     private MenuID _visibleMenuID;
-
+    
     // public UIStateBeforeCustomPopup stateBeforePopup;
 
     [SerializeField]
@@ -84,7 +87,7 @@ public class DashPanel : MonoBehaviour
         _lockScreenNotice = GlobalFinder.Find("LockScreenNotice").Only();
 
         // hide 6dof button if not supported
-        if (NRDevice.Subsystem.GetDeviceType() != NRDeviceType.NrealLight)
+        if (NRDevice.Subsystem.GetDeviceType() != NRDeviceType.XrealLight)
             GlobalFinder.Find("ChangeTo6Dof").Only().SetActive(false);
 
         var versionName = Application.version;
@@ -96,7 +99,7 @@ public class DashPanel : MonoBehaviour
 
         // Center Menus/Objects
         CenterXY(_lockScreenNotice);
-        CenterXY(_menuPanel);
+        CenterXY(_rootPanel);
         CenterXY(_appMenu);
 
         _lockScreenNotice.SetActive(false);
@@ -153,12 +156,12 @@ public class DashPanel : MonoBehaviour
         var basePanel = gameObject.ByName("BaseControllerPanel").Only();
         _baseButtons = basePanel.ByName("Buttons").Only();
 
-        _menuPanel = gameObject.ByName("RootPanel").Only();
+        _rootPanel = gameObject.ByName("RootPanel").Only();
         _appMenu = gameObject.ByName("AppMenu").Only();
 
         // _unlock_3d_sphere_mode_prompt_popup = FindGameObjectsAllFirst("Unlock3DSphereModePopup");
 
-        _aspectPopup = gameObject.ByName("AspectRatioPopup").Only();
+        _aspectRatioPopup = gameObject.ByName("AspectRatioPopup").Only();
         _optionsButton = gameObject.ByName("OptionsButton").Only();
         _displayPopup = gameObject.ByName("DisplayPopup").Only();
         _formatPopup = gameObject.ByName("FormatPopup").Only();
@@ -240,7 +243,7 @@ public class DashPanel : MonoBehaviour
 
     private void ShowControllerMenu()
     {
-        _menuPanel?.SetActive(true);
+        _rootPanel?.SetActive(true);
 
         _optionsButton.SetActive(true);
         _menuToggleButton.SetActive(true);
@@ -248,7 +251,7 @@ public class DashPanel : MonoBehaviour
 
     private void HideControllerMenu()
     {
-        _menuPanel?.SetActive(false);
+        _rootPanel?.SetActive(false);
     }
 
     public void UIToggleControllerMenu()
@@ -332,7 +335,7 @@ public class DashPanel : MonoBehaviour
     // TODO: aggregate into a view
     public void ShowAspectRatioPopup()
     {
-        _aspectPopup.SetActive(true);
+        _aspectRatioPopup.SetActive(true);
 
         var updater = new AspectRatioUpdater(controller.display);
 
@@ -342,7 +345,7 @@ public class DashPanel : MonoBehaviour
 
     private void HideAspectRatioPopup()
     {
-        _aspectPopup.SetActive(false);
+        _aspectRatioPopup.SetActive(false);
     }
 
     public void ShowDisplayPopup()
