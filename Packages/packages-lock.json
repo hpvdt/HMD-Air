@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.tayx.graphy": {
+      "version": "3.0.5",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://package.openupm.com"
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
@@ -31,7 +38,7 @@
         "com.unity.editorcoroutines": "1.0.0",
         "com.unity.performance.profile-analyzer": "1.2.2",
         "com.unity.test-framework": "1.1.33",
-        "com.unity.testtools.codecoverage": "1.2.5"
+        "com.unity.testtools.codecoverage": "1.2.6"
       }
     },
     "com.unity.ide.rider": {
@@ -101,21 +108,12 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.testtools.codecoverage": {
-      "version": "1.2.5",
+      "version": "1.2.6",
       "depth": 1,
       "source": "registry",
       "dependencies": {
         "com.unity.test-framework": "1.0.16",
         "com.unity.settings-manager": "1.0.1"
-      },
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.textmeshpro": {
-      "version": "3.0.9",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.ugui": "1.0.0"
       },
       "url": "https://packages.unity.com"
     },
@@ -211,12 +209,26 @@
       },
       "url": "https://packages.unity.com"
     },
-    "com.yasirkula.nativefilepicker": {
-      "version": "https://github.com/yasirkula/UnityNativeFilePicker.git#v1.3.4",
+    "com.yamldotnet.uni": {
+      "version": "13.2.0",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://package.openupm.com"
+    },
+    "com.yasirkula.ingamedebugconsole": {
+      "version": "https://github.com/yasirkula/UnityIngameDebugConsole.git#v1.6.7",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "c1b54d864f4dc3c4dff5d05b0c5ad7c45b505c6c"
+      "hash": "b1204706248cea04f1b762dca8591e32ae044652"
+    },
+    "io.github.gkngkc.unity-standalone-file-browser": {
+      "version": "1.3.2",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://package.openupm.com"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

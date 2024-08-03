@@ -1,19 +1,19 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
 using HMD.Scripts.Util;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class FOVController : MonoBehaviourWithLogging
 {
-        
-    [SerializeField] private Camera leftCamera;
-    [SerializeField] private Camera centerCamera;
-    [SerializeField] private Camera rightCamera;
+    public Camera mainCamera;
 
-    [SerializeField] private Camera airPoseCamera;
-        
+    // TODO : enable this after gimbal or professional AR camera support
+    // [SerializeField] private Camera leftCamera;
+    // [SerializeField] private Camera rightCamera;
+
     [SerializeField] private Slider fovBar;
-    
+
     // [SerializeField] public Slider brightnessBar; // TODO: enable
     //
     // [SerializeField] public Slider contrastBar;
@@ -32,42 +32,32 @@ public class FOVController : MonoBehaviourWithLogging
     private static float maxFocal = 15.0f;
     private static float minFocal = -15.0f;
 
-    
-    private List<Camera> MainCameras()
-    {
-        return new List<Camera> { centerCamera, airPoseCamera };
-    }
+    private List<Camera>? _mainCameras;
+    private List<Camera> MainCameras => _mainCameras ??= new List<Camera> { mainCamera };
 
-    private List<Camera> AllCameras()
-    {
-        var result = MainCameras();
-        result.Add(leftCamera);
-        result.Add(rightCamera);
+    private List<Camera>? _allCameras;
+    private List<Camera> AllCameras => _allCameras ??= MainCameras;
 
-        return result;
-    }
-        
-        
     private float FOV // 20 for 2D 140 for spherical
     {
         get
         {
-            return centerCamera.fieldOfView;
+            return mainCamera.fieldOfView;
         }
         set
         {
-            foreach (var c in AllCameras()) c.fieldOfView = value;
+            foreach (var c in AllCameras) c.fieldOfView = value;
         }
     }
-        
-        
+
+
     #region unity
     protected void Start()
     {
         BindUI();
     }
-    
-    
+
+
     private void BindUI()
     {
         fovBar.onValueChanged.AddListener(OnFOVSliderUpdated);
@@ -75,7 +65,7 @@ public class FOVController : MonoBehaviourWithLogging
         // contrastBar.onValueChanged.AddListener(OnContrastSliderUpdated);
         // gammaBar.onValueChanged.AddListener(OnGammaSliderUpdated);
     }
-    
+
     protected void Awake()
     {
         base.Awake();
@@ -83,17 +73,17 @@ public class FOVController : MonoBehaviourWithLogging
         fovBar.value = FOV;
     }
     #endregion
-    
+
     private void OnFOVSliderUpdated(float value)
     {
         // NOTE: NRSDK doesn't support custom FOV on cameras
         // NOTE: TESTING COMMENTING OUT camera.projectionMatrix = statements in NRHMDPoseTracker
 
         FOV = value;
-        Log("fov " + FOV);
+        Log.V("fov " + FOV);
     }
-    
-    
+
+
     private void OnBrightnessSliderUpdated()
     {
     }
@@ -105,8 +95,8 @@ public class FOVController : MonoBehaviourWithLogging
     private void OnContrastSliderUpdated()
     {
     }
-    
-    
+
+
     // private void UpdateColorGrade()
     // {
     //     // Get the Color Grading effect from the camera's post-processing profile

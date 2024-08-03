@@ -8,7 +8,7 @@ namespace HMD.Scripts.Streaming
     {
         protected abstract (uint, uint) GetSize();
 
-        public (uint, uint)? GetSizeOptional()
+        public (uint, uint)? GetSizeNonZero()
         {
             var size = GetSize();
             if (size.Item1 == 0 || size.Item2 == 0) return null;
@@ -19,13 +19,13 @@ namespace HMD.Scripts.Streaming
 
         public TextureView? TryGetTexture(TextureView? existing)
         {
-            if (GetSizeOptional() != null)
+            if (GetSizeNonZero() != null)
             {
                 var res = TryGetTextureIfValid(existing);
 
                 if (existing != null && res != null && res != existing)
                 {
-                    LogWarning($"existing texture {existing} is obsolete\n"
+                    Warning.V($"existing texture {existing} is obsolete\n"
                         + $"creating new one {res}\n");
                 }
 
@@ -45,7 +45,7 @@ namespace HMD.Scripts.Streaming
 
         public Frac NativeAspectRatio()
         {
-            var s = GetSizeOptional();
+            var s = GetSizeNonZero();
             var _s = s.GetValueOrDefault((1, 1));
             return new Frac((int)_s.Item1, (int)_s.Item2);
         }
@@ -64,7 +64,7 @@ namespace HMD.Scripts.Streaming
         {
             get;
         } = Vector2.one;
-        
+
         protected new virtual void Awake()
         {
             base.Awake();

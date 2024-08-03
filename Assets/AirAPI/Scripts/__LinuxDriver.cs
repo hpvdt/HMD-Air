@@ -1,6 +1,8 @@
-public class __LinuxDriver
+namespace AirAPI.Scripts
 {
-    /*
+    public class __LinuxDriver
+    {
+        /*
      We have 2 options:
 
      - https://github.com/wheaney/breezy-desktop?tab=readme-ov-file
@@ -36,4 +38,5 @@ public class __LinuxDriver
        Deleting temp directory: /tmp/breezy-vulkan-Hli2GycZLU
 
      */
+    }
 }

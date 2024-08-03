@@ -10,7 +10,7 @@
     #error Wrong include order: MAVLINK_FALCON_SENSORS.H MUST NOT BE DIRECTLY USED. Include mavlink.h from the same directory instead or set ALL AND EVERY defines from MAVLINK.H manually accordingly, including the #define MAVLINK_H call.
 #endif
 
-#define MAVLINK_FALCON_SENSORS_XML_HASH 1642071261565688626
+#define MAVLINK_FALCON_SENSORS_XML_HASH 4477913971594980381
 
 #ifdef __cplusplus
 extern "C" {

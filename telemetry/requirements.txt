@@ -1,1 +1,1 @@
-future>=0.18.3
+pymavlink>=2.4.41
