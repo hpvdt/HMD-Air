@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace HMD.Scripts.Streaming
 {
-    
+
     public abstract class MainDisplay : MonoBehaviourWithLogging
     {
         public enum VideoMode
@@ -72,6 +72,19 @@ namespace HMD.Scripts.Streaming
         //Unity Awake, OnDestroy, and Update functions
 
         #region unity
+        protected void Start()
+        {
+            BindUI();
+        }
+
+        private void BindUI()
+        {
+            deformBar.onValueChanged.AddListener(OnDeformBarUpdated);
+            distanceBar.onValueChanged.AddListener(OnDistanceSliderUpdated);
+            horizontalBar.onValueChanged.AddListener(OnHorizontalSliderUpdated);
+            verticalBar.onValueChanged.AddListener(OnVerticalSliderUpdated);
+        }
+        
         protected void Awake()
         {
             base.Awake();
@@ -118,11 +131,9 @@ namespace HMD.Scripts.Streaming
 
         private static Vector2 SCALE_RANGE = new Vector2(1f, 4.702173720867682f);
 
-        public void OnDeformSliderUpdated()
+        public void OnDeformBarUpdated(float value)
         {
             // if (deformBar is null) return;
-
-            var value = deformBar.value;
 
             var scale = Mathf.Lerp(SCALE_RANGE.x, SCALE_RANGE.y, value / 100);
 
@@ -140,34 +151,31 @@ namespace HMD.Scripts.Streaming
         }
 
 
-        public void OnDistanceSliderUpdated()
+        public void OnDistanceSliderUpdated(float value)
         {
-            var newDistance = distanceBar.value;
             gameObject.transform.localPosition = new Vector3(
                 gameObject.transform.localPosition.x,
                 gameObject.transform.localPosition.y,
-                newDistance
+                value
             );
         }
 
         /* Horizontal (X) axis offset for screen */
-        public void OnHorizontalSliderUpdated()
+        public void OnHorizontalSliderUpdated(float value)
         {
-            var newOffset = horizontalBar.value;
             gameObject.transform.localPosition = new Vector3(
-                newOffset,
+                value,
                 gameObject.transform.localPosition.y,
                 gameObject.transform.localPosition.z
             );
         }
 
         /* Vertical (Y) axis offset for screen */
-        public void OnVerticalSliderUpdated()
+        public void OnVerticalSliderUpdated(float value)
         {
-            var newOffset = verticalBar.value;
             gameObject.transform.localPosition = new Vector3(
                 gameObject.transform.localPosition.x,
-                newOffset,
+                value,
                 gameObject.transform.localPosition.z
             );
         }

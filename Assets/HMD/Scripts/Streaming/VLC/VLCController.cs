@@ -40,10 +40,10 @@ namespace HMD.Scripts.Streaming.VLC
         
         public Text currentTimecode;
 
-        public Slider aspectRatioSlider;
+        public Slider aspectRatioBar;
         public GameObject aspectRatioText;
 
-        private bool _isDraggingAspectRatioSlider = false;
+        private bool _isDraggingAspectRatioBar = false;
 
         //Configurable Options
         public int maxVolume = 100; //The highest volume the slider can reach. 100 is usually good but you can go higher.
@@ -70,12 +70,12 @@ namespace HMD.Scripts.Streaming.VLC
             display.controller = this;
             dashPanel.controller = this;
 
-            BindListeners();
+            BindUI();
 
             display.Stop();
         }
 
-        private void BindListeners()
+        private void BindUI()
         {
             if (display?.vlcFeed.Player is null)
             {
@@ -184,43 +184,45 @@ namespace HMD.Scripts.Streaming.VLC
             });
             seekBarEvents.triggers.Add(seekBarPointerUp);
             
-            // AR Combo Bar Events
-            var aspectRatioSliderEvents = aspectRatioSlider.GetComponent<EventTrigger>();
-            
-            // TODO: the following drag & drop with EventTrigger should have a shared class
-            var aspectRatioSliderPointerDown = new EventTrigger.Entry
+            // Aspect Ratio Bar Events
+            {
+                var events = aspectRatioBar.GetComponent<EventTrigger>();
+
+                // TODO: the following drag & drop with EventTrigger should have a shared class
+                var pointerDown = new EventTrigger.Entry
                 {
                     eventID = EventTriggerType.PointerDown
                 };
-            aspectRatioSliderPointerDown.callback.AddListener((_) => { _isDraggingAspectRatioSlider = true; });
-            aspectRatioSliderEvents.triggers.Add(aspectRatioSliderPointerDown);
+                pointerDown.callback.AddListener((_) => { _isDraggingAspectRatioBar = true; });
+                events.triggers.Add(pointerDown);
 
-            var aspectRatioSliderPointerUp = new EventTrigger.Entry
+                var pointerUp = new EventTrigger.Entry
                 {
                     eventID = EventTriggerType.PointerUp
                 };
-            
-            void SyncV(float fromSlider)
-            {
-                var ln = fromSlider;
-                // var arDecimal = Mathf.Round(fromSlider * 100f) / 100f;
-                
-                // Get the aspect ratio fraction from the decimal
-                var frac = Frac.FromLn(ln);
 
-                display.AspectRatio = frac;
+                void SyncV(float fromSlider)
+                {
+                    var ln = fromSlider;
+                    // var arDecimal = Mathf.Round(fromSlider * 100f) / 100f;
 
-                // var updater = new AspectRatioUpdater(mainDisplay);
-                // updater.SyncText();
+                    // Get the aspect ratio fraction from the decimal
+                    var frac = Frac.FromLn(ln);
+
+                    display.AspectRatio = frac;
+
+                    // var updater = new AspectRatioUpdater(mainDisplay);
+                    // updater.SyncText();
+                }
+
+                pointerUp.callback.AddListener((_) =>
+                {
+                    if (_isDraggingAspectRatioBar) SyncV(aspectRatioBar.value);
+                    _isDraggingAspectRatioBar = false;
+                });
+                events.triggers.Add(pointerUp);
+                aspectRatioBar.onValueChanged.AddListener(SyncV);
             }
-            
-            aspectRatioSliderPointerUp.callback.AddListener((_) =>
-            {
-                if (_isDraggingAspectRatioSlider) SyncV(aspectRatioSlider.value);
-                _isDraggingAspectRatioSlider = false;
-            });
-            aspectRatioSliderEvents.triggers.Add(aspectRatioSliderPointerUp);
-            aspectRatioSlider.onValueChanged.AddListener(SyncV);
 
             //Volume Bar
             volumeBar.wholeNumbers = true;

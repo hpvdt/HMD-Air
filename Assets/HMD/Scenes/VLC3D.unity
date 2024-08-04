@@ -24563,6 +24563,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1066429524059530, guid: e0f440c4bb94be641af5dc113d3248f5, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2089846052}
+    - targetCorrespondingSourceObject: {fileID: 1066429524059530, guid: e0f440c4bb94be641af5dc113d3248f5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2089846055}
   m_SourcePrefab: {fileID: 100100000, guid: e0f440c4bb94be641af5dc113d3248f5, type: 3}
 --- !u!224 &2089846050 stripped
 RectTransform:
@@ -24587,6 +24590,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 0}
+--- !u!114 &2089846055
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2089846051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43a5681c53414f2a9f5ca29529570f88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  logToConsole: 1
+  loggerPrefix: 
+  leftCamera: {fileID: 2066632863}
+  centerCamera: {fileID: 1085126938}
+  rightCamera: {fileID: 2087385060}
+  airPoseCamera: {fileID: 1233077427}
+  fovBar: {fileID: 1572876476}
 --- !u!1 &2095801855
 GameObject:
   m_ObjectHideFlags: 0
@@ -24753,10 +24775,6 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1085126938}
     - target: {fileID: 4275595960511208451, guid: 90e54ac8b34219b438a39bdd8c9b9d70, type: 3}
-      propertyPath: logToConsole
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4275595960511208451, guid: 90e54ac8b34219b438a39bdd8c9b9d70, type: 3}
       propertyPath: airPoseCamera
       value: 
       objectReference: {fileID: 1233077427}
@@ -24832,6 +24850,10 @@ PrefabInstance:
       propertyPath: consoleButton
       value: 
       objectReference: {fileID: 1809665528}
+    - target: {fileID: 7253315729899444372, guid: 90e54ac8b34219b438a39bdd8c9b9d70, type: 3}
+      propertyPath: aspectRatioBar
+      value: 
+      objectReference: {fileID: 1912183160}
     - target: {fileID: 7253315729899444372, guid: 90e54ac8b34219b438a39bdd8c9b9d70, type: 3}
       propertyPath: pathInputField
       value: 

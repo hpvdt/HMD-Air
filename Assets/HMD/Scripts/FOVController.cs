@@ -12,7 +12,7 @@ public class FOVController : MonoBehaviourWithLogging
 
     [SerializeField] private Camera airPoseCamera;
         
-    [SerializeField] public Slider fovBar;
+    [SerializeField] private Slider fovBar;
     
     // [SerializeField] public Slider brightnessBar; // TODO: enable
     //
@@ -62,37 +62,47 @@ public class FOVController : MonoBehaviourWithLogging
         
         
     #region unity
+    protected void Start()
+    {
+        BindUI();
+    }
+    
+    
+    private void BindUI()
+    {
+        fovBar.onValueChanged.AddListener(OnFOVSliderUpdated);
+        // brightnessBar.onValueChanged.AddListener(OnBrightnessSliderUpdated);
+        // contrastBar.onValueChanged.AddListener(OnContrastSliderUpdated);
+        // gammaBar.onValueChanged.AddListener(OnGammaSliderUpdated);
+    }
+    
     protected void Awake()
     {
         base.Awake();
 
-        if (fovBar is not null) fovBar.value = FOV;
-            
-        // init
-        OnFOVSliderUpdated();
+        fovBar.value = FOV;
     }
     #endregion
-        
-        
-    public void OnFOVSliderUpdated()
+    
+    private void OnFOVSliderUpdated(float value)
     {
         // NOTE: NRSDK doesn't support custom FOV on cameras
         // NOTE: TESTING COMMENTING OUT camera.projectionMatrix = statements in NRHMDPoseTracker
 
-        FOV = fovBar.value;
-        Debug.Log("fov " + FOV);
+        FOV = value;
+        Log("fov " + FOV);
     }
     
     
-    public void OnBrightnessSliderUpdated()
+    private void OnBrightnessSliderUpdated()
     {
     }
 
-    public void OnGammaSliderUpdated()
+    private void OnGammaSliderUpdated()
     {
     }
 
-    public void OnContrastSliderUpdated()
+    private void OnContrastSliderUpdated()
     {
     }
     

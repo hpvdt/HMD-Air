@@ -30,13 +30,13 @@
                 vlcFeed.Player.AspectRatio = value?.ToRatioText();
 
                 var actual = AspectRatio;
-                var n_actual = (float) (actual.ToDouble());
+                var actualF = (float) (actual.ToDouble());
                 if (m_lMaterial is not null)
-                    m_lMaterial.SetFloat("AspectRatio", n_actual);
+                    m_lMaterial.SetFloat("AspectRatio", actualF);
 
                 // todo: are they redundant? why are they affected instead of other materials?
                 if (m_rMaterial is not null)
-                    m_rMaterial.SetFloat("AspectRatio",  n_actual);
+                    m_rMaterial.SetFloat("AspectRatio",  actualF);
 
                 var updater = new AspectRatioUpdater(this);
                 updater.SyncAll();

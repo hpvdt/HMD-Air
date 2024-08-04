@@ -16,7 +16,7 @@
 
         public void SyncSlider()
         {
-            Display.controller.aspectRatioSlider.GetComponent<Slider>()
+            Display.controller.aspectRatioBar.GetComponent<Slider>()
                 .SetValueWithoutNotify((float)Value.ToLn());
         }
 
