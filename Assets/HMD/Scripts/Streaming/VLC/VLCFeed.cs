@@ -58,7 +58,7 @@ namespace HMD.Scripts.Streaming.VLC
             }
         }
 
-        private MediaPlayer _player;
+        private volatile MediaPlayer _player;
 
         public MediaPlayer Player
         {

@@ -35,7 +35,7 @@
             
                 return All.First();
             }
-            public  GameObject Exact()
+            public  GameObject Only()
             {
                 if (All.Length > 1)
                     throw new System.Exception($"{All.Length} GameObjects with name " + Query + " found in scene.");
