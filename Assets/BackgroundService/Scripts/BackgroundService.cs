@@ -1,10 +1,10 @@
-using TMPro;
 using UnityEngine;
+
 public class BackgroundService : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI stepsText;
-    [SerializeField] private TextMeshProUGUI totalStepsText;
-    [SerializeField] private TextMeshProUGUI syncedDateText;
+    // [SerializeField] private TextMeshProUGUI stepsText;
+    // [SerializeField] private TextMeshProUGUI totalStepsText;
+    // [SerializeField] private TextMeshProUGUI syncedDateText;
 
     private AndroidJavaClass unityClass;
     private AndroidJavaObject unityActivity;
@@ -48,7 +48,7 @@ public class BackgroundService : MonoBehaviour
     public void GetCurrentSteps()
     {
         int? stepsCount = customClass.CallStatic<int>(CustomClassGetCurrentStepsMethod);
-        stepsText.text = stepsCount.ToString();
+        // stepsText.text = stepsCount.ToString();
     }
 
     public void SyncData()
@@ -57,12 +57,12 @@ public class BackgroundService : MonoBehaviour
 
         var parsedData = data.Split('#');
         var dateOfSync = parsedData[0] + " - " + parsedData[1];
-        syncedDateText.text = dateOfSync;
+        // syncedDateText.text = dateOfSync;
         var receivedSteps = int.Parse(parsedData[2]);
         var prefsSteps = PlayerPrefs.GetInt(PlayerPrefsTotalSteps, 0);
         var prefsStepsToSave = prefsSteps + receivedSteps;
         PlayerPrefs.SetInt(PlayerPrefsTotalSteps, prefsStepsToSave);
-        totalStepsText.text = prefsStepsToSave.ToString();
+        // totalStepsText.text = prefsStepsToSave.ToString();
 
         GetCurrentSteps();
     }
