@@ -1,17 +1,17 @@
 ﻿using System.Collections.Generic;
 using HMD.Scripts.Util;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class FOVController : MonoBehaviourWithLogging
 {
-        
-    [SerializeField] private Camera leftCamera;
-    [SerializeField] private Camera centerCamera;
-    [SerializeField] private Camera rightCamera;
-
-    [SerializeField] private Camera airPoseCamera;
-        
+    [SerializeField] private Camera mainCamera;
+    
+    // TODO : enable this after gimbal or professional AR camera support
+    // [SerializeField] private Camera leftCamera;
+    // [SerializeField] private Camera rightCamera;
+    
     [SerializeField] private Slider fovBar;
     
     // [SerializeField] public Slider brightnessBar; // TODO: enable
@@ -35,14 +35,14 @@ public class FOVController : MonoBehaviourWithLogging
     
     private List<Camera> MainCameras()
     {
-        return new List<Camera> { centerCamera, airPoseCamera };
+        return new List<Camera> { mainCamera };
     }
 
     private List<Camera> AllCameras()
     {
         var result = MainCameras();
-        result.Add(leftCamera);
-        result.Add(rightCamera);
+        // result.Add(leftCamera);
+        // result.Add(rightCamera);
 
         return result;
     }
@@ -52,7 +52,7 @@ public class FOVController : MonoBehaviourWithLogging
     {
         get
         {
-            return centerCamera.fieldOfView;
+            return mainCamera.fieldOfView;
         }
         set
         {
