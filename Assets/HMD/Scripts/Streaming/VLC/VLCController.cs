@@ -4,6 +4,7 @@ namespace HMD.Scripts.Streaming.VLC
     using Util;
     using UnityEngine;
     using UnityEngine.EventSystems;
+    using UnityEngine.Serialization;
     using UnityEngine.UI;
     
     ///This script controls all the GUI for the VLC Unity Canvas Example
@@ -12,7 +13,7 @@ namespace HMD.Scripts.Streaming.VLC
     public class VlcController : MonoBehaviour
     {
         public VlcDisplay display;
-        public DashPanel dashPanel;
+        public DashPanels dashPanels;
 
         //GUI Elements
         //public RawImage screen;
@@ -67,7 +68,7 @@ namespace HMD.Scripts.Streaming.VLC
         private void Start()
         {
             display.controller = this;
-            dashPanel.controller = this;
+            dashPanels.controller = this;
 
             BindUI();
 

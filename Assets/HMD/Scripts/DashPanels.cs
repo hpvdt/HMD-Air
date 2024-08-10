@@ -3,7 +3,7 @@ using HMD.Scripts.Util;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DashPanel : MonoBehaviour
+public class DashPanels : MonoBehaviour
 {
     [HideInInspector]
     public VlcController controller;
