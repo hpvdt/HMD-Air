@@ -1,5 +1,8 @@
 ﻿namespace HMD.Scripts.Streaming.VLC
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using SFB;
     using UnityEngine;
     using Util;
     
@@ -46,27 +49,62 @@
         
         public void PromptUserFilePicker()
         {
-            var fileTypes = new[] { "*", "Media resource locator/mrl,url,txt", "video/*", "Video(others)/movie" };
-
-            // Pick image(s) and/or video(s)
-            var permission = NativeFilePicker.PickFile(path =>
+            // from Claude 3.5
+            var video = new List<string>
             {
-                if (path == null)
-                {
-                    Debug.Log("Operation cancelled");
-                }
-                else
-                {
-                    Debug.Log("Picked file: " + path);
-
-                    vlcFeed.Open(path);
-                    Play();
-                }
-            }, fileTypes);
-
-            if (permission is not NativeFilePicker.Permission.Granted)
+                // Video formats
+                "mp4", "avi", "mkv", "mov", "wmv", "flv", "webm", "m4v", "mpg", "mpeg", "3gp"
+            };
+            
+            var audio = new List<string>
             {
-                Debug.Log("Permission not granted: " + permission);
+                // Audio formats
+                "mp3", "wav", "ogg", "flac", "aac", "wma", "m4a", "opus",
+            };
+            
+            var locator = new List<string>
+            {
+                "mrl", "url", "txt",
+            };
+            
+            var supported = video.Union(audio).Union(locator);
+            
+            var unused = new List<string>
+            {
+                // Playlist formats
+                "m3u", "pls",
+    
+                // DVD and Blu-ray formats
+                "vob", "iso", "m2ts",
+    
+                // Streaming formats
+                "m3u8", "ts",
+    
+                // Subtitle formats
+                "srt", "sub", "ass"
+            };
+            
+            // Open file with filter
+            var fileTypes = new [] {
+                new ExtensionFilter("Supported", supported.ToArray() ),
+                new ExtensionFilter("Video", video.ToArray() ),
+                new ExtensionFilter("Audio", audio.ToArray() ),
+                new ExtensionFilter("Media resource locator", locator.ToArray() ),
+                new ExtensionFilter("Any", "*" ),
+            };
+            var paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", fileTypes, false);
+            var path = paths.FirstOrDefault();
+            
+            if (path == null)
+            {
+                Debug.Log("Operation cancelled");
+            }
+            else
+            {
+                Debug.Log("Picked file: " + path);
+            
+                vlcFeed.Open(path);
+                Play();
             }
         }
     }
