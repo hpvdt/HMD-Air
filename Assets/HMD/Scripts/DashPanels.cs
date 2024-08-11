@@ -205,6 +205,19 @@ public class DashPanels : MonoBehaviour
         _aspectRatioPopup.SetActive(false);
     }
 
+    public void ExtendDisplay()
+    {
+        Debug.Log ("displays connected: " + Display.displays.Length);
+        // Display.displays[0] is the primary, default display and is always ON, so start at index 1.
+        // Check if additional displays are available and activate each.
+    
+        foreach (Display d in Display.displays)
+        {
+            Debug.Log ("display" + d.systemWidth + "x" + d.systemHeight + " : " + d.renderingWidth + "x" + d.renderingHeight);
+            d.Activate();
+        }
+    }
+    
     public void ShowDisplayPopup()
     {
         _displayPopup.SetActive(true);

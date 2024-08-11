@@ -23,22 +23,10 @@ public class IntentHandler : MonoBehaviour
             Debug.Log("Application lost focus");
         }
     }
-
+    
     // OnIntent
     private void OnIntent()
     {
-        
-        Debug.Log ("displays connected: " + Display.displays.Length);
-        // Display.displays[0] is the primary, default display and is always ON, so start at index 1.
-        // Check if additional displays are available and activate each.
-    
-        // TODO: enable later
-        // foreach (Display d in Display.displays)
-        // {
-        //     Debug.Log ("activating display");
-        //     d.Activate();
-        // }
-        
         // if (Application.isEditor) return;
         
         if (Application.platform == RuntimePlatform.Android)
