@@ -20,7 +20,7 @@ public class DashPanels : MonoBehaviour
     private GameObject _lockScreenNotice;
 
     private GameObject _aspectRatioPopup;
-    private GameObject _displayPopup;
+    private GameObject _screenPopup;
     private GameObject _formatPopup;
     private GameObject _whatsNewPopup;
     private GameObject _pictureSettingsPopup;
@@ -110,7 +110,7 @@ public class DashPanels : MonoBehaviour
 
         _aspectRatioPopup = gameObject.ByName("AspectRatioPopup").Only();
         _optionsButton = gameObject.ByName("OptionsButton").Only();
-        _displayPopup = gameObject.ByName("DisplayPopup").Only();
+        _screenPopup = gameObject.ByName("ScreenPopup").Only();
         _formatPopup = gameObject.ByName("FormatPopup").Only();
         _whatsNewPopup = gameObject.ByName("WhatsNewPopup").Only();
         _pictureSettingsPopup = gameObject.ByName("PictureSettingsPopup").Only();
@@ -183,7 +183,7 @@ public class DashPanels : MonoBehaviour
         // HideUnlock3DSphereModePropmptPopup();
         // HideCustomPopup();
         HideAspectRatioPopup();
-        HideDisplayPopup();
+        HideScreenPopup();
         HideFormatPopup();
         HideWhatsNewPopup();
         HidePictureSettingsPopup();
@@ -194,7 +194,7 @@ public class DashPanels : MonoBehaviour
     {
         _aspectRatioPopup.SetActive(true);
 
-        var updater = new AspectRatioUpdater(controller.display);
+        var updater = new AspectRatioUpdater(controller.screen);
 
         updater.SyncAll();
     }
@@ -218,14 +218,14 @@ public class DashPanels : MonoBehaviour
         }
     }
     
-    public void ShowDisplayPopup()
+    public void ShowScreenPopup()
     {
-        _displayPopup.SetActive(true);
+        _screenPopup.SetActive(true);
     }
 
-    private void HideDisplayPopup()
+    private void HideScreenPopup()
     {
-        _displayPopup.SetActive(false);
+        _screenPopup.SetActive(false);
     }
 
     public void ShowFormatPopup()

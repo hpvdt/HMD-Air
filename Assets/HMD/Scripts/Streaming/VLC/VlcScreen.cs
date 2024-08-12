@@ -6,7 +6,7 @@
     using UnityEngine;
     using Util;
     
-    public class VlcDisplay : MainDisplay
+    public class VlcScreen : PlayerScreen
     {
         
         [HideInInspector]

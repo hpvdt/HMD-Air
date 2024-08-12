@@ -12,7 +12,7 @@ namespace HMD.Scripts.Streaming.VLC
     ///This example shows how to safely set up LibVLC events and a simple way to call Unity functions from them
     public class VlcController : MonoBehaviour
     {
-        public VlcDisplay display;
+        public VlcScreen screen;
         public DashPanels dashPanels;
 
         //GUI Elements
@@ -67,23 +67,23 @@ namespace HMD.Scripts.Streaming.VLC
 
         private void Start()
         {
-            display.controller = this;
+            screen.controller = this;
             dashPanels.controller = this;
 
             BindUI();
 
-            display.Stop();
+            screen.Stop();
         }
 
         private void BindUI()
         {
-            if (display?.vlcFeed.Player is null)
+            if (screen?.vlcFeed.Player is null)
             {
                 Debug.LogError("VLC Player mediaPlayer not found");
                 return;
             }
 
-            var player = display.vlcFeed.Player;
+            var player = screen.vlcFeed.Player;
             
             //VLC Event Handlers
             player.Playing += (_, _) =>
@@ -133,23 +133,23 @@ namespace HMD.Scripts.Streaming.VLC
             rewind10Button.onClick.AddListener(() =>
             {
                 Debug.Log("Rewind10Button");
-                display.vlcFeed.SeekBack10();
+                screen.vlcFeed.SeekBack10();
             });
             ffw10Button.onClick.AddListener(() =>
             {
                 Debug.Log("FFW10Button");
-                display.vlcFeed.SeekForward10();
+                screen.vlcFeed.SeekForward10();
             });
-            pauseButton.onClick.AddListener(() => { display.Pause(); });
-            playButton.onClick.AddListener(() => { display.Play(); });
-            stopButton.onClick.AddListener(() => { display.Stop(); });
+            pauseButton.onClick.AddListener(() => { screen.Pause(); });
+            playButton.onClick.AddListener(() => { screen.Play(); });
+            stopButton.onClick.AddListener(() => { screen.Stop(); });
             
             consoleButton.onClick.AddListener(() =>
             {
                 if (ToggleElement(consoleGroup))
                     pathInputField.Select();
             });
-            fileButton.onClick.AddListener(() => { display.PromptUserFilePicker(); });
+            fileButton.onClick.AddListener(() => { screen.PromptUserFilePicker(); });
             
             trackButton.onClick.AddListener(() =>
             {
@@ -160,7 +160,7 @@ namespace HMD.Scripts.Streaming.VLC
             pathEnterButton.onClick.AddListener(() =>
             {
                 ToggleElement(consoleGroup);
-                display.vlcFeed.Open(pathInputField.text);
+                screen.vlcFeed.Open(pathInputField.text);
             });
 
             //Seek Bar Events
@@ -180,7 +180,7 @@ namespace HMD.Scripts.Streaming.VLC
             seekBarPointerUp.callback.AddListener((_) =>
             {
                 _isDraggingSeekBar = false;
-                display.vlcFeed.SetTime((long)((double)display.vlcFeed.Duration * seekBar.value));
+                screen.vlcFeed.SetTime((long)((double)screen.vlcFeed.Duration * seekBar.value));
             });
             seekBarEvents.triggers.Add(seekBarPointerUp);
             
@@ -209,9 +209,9 @@ namespace HMD.Scripts.Streaming.VLC
                     // Get the aspect ratio fraction from the decimal
                     var frac = Frac.FromLn(ln);
 
-                    display.AspectRatio = frac;
+                    screen.AspectRatio = frac;
 
-                    // var updater = new AspectRatioUpdater(mainDisplay);
+                    // var updater = new AspectRatioUpdater(screen);
                     // updater.SyncText();
                 }
 
@@ -227,8 +227,8 @@ namespace HMD.Scripts.Streaming.VLC
             //Volume Bar
             volumeBar.wholeNumbers = true;
             volumeBar.maxValue = maxVolume; //You can go higher than 100 but you risk audio clipping
-            volumeBar.value = display.vlcFeed.Volume;
-            volumeBar.onValueChanged.AddListener((_) => { display.vlcFeed.SetVolume((int)volumeBar.value); });
+            volumeBar.value = screen.vlcFeed.Volume;
+            volumeBar.onValueChanged.AddListener((_) => { screen.vlcFeed.SetVolume((int)volumeBar.value); });
         }
 
 
@@ -254,9 +254,9 @@ namespace HMD.Scripts.Streaming.VLC
         //Update the position of the Seek slider to the match the VLC Player
         private void UpdateSeekBar()
         {
-            var mm = display;
+            var mm = screen;
             // Get the current playback time as a TimeSpan object
-            var currentTime = display.vlcFeed.Time;
+            var currentTime = screen.vlcFeed.Time;
             var currentTimeSpan = TimeSpan.FromMilliseconds(currentTime);
 
             // Format the TimeSpan object as a string in the desired format
@@ -266,9 +266,9 @@ namespace HMD.Scripts.Streaming.VLC
 
             if (!_isDraggingSeekBar)
             {
-                var duration = display.vlcFeed.Duration;
+                var duration = screen.vlcFeed.Duration;
                 if (duration > 0)
-                    seekBar.value = (float)((double)display.vlcFeed.Time / duration);
+                    seekBar.value = (float)((double)screen.vlcFeed.Time / duration);
             }
         }
 

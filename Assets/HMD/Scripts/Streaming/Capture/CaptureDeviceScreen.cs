@@ -3,12 +3,9 @@
     using System;
     using System.Linq;
     using UnityEngine;
-    using UnityEngine.Serialization;
 
-    public class CaptureDeviceDisplay : MainDisplay
+    public class CaptureDeviceScreen : PlayerScreen
     {
-        
-        [FormerlySerializedAs("captureDevice")]
         public CaptureDeviceFeed captureDeviceFeed;
 
         protected override FeedLike Feed

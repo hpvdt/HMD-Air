@@ -5,24 +5,24 @@
 
     public class AspectRatioUpdater
     {
-        public readonly VlcDisplay Display;
+        public readonly VlcScreen Screen;
         public readonly Frac Value;
 
-        public AspectRatioUpdater(VlcDisplay display)
+        public AspectRatioUpdater(VlcScreen screen)
         {
-            this.Display = display;
-            Value = display.AspectRatio;
+            this.Screen = screen;
+            Value = screen.AspectRatio;
         }
 
         public void SyncSlider()
         {
-            Display.controller.aspectRatioBar.GetComponent<Slider>()
+            Screen.controller.aspectRatioBar.GetComponent<Slider>()
                 .SetValueWithoutNotify((float)Value.ToLn());
         }
 
         public void SyncText()
         {
-            Display.controller.aspectRatioText.GetComponent<Text>().text =
+            Screen.controller.aspectRatioText.GetComponent<Text>().text =
                 $"{Value.ToRatioText()}\n{Value.ToDouble().ToString()}";
         }
 

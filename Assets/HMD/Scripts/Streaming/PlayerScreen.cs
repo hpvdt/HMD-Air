@@ -8,7 +8,7 @@ using UnityEngine.UI;
 namespace HMD.Scripts.Streaming
 {
 
-    public abstract class MainDisplay : MonoBehaviourWithLogging
+    public abstract class PlayerScreen : MonoBehaviourWithLogging
     {
         public enum VideoMode
         {
@@ -33,8 +33,8 @@ namespace HMD.Scripts.Streaming
             return new List<GameObject> { leftEyeScreen, rightEyeScreen };
         }
 
-        private Renderer _morphDisplayLeftRenderer;
-        private Renderer _morphDisplayRightRenderer;
+        private Renderer _morphLeftRenderer;
+        private Renderer _morphRightRenderer;
 
 
         // [SerializeField] public Slider scaleBar;
@@ -91,8 +91,8 @@ namespace HMD.Scripts.Streaming
 
             if (deformBar is not null) deformBar.value = 0.0f;
             
-            _morphDisplayLeftRenderer = leftEyeScreen.GetComponent<Renderer>();
-            _morphDisplayRightRenderer = rightEyeScreen.GetComponent<Renderer>();
+            _morphLeftRenderer = leftEyeScreen.GetComponent<Renderer>();
+            _morphRightRenderer = rightEyeScreen.GetComponent<Renderer>();
 
             SetVideoModeMono();
         }
@@ -239,7 +239,7 @@ namespace HMD.Scripts.Streaming
         {
             get { return Feed.NativeAspectRatio(); } // by default, has no setter
             set { }
-            // may not have a setter for some display 
+            // may not have a setter for some feeds
         }
 
         public void SetARNull()
@@ -288,16 +288,16 @@ namespace HMD.Scripts.Streaming
 
         public void ClearMaterialTextureLinks()
         {
-            if (_morphDisplayLeftRenderer.material is not null)
+            if (_morphLeftRenderer.material is not null)
             {
-                _morphDisplayLeftRenderer.material.mainTexture = null;
-                _morphDisplayLeftRenderer.material = null;
+                _morphLeftRenderer.material.mainTexture = null;
+                _morphLeftRenderer.material = null;
             }
 
-            if (_morphDisplayRightRenderer.material is not null)
+            if (_morphRightRenderer.material is not null)
             {
-                _morphDisplayRightRenderer.material.mainTexture = null;
-                _morphDisplayRightRenderer.material = null;
+                _morphRightRenderer.material.mainTexture = null;
+                _morphRightRenderer.material = null;
             }
         }
 
@@ -323,8 +323,8 @@ namespace HMD.Scripts.Streaming
                 leftEyeScreen.layer = LayerMask.NameToLayer("Default");
                 rightEyeScreen.SetActive(false);
 
-                _morphDisplayLeftRenderer.material = m_monoMaterial; // m_lMaterial;
-                _morphDisplayLeftRenderer.material.mainTexture = Texture.Effective;
+                _morphLeftRenderer.material = m_monoMaterial; // m_lMaterial;
+                _morphLeftRenderer.material.mainTexture = Texture.Effective;
             }
             else
             {
@@ -337,17 +337,17 @@ namespace HMD.Scripts.Streaming
 
                 if (mode is VideoMode._3D_OU)
                 {
-                    _morphDisplayLeftRenderer.material = _flipStereo ? m_rightEyeTBMaterial : m_leftEyeTBMaterial;
-                    _morphDisplayRightRenderer.material = _flipStereo ? m_leftEyeTBMaterial : m_rightEyeTBMaterial;
+                    _morphLeftRenderer.material = _flipStereo ? m_rightEyeTBMaterial : m_leftEyeTBMaterial;
+                    _morphRightRenderer.material = _flipStereo ? m_leftEyeTBMaterial : m_rightEyeTBMaterial;
                 }
                 else
                 {
-                    _morphDisplayLeftRenderer.material = _flipStereo ? m_rMaterial : m_lMaterial;
-                    _morphDisplayRightRenderer.material = _flipStereo ? m_lMaterial : m_rMaterial;
+                    _morphLeftRenderer.material = _flipStereo ? m_rMaterial : m_lMaterial;
+                    _morphRightRenderer.material = _flipStereo ? m_lMaterial : m_rMaterial;
                 }
 
-                _morphDisplayLeftRenderer.material.mainTexture = Texture.Effective;
-                _morphDisplayRightRenderer.material.mainTexture = Texture.Effective;
+                _morphLeftRenderer.material.mainTexture = Texture.Effective;
+                _morphRightRenderer.material.mainTexture = Texture.Effective;
             }
         }
 

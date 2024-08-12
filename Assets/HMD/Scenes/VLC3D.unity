@@ -1124,7 +1124,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2089846052}
         m_TargetAssemblyTypeName: DashPanel, Assembly-CSharp
-        m_MethodName: ShowDisplayPopup
+        m_MethodName: ShowScreenPopup
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5069,7 +5069,7 @@ GameObject:
   m_Component:
   - component: {fileID: 482070165}
   m_Layer: 0
-  m_Name: DisplayPopup
+  m_Name: ScreenPopup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25883,6 +25883,10 @@ PrefabInstance:
       propertyPath: horizontalBar
       value: 
       objectReference: {fileID: 503463400}
+    - target: {fileID: 7253315729899444372, guid: 90e54ac8b34219b438a39bdd8c9b9d70, type: 3}
+      propertyPath: screen
+      value: 
+      objectReference: {fileID: 1701806922}
     - target: {fileID: 7253315729899444372, guid: 90e54ac8b34219b438a39bdd8c9b9d70, type: 3}
       propertyPath: display
       value: 
