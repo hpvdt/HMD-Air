@@ -7,10 +7,10 @@ namespace HMD.Scripts.Streaming
     public class TextureView : IDisposable
         // immutable, can only be initialised once, all derivative textures can only be destroyed together
     {
-        private Texture _source; //This is the texture libVLC writes to directly.
-        private RenderTexture _cache; //We copy it into this texture which we actually use in unity.
+        private readonly Texture _source; //This is the texture libVLC writes to directly.
+        private readonly RenderTexture _cache; //We copy it into this texture which we actually use in unity.
 
-        public Lazy<(int, int)> Size;
+        public readonly Lazy<(int, int)> Size;
 
         public Lazy<string> NativeAspectRatioText; // width:height
 

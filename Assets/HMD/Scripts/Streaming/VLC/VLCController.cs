@@ -4,9 +4,8 @@ namespace HMD.Scripts.Streaming.VLC
     using Util;
     using UnityEngine;
     using UnityEngine.EventSystems;
-    using UnityEngine.Serialization;
     using UnityEngine.UI;
-    
+
     ///This script controls all the GUI for the VLC Unity Canvas Example
     ///It sets up event handlers and updates the GUI every frame
     ///This example shows how to safely set up LibVLC events and a simple way to call Unity functions from them
@@ -27,19 +26,12 @@ namespace HMD.Scripts.Streaming.VLC
         public Button pauseButton;
         public Button stopButton;
         public Button fileButton;
-        
-        public Button consoleButton;
-        public GameObject consoleGroup;
+
         public InputField pathInputField; // TODO: this won't be on the dashUI, will be moved to HUD
         public Button pathEnterButton;
-        
-        public Button trackButton;
-        public GameObject trackGroup;
-        
-        public Button volumeButton;
-        public GameObject volumeGroup;
+
         public Slider volumeBar;
-        
+
         public Text currentTimecode;
 
         public Slider aspectRatioBar;
@@ -48,12 +40,15 @@ namespace HMD.Scripts.Streaming.VLC
         private bool _isDraggingAspectRatioBar = false;
 
         //Configurable Options
-        public int maxVolume = 100; //The highest volume the slider can reach. 100 is usually good but you can go higher.
+        public int
+            maxVolume = 100; //The highest volume the slider can reach. 100 is usually good but you can go higher.
 
         //State variables
-        private volatile bool _isPlaying = false; //We use VLC events to track whether we are playing, rather than relying on IsPlaying 
+        private volatile bool
+            _isPlaying = false; //We use VLC events to track whether we are playing, rather than relying on IsPlaying 
 
-        private volatile bool _isDraggingSeekBar = false; //We advance the seek bar every frame, unless the user is dragging it
+        private volatile bool
+            _isDraggingSeekBar = false; //We advance the seek bar every frame, unless the user is dragging it
 
         ///Unity wants to do everything on the main thread, but VLC events use their own thread.
         ///These variables can be set to true in a VLC event handler indicate that a function should be called next Update.
@@ -64,11 +59,10 @@ namespace HMD.Scripts.Streaming.VLC
         // private List<Button> _videoTracksButtons = new List<Button>();
         // private List<Button> _audioTracksButtons = new List<Button>();
         // private List<Button> _textTracksButtons = new List<Button>();
-
         private void Start()
         {
             screen.controller = this;
-            dashPanels.controller = this;
+            // dashPanels.controller = this;
 
             BindUI();
 
@@ -84,7 +78,7 @@ namespace HMD.Scripts.Streaming.VLC
             }
 
             var player = screen.vlcFeed.Player;
-            
+
             //VLC Event Handlers
             player.Playing += (_, _) =>
             {
@@ -141,49 +135,41 @@ namespace HMD.Scripts.Streaming.VLC
                 screen.vlcFeed.SeekForward10();
             });
             pauseButton.onClick.AddListener(() => { screen.Pause(); });
-            playButton.onClick.AddListener(() => { screen.Play(); });
+
+            var updater = new AspectRatioUpdater(screen);
+            updater.SyncAll();
+
+            playButton.onClick.AddListener(() =>
+            {
+                screen.Play();
+
+                updater.SyncAll();
+            });
             stopButton.onClick.AddListener(() => { screen.Stop(); });
-            
-            consoleButton.onClick.AddListener(() =>
-            {
-                if (ToggleElement(consoleGroup))
-                    pathInputField.Select();
-            });
+
             fileButton.onClick.AddListener(() => { screen.PromptUserFilePicker(); });
-            
-            trackButton.onClick.AddListener(() =>
-            {
-                ToggleElement(trackGroup);
-                // SetupTrackButtons();
-            });
-            volumeButton.onClick.AddListener(() => { ToggleElement(volumeGroup.gameObject); });
-            pathEnterButton.onClick.AddListener(() =>
-            {
-                ToggleElement(consoleGroup);
-                screen.vlcFeed.Open(pathInputField.text);
-            });
 
             //Seek Bar Events
             var seekBarEvents = seekBar.GetComponent<EventTrigger>();
 
             var seekBarPointerDown = new EventTrigger.Entry
-                {
-                    eventID = EventTriggerType.PointerDown
-                };
+            {
+                eventID = EventTriggerType.PointerDown
+            };
             seekBarPointerDown.callback.AddListener((_) => { _isDraggingSeekBar = true; });
             seekBarEvents.triggers.Add(seekBarPointerDown);
 
             var seekBarPointerUp = new EventTrigger.Entry
-                {
-                    eventID = EventTriggerType.PointerUp
-                };
+            {
+                eventID = EventTriggerType.PointerUp
+            };
             seekBarPointerUp.callback.AddListener((_) =>
             {
                 _isDraggingSeekBar = false;
                 screen.vlcFeed.SetTime((long)((double)screen.vlcFeed.Duration * seekBar.value));
             });
             seekBarEvents.triggers.Add(seekBarPointerUp);
-            
+
             // Aspect Ratio Bar Events
             {
                 var events = aspectRatioBar.GetComponent<EventTrigger>();
@@ -270,14 +256,6 @@ namespace HMD.Scripts.Streaming.VLC
                 if (duration > 0)
                     seekBar.value = (float)((double)screen.vlcFeed.Time / duration);
             }
-        }
-
-        //Enable a GameObject if it is disabled, or disable it if it is enabled
-        private bool ToggleElement(GameObject element)
-        {
-            var toggled = !element.activeInHierarchy;
-            element.SetActive(toggled);
-            return toggled;
         }
     }
 }

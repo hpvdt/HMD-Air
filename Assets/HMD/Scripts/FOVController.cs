@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
 using HMD.Scripts.Util;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class FOVController : MonoBehaviourWithLogging
@@ -32,22 +32,13 @@ public class FOVController : MonoBehaviourWithLogging
     private static float maxFocal = 15.0f;
     private static float minFocal = -15.0f;
 
+
+    private List<Camera>? _mainCameras;
+    private List<Camera> MainCameras => _mainCameras ??= new List<Camera> { mainCamera };
+
+    private List<Camera>? _allCameras;
+    private List<Camera> AllCameras => _allCameras ??= MainCameras;
     
-    private List<Camera> MainCameras()
-    {
-        return new List<Camera> { mainCamera };
-    }
-
-    private List<Camera> AllCameras()
-    {
-        var result = MainCameras();
-        // result.Add(leftCamera);
-        // result.Add(rightCamera);
-
-        return result;
-    }
-        
-        
     private float FOV // 20 for 2D 140 for spherical
     {
         get
@@ -56,7 +47,7 @@ public class FOVController : MonoBehaviourWithLogging
         }
         set
         {
-            foreach (var c in AllCameras()) c.fieldOfView = value;
+            foreach (var c in AllCameras) c.fieldOfView = value;
         }
     }
         
