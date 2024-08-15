@@ -4,8 +4,9 @@ namespace HMD.Scripts.Streaming
 {
     using System;
     using Unity.VisualScripting;
+
     public class TextureView : IDisposable
-        // immutable, can only be initialised once, all derivative textures can only be destroyed together
+    // immutable, can only be initialised once, all derivative textures can only be destroyed together
     {
         private readonly Texture _source; //This is the texture libVLC writes to directly.
         private readonly RenderTexture _cache; //We copy it into this texture which we actually use in unity.

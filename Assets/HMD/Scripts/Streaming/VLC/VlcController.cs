@@ -12,7 +12,7 @@ namespace HMD.Scripts.Streaming.VLC
     public class VlcController : MonoBehaviour
     {
         public VlcScreen screen;
-        public DashPanels dashPanels;
+        // public DashPanels dashPanels;
 
         //GUI Elements
         //public RawImage screen;
@@ -59,17 +59,20 @@ namespace HMD.Scripts.Streaming.VLC
         // private List<Button> _videoTracksButtons = new List<Button>();
         // private List<Button> _audioTracksButtons = new List<Button>();
         // private List<Button> _textTracksButtons = new List<Button>();
-        private void Start()
+        private void Awake()
         {
             screen.controller = this;
             // dashPanels.controller = this;
-
-            BindUI();
-
-            screen.Stop();
         }
 
-        private void BindUI()
+        private void Start()
+        {
+            screen.Stop();
+
+            Init();
+        }
+
+        public void Init()
         {
             if (screen?.vlcFeed.Player is null)
             {
@@ -122,64 +125,75 @@ namespace HMD.Scripts.Streaming.VLC
                     Debug.LogError("Exception caught in mediaPlayer.Stopped: \n" + ex);
                 }
             };
+        }
 
+
+        public void BindUI()
+        {
             //Buttons
-            rewind10Button.onClick.AddListener(() =>
+            rewind10Button.onClick.Rebind(() =>
             {
                 Debug.Log("Rewind10Button");
                 screen.vlcFeed.SeekBack10();
             });
-            ffw10Button.onClick.AddListener(() =>
+            ffw10Button.onClick.Rebind(() =>
             {
                 Debug.Log("FFW10Button");
                 screen.vlcFeed.SeekForward10();
             });
-            pauseButton.onClick.AddListener(() => { screen.Pause(); });
+            pauseButton.onClick.Rebind(() => { screen.Pause(); });
 
             var updater = new AspectRatioUpdater(screen);
             updater.SyncAll();
 
-            playButton.onClick.AddListener(() =>
+            playButton.onClick.Rebind(() =>
             {
                 screen.Play();
 
                 updater.SyncAll();
             });
-            stopButton.onClick.AddListener(() => { screen.Stop(); });
+            stopButton.onClick.Rebind(() => { screen.Stop(); });
 
-            fileButton.onClick.AddListener(() => { screen.PromptUserFilePicker(); });
+            fileButton.onClick.Rebind(() => { screen.PromptUserFilePicker(); });
+
+            // TODO: the following drag & drop definition with EventTrigger are too complex
+            //   should use onValueChanged only or something similar
 
             //Seek Bar Events
-            var seekBarEvents = seekBar.GetComponent<EventTrigger>();
+            {
+                var events = seekBar.GetComponent<EventTrigger>();
+                events.triggers.Clear();
 
-            var seekBarPointerDown = new EventTrigger.Entry
-            {
-                eventID = EventTriggerType.PointerDown
-            };
-            seekBarPointerDown.callback.AddListener((_) => { _isDraggingSeekBar = true; });
-            seekBarEvents.triggers.Add(seekBarPointerDown);
+                var pointerDown = new EventTrigger.Entry
+                {
+                    eventID = EventTriggerType.PointerDown
+                };
+                pointerDown.callback.Rebind((_) => { _isDraggingSeekBar = true; });
+                events.triggers.Add(pointerDown);
 
-            var seekBarPointerUp = new EventTrigger.Entry
-            {
-                eventID = EventTriggerType.PointerUp
-            };
-            seekBarPointerUp.callback.AddListener((_) =>
-            {
-                _isDraggingSeekBar = false;
-                screen.vlcFeed.SetTime((long)((double)screen.vlcFeed.Duration * seekBar.value));
-            });
-            seekBarEvents.triggers.Add(seekBarPointerUp);
+                var pointerUp = new EventTrigger.Entry
+                {
+                    eventID = EventTriggerType.PointerUp
+                };
+                pointerUp.callback.Rebind((_) =>
+                {
+                    _isDraggingSeekBar = false;
+                    screen.vlcFeed.SetTime((long)((double)screen.vlcFeed.Duration * seekBar.value));
+                });
+                events.triggers.Add(pointerUp);
+            }
 
             // Aspect Ratio Bar Events
             {
                 var events = aspectRatioBar.GetComponent<EventTrigger>();
+                events.triggers.Clear();
 
                 // TODO: the following drag & drop with EventTrigger should have a shared class
                 var pointerDown = new EventTrigger.Entry
                 {
                     eventID = EventTriggerType.PointerDown
                 };
-                pointerDown.callback.AddListener((_) => { _isDraggingAspectRatioBar = true; });
+                pointerDown.callback.Rebind((_) => { _isDraggingAspectRatioBar = true; });
                 events.triggers.Add(pointerDown);
 
                 var pointerUp = new EventTrigger.Entry
@@ -201,22 +215,24 @@ namespace HMD.Scripts.Streaming.VLC
                     // updater.SyncText();
                 }
 
-                pointerUp.callback.AddListener((_) =>
+                pointerUp.callback.Rebind((_) =>
                 {
                     if (_isDraggingAspectRatioBar) SyncV(aspectRatioBar.value);
                     _isDraggingAspectRatioBar = false;
                 });
                 events.triggers.Add(pointerUp);
-                aspectRatioBar.onValueChanged.AddListener(SyncV);
+                aspectRatioBar.onValueChanged.Rebind(SyncV);
             }
 
             //Volume Bar
             volumeBar.wholeNumbers = true;
             volumeBar.maxValue = maxVolume; //You can go higher than 100 but you risk audio clipping
             volumeBar.value = screen.vlcFeed.Volume;
-            volumeBar.onValueChanged.AddListener((_) => { screen.vlcFeed.SetVolume((int)volumeBar.value); });
-        }
+            volumeBar.onValueChanged.Rebind((_) => { screen.vlcFeed.SetVolume((int)volumeBar.value); });
 
+            // screen
+            screen.BindUI();
+        }
 
         private void Update()
         {
@@ -240,7 +256,6 @@ namespace HMD.Scripts.Streaming.VLC
         //Update the position of the Seek slider to the match the VLC Player
         private void UpdateSeekBar()
         {
-            var mm = screen;
             // Get the current playback time as a TimeSpan object
             var currentTime = screen.vlcFeed.Time;
             var currentTimeSpan = TimeSpan.FromMilliseconds(currentTime);

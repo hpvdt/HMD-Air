@@ -24,7 +24,7 @@ namespace HMD.Scripts.Streaming
 
         protected abstract FeedLike Feed { get; }
 
-        
+
         [SerializeField] private GameObject leftEyeScreen;
         [SerializeField] private GameObject rightEyeScreen;
 
@@ -72,25 +72,20 @@ namespace HMD.Scripts.Streaming
         //Unity Awake, OnDestroy, and Update functions
 
         #region unity
-        protected void Start()
+        public void BindUI()
         {
-            BindUI();
+            deformBar.onValueChanged.Rebind(OnDeformBarUpdated);
+            distanceBar.onValueChanged.Rebind(OnDistanceSliderUpdated);
+            horizontalBar.onValueChanged.Rebind(OnHorizontalSliderUpdated);
+            verticalBar.onValueChanged.Rebind(OnVerticalSliderUpdated);
         }
 
-        private void BindUI()
-        {
-            deformBar.onValueChanged.AddListener(OnDeformBarUpdated);
-            distanceBar.onValueChanged.AddListener(OnDistanceSliderUpdated);
-            horizontalBar.onValueChanged.AddListener(OnHorizontalSliderUpdated);
-            verticalBar.onValueChanged.AddListener(OnVerticalSliderUpdated);
-        }
-        
-        protected void Awake()
+        protected new void Awake()
         {
             base.Awake();
 
             if (deformBar is not null) deformBar.value = 0.0f;
-            
+
             _morphLeftRenderer = leftEyeScreen.GetComponent<Renderer>();
             _morphRightRenderer = rightEyeScreen.GetComponent<Renderer>();
 
@@ -100,7 +95,7 @@ namespace HMD.Scripts.Streaming
         private void Update()
         {
             // TODO: can F1 be generalised?
-            
+
 #if UNITY_EDITOR
             if (Input.GetKeyDown(KeyCode.F1))
                 EditorWindow.focusedWindow.maximized = !EditorWindow.focusedWindow.maximized;
@@ -120,13 +115,12 @@ namespace HMD.Scripts.Streaming
         {
             OnDestroy();
         }
-        
+
         private void OnDestroy()
         {
             //Dispose of mediaPlayer, or it will stay in nemory and keep playing audio
             Feed.Dispose();
         }
-        
         #endregion
 
         private static Vector2 SCALE_RANGE = new Vector2(1f, 4.702173720867682f);
@@ -179,7 +173,7 @@ namespace HMD.Scripts.Streaming
                 gameObject.transform.localPosition.z
             );
         }
-        
+
         private float _sphereScale;
 
         #region vlc
@@ -227,14 +221,13 @@ namespace HMD.Scripts.Streaming
         //Private functions create and destroy VLC objects and textures
 
         #region internal
-
         public void ToggleFlipStereo()
         {
             _flipStereo = !_flipStereo;
             SetVideoMode(videoMode);
         }
-        
-        
+
+
         public virtual Frac AspectRatio
         {
             get { return Feed.NativeAspectRatio(); } // by default, has no setter
@@ -379,7 +372,6 @@ namespace HMD.Scripts.Streaming
         //     rightEyeScreen.transform.localRotation = Quaternion.identity;
         //     rightEyeScreen.transform.localScale = new Vector3(1, 1, 1);
         // }
-
         #endregion
     }
 }

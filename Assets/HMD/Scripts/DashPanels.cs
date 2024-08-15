@@ -1,10 +1,10 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using HMD.Scripts.Streaming.VLC;
 using HMD.Scripts.Util;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class DashPanels : MonoBehaviour
@@ -12,19 +12,95 @@ public class DashPanels : MonoBehaviour
     // [HideInInspector]
     // public VlcController controller;
 
-    public GameObject vlcTemplate;
+    public GameObject vlcPlayerTemplate;
+
+    public Dropdown playerDropdown;
+
+    public class Player : Dependent<DashPanels>, IDisposable
+    {
+        public string ID;
+
+        public GameObject Prefab;
+
+        private VlcController? _controller;
+
+        public VlcController Controller
+        {
+            get
+            {
+                return _controller ??= Prefab.GetComponent<VlcController>();
+            }
+        }
+
+        public void Focus()
+        {
+            Controller.BindUI();
+            var dropdown = Outer.playerDropdown;
+            var newIndex = dropdown.options.FindIndex(option => option.text == ID);
+            dropdown.value = newIndex;
+        }
+
+        // TODO: icon is also used to mark player with no video, need to highlight icon
+        // public void Select()
+        // {
+        //     Controller.screen.cone.SetActive(true);
+        // }
+
+        public void Dispose()
+        {
+            Destroy(Prefab);
+            Outer._activePlayers.Remove(this.ID);
+        }
+    }
+
+    private AtomicInt _incCounter = new AtomicInt();
+
+    private Dictionary<string, Player> _activePlayers = new Dictionary<string, Player> { };
+
+    // private Player? _focusedPlayer;
+
+    private Player _setupPlayer(GameObject prefab, string playerName, bool focus = true)
+    {
+        prefab.SetActive(true);
+        var id = playerName + "(" + _incCounter.Next() + ")";
+
+        var neo = new Player { Outer = this, Prefab = prefab, ID = id };
+        _activePlayers.Add(id, neo);
+
+        if (focus)
+        {
+            neo.Focus();
+        }
+
+        return neo;
+    }
+
+    public Player SetupVlc()
+    {
+        var prefab = Instantiate(vlcPlayerTemplate, Vector3.zero, Quaternion.identity);
+
+        var player = _setupPlayer(prefab, "VLC");
+
+        playerDropdown.options.Add(new Dropdown.OptionData(player.ID));
+        playerDropdown.RefreshShownValue();
+
+        return player;
+    }
+
+    // SetupCaptureDevice()
 
     public GameObject playerTab;
     public void TogglePlayerTab()
     {
-        GetExtendDisplays();
+        ExtendDisplayOnce();
         ToggleElement(playerTab);
     }
 
-    private List<Display>? _extendDisplays;
-    private List<Display> GetExtendDisplays() // In Unity, display cannot be scrapped
+    private List<Display>? _extendDisplay;
+    // TODO: this shouldn't be cached, display may be connected or disconnected during execution
+    private List<Display> ExtendDisplayOnce() // In Unity, display cannot be scrapped
     {
-        if (_extendDisplays == null)
+        if (_extendDisplay == null)
         {
             Debug.Log("displays connected: " + Display.displays.Length);
             // Display.displays[0] is the primary, default display and is always ON, so start at index 1.
@@ -39,12 +115,14 @@ public class DashPanels : MonoBehaviour
                 d.Activate();
             }
 
-            _extendDisplays = result;
+            _extendDisplay = result;
             return result;
         }
 
-        return _extendDisplays;
+        return _extendDisplay;
     }
+
+    public FOVController fovController;
 
     public GameObject consoleTab;
     public void ToggleConsoleTab()
@@ -143,7 +221,7 @@ public class DashPanels : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        UpdateReferences();
+        BindUI();
 
         _lockScreenNotice = GlobalFinder.Find("LockScreenNotice").Only();
 
@@ -202,12 +280,11 @@ public class DashPanels : MonoBehaviour
         );
     }
 
-    private void OnApplicationFocus(bool hasFocus)
-    {
-        if (hasFocus) UpdateReferences();
-    }
+    // private void OnApplicationFocus(bool hasFocus)
+    // { TODO: remove, useless
+    // }
 
-    public void UpdateReferences()
+    private void UpdateReferences()
     {
         // TODO: this is unsafe, should change to static binding
         _rootMenu = gameObject.ByName("RootPanel").Only();
@@ -221,6 +298,39 @@ public class DashPanels : MonoBehaviour
         _formatPopup = gameObject.ByName("FormatPopup").Only();
         _releaseInfoPopup = gameObject.ByName("WhatsNewPopup").Only();
         _pictureSettingsPopup = gameObject.ByName("PictureSettingsPopup").Only();
+    }
+
+    private const string NEW_VLC = "New VLC ...";
+
+    private void BindUI()
+    {
+        UpdateReferences();
+
+        // playerDropdown.RefreshShownValue();
+
+        playerDropdown.options.Add(new Dropdown.OptionData(NEW_VLC));
+        playerDropdown.RefreshShownValue();
+
+        playerDropdown.onValueChanged.AddListener(
+            value =>
+            {
+                var option = playerDropdown.options[value];
+
+                if (option.text == NEW_VLC)
+                {
+                    SetupVlc();
+                }
+                else if (option.text == "")
+                {
+                    // do nothing
+                }
+                else
+                {
+                    var selected = _activePlayers[option.text];
+                    selected.Focus();
+                }
+            }
+        );
     }
 
     public void ClearPlayerPrefs()
