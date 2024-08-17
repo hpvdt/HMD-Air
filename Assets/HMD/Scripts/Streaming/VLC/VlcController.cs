@@ -37,7 +37,7 @@ namespace HMD.Scripts.Streaming.VLC
         public Slider aspectRatioBar;
         public GameObject aspectRatioText;
 
-        private bool _isDraggingAspectRatioBar = false;
+        private bool _isDraggingAspectRatioBar; // TODO: cleanup, onValueChange is totally good enough
 
         //Configurable Options
         public int
@@ -45,10 +45,10 @@ namespace HMD.Scripts.Streaming.VLC
 
         //State variables
         private volatile bool
-            _isPlaying = false; //We use VLC events to track whether we are playing, rather than relying on IsPlaying 
+            _isPlaying; //We use VLC events to track whether we are playing, rather than relying on IsPlaying 
 
         private volatile bool
-            _isDraggingSeekBar = false; //We advance the seek bar every frame, unless the user is dragging it
+            _isDraggingSeekBar; //We advance the seek bar every frame, unless the user is dragging it
 
         ///Unity wants to do everything on the main thread, but VLC events use their own thread.
         ///These variables can be set to true in a VLC event handler indicate that a function should be called next Update.

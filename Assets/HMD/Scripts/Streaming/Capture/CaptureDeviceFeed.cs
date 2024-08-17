@@ -43,7 +43,7 @@ namespace HMD.Scripts.Streaming.Capture
 
             if (res == null)
             {
-                Log($"Setting up camera `{_device.Value.name}`");
+                Log.V($"Setting up camera `{_device.Value.name}`");
                 Open(new CameraSelector
                 {
                     Name = _device.Value.name
@@ -54,7 +54,7 @@ namespace HMD.Scripts.Streaming.Capture
                 var _res = res.Value;
                 if (resList != null && !resList.Contains(_res))
                 {
-                    LogWarning(
+                    Warning.V(
                         $"resolution `{_res.ToString()}` may be unsupported:\n"
                         + $"supported resolutions are [{string.Join(", ", resList.Select(x => x.ToString()))}]"
                     );
@@ -98,7 +98,7 @@ namespace HMD.Scripts.Streaming.Capture
             Play();
             _webCamTex.GetPixels(); // otherwise width and height will always be 16x16
 
-            Log(
+            Log.V(
                 $"Setting up camera:\n"
                 + $"    Seleccted: `{selector.Name}` ({selector.Res.ToSafeString()})\n"
                 + $"    Actual: `{_webCamTex.deviceName}` ({_webCamTex.width}x{_webCamTex.height} @ {_webCamTex.requestedFPS}fps)"
@@ -108,7 +108,7 @@ namespace HMD.Scripts.Streaming.Capture
 
         public override void Stop()
         {
-            Log("Stop");
+            Log.V("Stop");
             _webCamTex?.Stop();
         }
 
@@ -132,7 +132,7 @@ namespace HMD.Scripts.Streaming.Capture
 
         public override void Play()
         {
-            Log("Play");
+            Log.V("Play");
             _webCamTex?.Play();
         }
 
@@ -151,7 +151,7 @@ namespace HMD.Scripts.Streaming.Capture
         {
             Stop();
 
-            Log("Destroy Camera Feed");
+            Log.V("Destroy Camera Feed");
             _webCamTex = null;
         }
     }

@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 namespace HMD.Scripts.Streaming
 {
+    using UnityEngine.Serialization;
 
     public abstract class PlayerScreen : MonoBehaviourWithLogging
     {
@@ -52,7 +53,7 @@ namespace HMD.Scripts.Streaming
         // [SerializeField] public Slider focusBar; // affect viewing angle of left/right eyes
 
         // TODO: group them
-        public GameObject cone;
+        public GameObject icon;
 
         private bool _flipStereo = false;
 
@@ -65,7 +66,6 @@ namespace HMD.Scripts.Streaming
         private float Yaw;
         private float Pitch;
         private float Roll;
-
 
         public TextureView Texture;
 
@@ -181,9 +181,8 @@ namespace HMD.Scripts.Streaming
         {
             if (Feed != null)
             {
-                cone.SetActive(false); // hide cone logo
-
-                gameObject.SetActive(true);
+                // icon.SetActive(false); // hide cone logo
+                // gameObject.SetActive(true);
 
                 Feed.Play();
             }
@@ -198,7 +197,7 @@ namespace HMD.Scripts.Streaming
         {
             _stopFeed();
 
-            Log("Stop");
+            Log.V("Stop");
 
             // clear to black
             Texture?.Dispose();
@@ -206,14 +205,13 @@ namespace HMD.Scripts.Streaming
 
             ClearMaterialTextureLinks();
 
-            gameObject.SetActive(false);
-
-            cone.SetActive(true);
+            // gameObject.SetActive(false);
+            // icon.SetActive(true);
         }
 
         public void Pause()
         {
-            Log("Pause");
+            Log.V("Pause");
             Feed.Pause();
         }
         #endregion
@@ -305,7 +303,7 @@ namespace HMD.Scripts.Streaming
             if (Texture == null) throw new VLCException("[SetVideoMode] texture is null!");
 
             var mode = videoMode;
-            Log($"set video mode {mode}");
+            Log.V($"set video mode {mode}");
 
             ClearMaterialTextureLinks();
 

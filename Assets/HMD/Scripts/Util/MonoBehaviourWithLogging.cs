@@ -5,8 +5,7 @@ namespace HMD.Scripts.Util
     using System;
     public class MonoBehaviourWithLogging : MonoBehaviour
     {
-        public bool logToConsole = true; //Log function calls and LibVLC logs to Unity console
-
+        public bool loggerVerbosity = true; // TODO: should be a number
         public string loggerPrefix;
 
         protected void Awake()
@@ -14,32 +13,66 @@ namespace HMD.Scripts.Util
             if (loggerPrefix == "") loggerPrefix = name;
         }
 
-        protected void Log(object message, LogType? type = null)
+        protected class Logger : Dependent<MonoBehaviourWithLogging>
         {
-            var actualType = type.GetValueOrDefault(LogType.Log);
-            //
-            // Debug.unityLogger.Log();
-            // var name = MethodBase.GetCurrentMethod().DeclaringType;
-            // if (logToConsole)
-            try
+            public LogType? Type;
+
+            private LogType ActualType
             {
-                Debug.unityLogger.Log(actualType, $"[{loggerPrefix}]", $"{message}", this);
-                Debug.Assert(loggerPrefix != null, "Not Awaken! LoggerPrefix != null");
+                get => Type.GetValueOrDefault(LogType.Log);
             }
-            catch (Exception ee)
+
+            public void Write(string message)
             {
-                Debug.LogError($"[ERROR LOGGING] {message}" + ee.Message, this);
+                //
+                // Debug.unityLogger.Log();
+                // var name = MethodBase.GetCurrentMethod().DeclaringType;
+                // if (logToConsole)
+
+                try
+                {
+                    Debug.unityLogger.Log(ActualType, $"[{Outer.loggerPrefix}]", $"{message}", Outer);
+                    Debug.Assert(Outer.loggerPrefix != null, "Not Awaken! LoggerPrefix != null");
+                }
+                catch (Exception ee)
+                {
+                    Debug.LogError($"[ERROR LOGGING] {message}" + ee.Message, Outer);
+                }
+            }
+
+            public void V(string message)
+            {
+                if (Outer.loggerVerbosity)
+                {
+                    Write(message);
+                }
             }
         }
 
-        protected void LogWarning(object message)
+        private Logger _log(LogType? type = null)
         {
-            Log(message, LogType.Warning);
+            return new Logger
+            {
+                Outer = this,
+                Type = type
+            };
         }
 
-        protected void LogError(object message)
+        protected Logger Log
         {
-            Log(message, LogType.Error);
+            get => _log();
+        }
+
+        protected Logger Warning
+        {
+            get => _log(LogType.Warning);
+        }
+
+
+        protected Logger Error
+        {
+            get => _log(LogType.Error);
         }
     }
+
 }

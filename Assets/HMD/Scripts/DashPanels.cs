@@ -5,16 +5,56 @@ using System.Linq;
 using HMD.Scripts.Streaming.VLC;
 using HMD.Scripts.Util;
 using UnityEngine;
+using UnityEngine.Assertions;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class DashPanels : MonoBehaviour
+public class DashPanels : MonoBehaviourWithLogging
 {
     // [HideInInspector]
     // public VlcController controller;
 
-    public GameObject vlcPlayerTemplate;
+    public GameObject vlcPlayerTemplate = null!;
 
-    public Dropdown playerDropdown;
+    public Dropdown playerMenu = null!;
+
+    private Dictionary<string, Player> _activePlayers = new Dictionary<string, Player> { };
+
+    private string FocusedPlayerID
+    {
+        get
+        {
+            return playerMenu.options[playerMenu.value].text;
+        }
+        set
+        {
+            var newIndex = playerMenu.options.FindIndex(option => option.text == value);
+
+            if (newIndex == -1)
+            {
+                throw new IndexOutOfRangeException($"cannot find player {value}");
+            }
+
+            playerMenu.value = newIndex;
+            playerMenu.RefreshShownValue();
+
+            Log.V($"player menu set to {newIndex} | {playerMenu.value}");
+        }
+    }
+
+    private Player? GetFocusedPlayer()
+    {
+        return _activePlayers.GetValueOrDefault(FocusedPlayerID);
+    }
+
+    public List<Player> FocusedPlayers
+    {
+        get
+        {
+            var result = new List<Player> { GetFocusedPlayer()! };
+            return result.Where(v => v != null).ToList();
+        }
+    }
 
     public class Player : Dependent<DashPanels>, IDisposable
     {
@@ -32,12 +72,31 @@ public class DashPanels : MonoBehaviour
             }
         }
 
+
+        public class DraggingMode
+        {
+            public static readonly DraggingMode Disabled = new DraggingMode();
+
+            public class Enabled : DraggingMode
+            {
+                public Quaternion Offset;
+            }
+
+            public class _2D : Enabled
+            {
+            }
+
+            public class _3D : Enabled
+            {
+            }
+        }
+
+        public DraggingMode Dragging;
+
         public void Focus()
         {
             Controller.BindUI();
-            var dropdown = Outer.playerDropdown;
-            var newIndex = dropdown.options.FindIndex(option => option.text == ID);
-            dropdown.value = newIndex;
+            Outer.FocusedPlayerID = ID;
         }
 
         // TODO: icon is also used to mark player with no video, need to highlight icon
@@ -55,17 +114,32 @@ public class DashPanels : MonoBehaviour
 
     private AtomicInt _incCounter = new AtomicInt();
 
-    private Dictionary<string, Player> _activePlayers = new Dictionary<string, Player> { };
 
     // private Player? _focusedPlayer;
 
-    private Player _setupPlayer(GameObject prefab, string playerName, bool focus = true)
+    private void Update()
+    {
+        foreach (var player in FocusedPlayers)
+        {
+            if (player?.Dragging is Player.DraggingMode._3D v)
+            {
+                var rotation = v.Offset * fovController.mainCamera.transform.rotation;
+                player.Prefab.transform.rotation = rotation;
+            }
+            // TODO: add 2D
+        }
+    }
+
+    private Player _setupPlayerPrefab(GameObject prefab, string playerName, bool focus = true)
     {
         prefab.SetActive(true);
         var id = playerName + "(" + _incCounter.Next() + ")";
 
         var neo = new Player { Outer = this, Prefab = prefab, ID = id };
         _activePlayers.Add(id, neo);
+
+        playerMenu.options.Add(new Dropdown.OptionData(neo.ID));
+        playerMenu.RefreshShownValue();
 
         if (focus)
         {
@@ -77,15 +151,15 @@ public class DashPanels : MonoBehaviour
 
     public Player SetupVlc()
     {
-        var prefab = Instantiate(vlcPlayerTemplate, Vector3.zero, Quaternion.identity);
+        var heading = fovController.mainCamera.transform.rotation;
 
-        var player = _setupPlayer(prefab, "VLC");
+        var prefab = Instantiate(vlcPlayerTemplate, Vector3.zero, heading);
 
-        playerDropdown.options.Add(new Dropdown.OptionData(player.ID));
-        playerDropdown.RefreshShownValue();
+        var player = _setupPlayerPrefab(prefab, "VLC");
 
         return player;
     }
+
 
     // SetupCaptureDevice()
 
@@ -266,7 +340,8 @@ public class DashPanels : MonoBehaviour
         for (var i = 0; i < popups.transform.childCount; i++)
         {
             var childGameObject = popups.transform.GetChild(i).gameObject;
-            //Debug.Log("centering " + childGameObject.name);
+
+            Log.V("centering " + childGameObject.name);
             CenterXY(childGameObject);
         }
     }
@@ -302,19 +377,21 @@ public class DashPanels : MonoBehaviour
 
     private const string NEW_VLC = "New VLC ...";
 
+    public Button? playerMove2DButton;
+    public Button? playerMove3DButton;
     private void BindUI()
     {
         UpdateReferences();
 
         // playerDropdown.RefreshShownValue();
 
-        playerDropdown.options.Add(new Dropdown.OptionData(NEW_VLC));
-        playerDropdown.RefreshShownValue();
+        playerMenu.options.Add(new Dropdown.OptionData(NEW_VLC));
+        playerMenu.RefreshShownValue();
 
-        playerDropdown.onValueChanged.AddListener(
+        playerMenu.onValueChanged.AddListener(
             value =>
             {
-                var option = playerDropdown.options[value];
+                var option = playerMenu.options[value];
 
                 if (option.text == NEW_VLC)
                 {
@@ -331,6 +408,67 @@ public class DashPanels : MonoBehaviour
                 }
             }
         );
+
+
+        {
+            // 3D
+            playerMove3DButton.OnEvent(EventTriggerType.PointerDown)
+                .AddListener(
+                    _ =>
+                    {
+                        Log.V("dragging in 3D ...");
+                        foreach (var player in FocusedPlayers)
+                        {
+                            var offset = Quaternion.Inverse(fovController.mainCamera.transform.rotation)
+                                * player.Prefab.transform.rotation;
+                            player.Dragging = new Player.DraggingMode._3D { Offset = offset };
+                        }
+                    }
+                );
+
+            playerMove3DButton.OnEvent(EventTriggerType.PointerUp)
+                .AddListener(
+                    _ =>
+                    {
+                        Log.V("... done");
+                        foreach (var player in FocusedPlayers)
+                        {
+                            player.Dragging = Player.DraggingMode.Disabled;
+                        }
+                    }
+                );
+        }
+
+        {
+            // 2D
+            playerMove2DButton.OnEvent(EventTriggerType.PointerDown)
+                .AddListener(
+                    _ =>
+                    {
+                        Log.V("dragging in 2D ...");
+                        foreach (var player in FocusedPlayers)
+                        {
+                            var withoutRoll = player.Prefab.transform.rotation.DropRoll();
+
+                            var offset = Quaternion.Inverse(withoutRoll)
+                                * player.Prefab.transform.rotation;
+                            player.Dragging = new Player.DraggingMode._2D { Offset = offset };
+                        }
+                    }
+                );
+
+            playerMove2DButton.OnEvent(EventTriggerType.PointerUp)
+                .AddListener(
+                    _ =>
+                    {
+                        Log.V("... done");
+                        foreach (var player in FocusedPlayers)
+                        {
+                            player.Dragging = Player.DraggingMode.Disabled;
+                        }
+                    }
+                );
+        }
     }
 
     public void ClearPlayerPrefs()
@@ -395,7 +533,7 @@ public class DashPanels : MonoBehaviour
         }
     }
 
-    // TODO: aggregate into a view
+// TODO: aggregate into a view
     public void ShowAspectRatioPopup()
     {
         _aspectRatioPopup.SetActive(true);

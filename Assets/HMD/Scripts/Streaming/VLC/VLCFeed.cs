@@ -40,11 +40,11 @@ namespace HMD.Scripts.Streaming.VLC
                 //LibVLC can freeze Unity if an exception goes unhandled inside an event handler.
                 try
                 {
-                    if (DebugVLCPlayer) Log($"[VLC-{e.Level}] [{s}{e.Module}] " + e.Message);
+                    if (DebugVLCPlayer) Log.V($"[VLC-{e.Level}] [{s}{e.Module}] " + e.Message);
                 }
                 catch (Exception ex)
                 {
-                    LogError("[VLC]Exception caught in libVLC.Log:\n" + ex);
+                    Error.V("[VLC]Exception caught in libVLC.Log:\n" + ex);
                 }
             };
         }
@@ -66,8 +66,8 @@ namespace HMD.Scripts.Streaming.VLC
             {
                 if (_player == null)
                 {
-                    Log($"LibVLC version and architecture {libVLC.Changeset}");
-                    Log($"LibVLCSharp version {typeof(LibVLC).Assembly.GetName().Version}");
+                    Log.V($"LibVLC version and architecture {libVLC.Changeset}");
+                    Log.V($"LibVLCSharp version {typeof(LibVLC).Assembly.GetName().Version}");
                     _player = new MediaPlayer(libVLC);
                 }
                 return _player;
@@ -89,7 +89,7 @@ namespace HMD.Scripts.Streaming.VLC
                 _libVLC?.Dispose();
                 _libVLC = null;
 
-                Log("Destroyed");
+                Log.V("Destroyed");
             }
         }
 
@@ -152,7 +152,7 @@ namespace HMD.Scripts.Streaming.VLC
 
                 // Player.AspectRatio = result.AspectRatioStr.Value;
 
-                Log($"texture size {px} {py} | {result.Size}");
+                Log.V($"texture size {px} {py} | {result.Size}");
 
                 return result;
             }
@@ -203,7 +203,7 @@ namespace HMD.Scripts.Streaming.VLC
                 Player.Media.Dispose();
 
             var parameters = Args.Parameters;
-            Log(
+            Log.V(
                 $"Opening `{Args.Location}` with {parameters.Length} parameter(s)"
                 + $" {string.Join(" ", parameters.Select(s => $"`{s}`").ToArray())}"
             );
@@ -238,7 +238,7 @@ namespace HMD.Scripts.Streaming.VLC
 
         public override void Stop()
         {
-            Log("Stop");
+            Log.V("Stop");
             Player?.Stop();
         }
 
@@ -296,13 +296,13 @@ namespace HMD.Scripts.Streaming.VLC
 
         public void SetTime(long time)
         {
-            Log("SetTime " + time);
+            Log.V("SetTime " + time);
             Player.SetTime(time);
         }
 
         public void SetVolume(int volume = 100)
         {
-            Log("SetVolume " + volume);
+            Log.V("SetVolume " + volume);
             Player.SetVolume(volume);
         }
 
@@ -359,25 +359,25 @@ namespace HMD.Scripts.Streaming.VLC
 
         public List<MediaTrack> Tracks(TrackType type)
         {
-            Log("Tracks " + type);
+            Log.V("Tracks " + type);
             return ConvertMediaTrackList(Player?.Tracks(type));
         }
 
         public MediaTrack SelectedTrack(TrackType type)
         {
-            Log("SelectedTrack " + type);
+            Log.V("SelectedTrack " + type);
             return Player?.SelectedTrack(type);
         }
 
         public void Select(MediaTrack track)
         {
-            Log("Select " + track.Name);
+            Log.V("Select " + track.Name);
             Player?.Select(track);
         }
 
         public void Unselect(TrackType type)
         {
-            Log("Unselect " + type);
+            Log.V("Unselect " + type);
             Player?.Unselect(type);
         }
     }

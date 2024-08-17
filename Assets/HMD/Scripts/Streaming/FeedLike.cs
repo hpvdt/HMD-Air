@@ -25,7 +25,7 @@ namespace HMD.Scripts.Streaming
 
                 if (existing != null && res != null && res != existing)
                 {
-                    LogWarning($"existing texture {existing} is obsolete\n"
+                    Warning.V($"existing texture {existing} is obsolete\n"
                         + $"creating new one {res}\n");
                 }
 
@@ -64,7 +64,7 @@ namespace HMD.Scripts.Streaming
         {
             get;
         } = Vector2.one;
-        
+
         protected new virtual void Awake()
         {
             base.Awake();
