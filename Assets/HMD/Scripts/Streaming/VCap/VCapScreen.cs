@@ -1,18 +1,20 @@
-﻿namespace HMD.Scripts.Streaming.Capture
+﻿namespace HMD.Scripts.Streaming.VCap
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
+    using SFB;
     using UnityEngine;
 
-    public class CaptureDeviceScreen : PlayerScreen
+    public class VCapScreen : ScreenLike
     {
-        public CaptureDeviceFeed captureDeviceFeed;
+        public VCapFeed feed;
 
         protected override FeedLike Feed
         {
-            get { return captureDeviceFeed; }
+            get { return feed; }
         }
-        
+
         // public void NextCamera(string resText)
         // {
         //     var res = ParseResolution(resText);
@@ -20,10 +22,11 @@
         //     captureDeviceFeed.OpenNextDevice(res);
         //     Play();
         // }
-        // TODO: need a single text I/O representation to specify both device & resolution
-        
+
         private static Resolution? ParseResolution(string resText)
         {
+            // TODO: remove if Yaml can handle everything
+
             if (string.IsNullOrEmpty(resText)) return null;
 
             var parts = resText.Split(":").ToList();
@@ -61,10 +64,37 @@
 
             throw new ArgumentException($"Illegal resolution format {resText}");
         }
-    }
-    
-    
-    
-    
 
+
+        public void PromptUserFilePicker()
+        {
+            feed.PromptAllDevices();
+
+            var yaml = new List<string>
+            {
+                "yaml", "yml",
+            };
+
+            // Open file with filter
+            var fileTypes = new[]
+            {
+                new ExtensionFilter("Video Capture Device YAML descriptor", yaml.ToArray()),
+                new ExtensionFilter("Any", "*"),
+            };
+            var paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", fileTypes, false);
+            var path = paths.FirstOrDefault();
+
+            if (path == null)
+            {
+                Debug.Log("Operation cancelled");
+            }
+            else
+            {
+                Debug.Log("Picked file: " + path);
+
+                feed.Open(path);
+                Play();
+            }
+        }
+    }
 }

@@ -26125,9 +26125,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2865fc91b38ed2d4caebdc6ce7c65caf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loggerVerbosity: 1
+  loggerVerbosity: 0
   loggerPrefix: 
   vlcPlayerTemplate: {fileID: 4732923173715968485}
+  vCapPlayerTemplate: {fileID: 146006058662195917}
   playerMenu: {fileID: 692852524}
   playerTab: {fileID: 122855088}
   fovController: {fileID: 2089846055}
@@ -26420,6 +26421,11 @@ MonoBehaviour:
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
   m_PresetInfoIsWorld: 0
+--- !u!1 &146006058662195917 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2994047657618112143, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+  m_PrefabInstance: {fileID: 785232386888442324}
+  m_PrefabAsset: {fileID: 0}
 --- !u!223 &223607525075988853
 Canvas:
   m_ObjectHideFlags: 0
@@ -26483,6 +26489,99 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!1001 &785232386888442324
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2994047657618112143, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+      propertyPath: m_Name
+      value: VCapTemplate
+      objectReference: {fileID: 0}
+    - target: {fileID: 2994047657618112143, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6220533081583540002, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+      propertyPath: fileButton
+      value: 
+      objectReference: {fileID: 274191030}
+    - target: {fileID: 6220533081583540002, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+      propertyPath: playButton
+      value: 
+      objectReference: {fileID: 1246672278}
+    - target: {fileID: 6220533081583540002, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+      propertyPath: stopButton
+      value: 
+      objectReference: {fileID: 425669261}
+    - target: {fileID: 6220533081583540002, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+      propertyPath: pauseButton
+      value: 
+      objectReference: {fileID: 1603396387}
+    - target: {fileID: 7159244430690923377, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+      propertyPath: deformBar
+      value: 
+      objectReference: {fileID: 887610637}
+    - target: {fileID: 7159244430690923377, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+      propertyPath: distanceBar
+      value: 
+      objectReference: {fileID: 1321033901}
+    - target: {fileID: 7159244430690923377, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+      propertyPath: verticalBar
+      value: 
+      objectReference: {fileID: 1932588666}
+    - target: {fileID: 7159244430690923377, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+      propertyPath: horizontalBar
+      value: 
+      objectReference: {fileID: 503463400}
+    - target: {fileID: 7461780706065289120, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7461780706065289120, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7461780706065289120, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7461780706065289120, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7461780706065289120, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7461780706065289120, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7461780706065289120, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7461780706065289120, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7461780706065289120, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7461780706065289120, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
 --- !u!1 &4732923173715968485 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7234521955528313221, guid: 90e54ac8b34219b438a39bdd8c9b9d70, type: 3}
@@ -26605,6 +26704,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2017414055}
     - target: {fileID: 7086862170708861431, guid: 90e54ac8b34219b438a39bdd8c9b9d70, type: 3}
+      propertyPath: currentTimeCode
+      value: 
+      objectReference: {fileID: 555917428}
+    - target: {fileID: 7086862170708861431, guid: 90e54ac8b34219b438a39bdd8c9b9d70, type: 3}
       propertyPath: currentTimecode
       value: 
       objectReference: {fileID: 555917428}
@@ -26614,7 +26717,7 @@ PrefabInstance:
       objectReference: {fileID: 379664259}
     - target: {fileID: 7234521955528313221, guid: 90e54ac8b34219b438a39bdd8c9b9d70, type: 3}
       propertyPath: m_Name
-      value: VLCTemplate (1)
+      value: VLCTemplate
       objectReference: {fileID: 0}
     - target: {fileID: 7234521955528313221, guid: 90e54ac8b34219b438a39bdd8c9b9d70, type: 3}
       propertyPath: m_IsActive
@@ -26640,3 +26743,4 @@ SceneRoots:
   - {fileID: 4279751547931225}
   - {fileID: 1233077423}
   - {fileID: 7243787259923109359}
+  - {fileID: 785232386888442324}

@@ -9,7 +9,7 @@ namespace HMD.Scripts.Streaming
 {
     using UnityEngine.Serialization;
 
-    public abstract class PlayerScreen : MonoBehaviourWithLogging
+    public abstract class ScreenLike : MonoBehaviourWithLogging
     {
         public enum VideoMode
         {
@@ -91,13 +91,6 @@ namespace HMD.Scripts.Streaming
 
         private void Update()
         {
-            // TODO: can F1 be generalised?
-
-#if UNITY_EDITOR
-            if (Input.GetKeyDown(KeyCode.F1))
-                EditorWindow.focusedWindow.maximized = !EditorWindow.focusedWindow.maximized;
-#endif
-
             var newTexture = Feed?.TryGetTexture(Texture);
             if (newTexture != null && newTexture != Texture)
             {

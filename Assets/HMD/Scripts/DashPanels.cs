@@ -2,10 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HMD.Scripts.Streaming;
 using HMD.Scripts.Streaming.VLC;
 using HMD.Scripts.Util;
+using NullableExtension;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -15,6 +16,7 @@ public class DashPanels : MonoBehaviourWithLogging
     // public VlcController controller;
 
     public GameObject vlcPlayerTemplate = null!;
+    public GameObject vCapPlayerTemplate = null!;
 
     public Dropdown playerMenu = null!;
 
@@ -51,8 +53,11 @@ public class DashPanels : MonoBehaviourWithLogging
     {
         get
         {
-            var result = new List<Player> { GetFocusedPlayer()! };
-            return result.Where(v => v != null).ToList();
+            var p = GetFocusedPlayer();
+            return p.Wrap().ToList();
+
+            // var result = new List<Player> { GetFocusedPlayer()! };
+            // return result.Where(v => v != null).ToList();
         }
     }
 
@@ -62,16 +67,15 @@ public class DashPanels : MonoBehaviourWithLogging
 
         public GameObject Prefab;
 
-        private VlcController? _controller;
+        private ControllerLike? _controller;
 
-        public VlcController Controller
+        public ControllerLike Controller
         {
             get
             {
-                return _controller ??= Prefab.GetComponent<VlcController>();
+                return _controller ??= Prefab.GetComponent<ControllerLike>();
             }
         }
-
 
         public class DraggingMode
         {
@@ -139,36 +143,46 @@ public class DashPanels : MonoBehaviourWithLogging
         }
     }
 
-    private Player _setupPlayerPrefab(GameObject prefab, string playerName, bool focus = true)
+    private Player _setupPlayerFromPrefab(GameObject prefab, string playerName)
     {
         prefab.SetActive(true);
         var id = playerName + "(" + _incCounter.Next() + ")";
 
-        var neo = new Player { Outer = this, Prefab = prefab, ID = id };
-        _activePlayers.Add(id, neo);
+        var player = new Player { Outer = this, Prefab = prefab, ID = id };
+        _activePlayers.Add(id, player);
 
-        playerMenu.options.Add(new Dropdown.OptionData(neo.ID));
+        playerMenu.options.Add(new Dropdown.OptionData(player.ID));
         playerMenu.RefreshShownValue();
-
-        if (focus)
-        {
-            neo.Focus();
-        }
-
-        return neo;
-    }
-
-    public Player SetupVlc()
-    {
-        var heading = fovController.mainCamera.transform.rotation;
-
-        var prefab = Instantiate(vlcPlayerTemplate, Vector3.zero, heading);
-
-        var player = _setupPlayerPrefab(prefab, "VLC");
 
         return player;
     }
 
+    private Player _setupPlayerFromTemplate(GameObject template, string prefix, bool focus = true)
+    {
+        var heading = fovController.mainCamera.transform.rotation;
+        var prefab = Instantiate(template, Vector3.zero, heading);
+
+        var player = _setupPlayerFromPrefab(prefab, prefix);
+
+        if (focus)
+        {
+            player.Focus();
+        }
+
+        return player;
+    }
+
+    public Player SetupVlc()
+    {
+        return _setupPlayerFromTemplate(vlcPlayerTemplate, "VLC");
+    }
+
+
+    public Player SetupVCap()
+    {
+
+        return _setupPlayerFromTemplate(vCapPlayerTemplate, "Video Capture");
+    }
 
     // SetupCaptureDevice()
 
@@ -325,6 +339,8 @@ public class DashPanels : MonoBehaviourWithLogging
         APP_MENU
     };
 
+    private const string WHATS_NEW = "OnboardingSeen_0_0_5_g";
+
     // Start is called before the first frame update
     private void Start()
     {
@@ -352,14 +368,14 @@ public class DashPanels : MonoBehaviourWithLogging
 
         UIShowControllerMenu();
 
-        if (PlayerPrefs.GetInt("OnboardingSeen_0_0_5_g") == 1)
+        if (PlayerPrefs.GetInt(WHATS_NEW) == 1)
         {
             // The user has already seen the onboarding tutorial text
         }
         else
         {
             // The user has not yet seen the onboarding tutorial text
-            PlayerPrefs.SetInt("OnboardingSeen_0_0_5_g", 1);
+            PlayerPrefs.SetInt(WHATS_NEW, 1);
             ShowWhatsNewPopup();
         }
     }
@@ -409,6 +425,8 @@ public class DashPanels : MonoBehaviourWithLogging
     }
 
     private const string NEW_VLC = "New VLC ...";
+    private const string NEW_V_CAP = "New Video Capture ...";
+
 
     public Button? playerMove2DButton;
     public Button? playerMove3DButton;
@@ -419,6 +437,7 @@ public class DashPanels : MonoBehaviourWithLogging
         // playerDropdown.RefreshShownValue();
 
         playerMenu.options.Add(new Dropdown.OptionData(NEW_VLC));
+        playerMenu.options.Add(new Dropdown.OptionData(NEW_V_CAP));
         playerMenu.RefreshShownValue();
 
         playerMenu.onValueChanged.AddListener(
@@ -429,6 +448,10 @@ public class DashPanels : MonoBehaviourWithLogging
                 if (option.text == NEW_VLC)
                 {
                     SetupVlc();
+                }
+                else if (option.text == NEW_V_CAP)
+                {
+                    SetupVCap();
                 }
                 else if (option.text == "")
                 {

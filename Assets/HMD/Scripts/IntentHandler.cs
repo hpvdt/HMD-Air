@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -16,6 +17,7 @@ public class IntentHandler : MonoBehaviour
     {
         if (hasFocus)
         {
+            Debug.Log("Application gained focus");
             OnIntent();
         }
         else
@@ -23,15 +25,24 @@ public class IntentHandler : MonoBehaviour
             Debug.Log("Application lost focus");
         }
     }
-    
+
+    private void Update()
+    {
+        // TODO: can F1 be generalised?
+#if UNITY_EDITOR
+        if (Input.GetKeyDown(KeyCode.F1))
+            EditorWindow.focusedWindow.maximized = !EditorWindow.focusedWindow.maximized;
+#endif
+    }
+
     // OnIntent
     private void OnIntent()
     {
         // if (Application.isEditor) return;
-        
+
         if (Application.platform == RuntimePlatform.Android)
         {
-            
+
             var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             var currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
 

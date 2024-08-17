@@ -209,6 +209,13 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.yamldotnet.uni": {
+      "version": "13.2.0",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://package.openupm.com"
+    },
     "com.yasirkula.ingamedebugconsole": {
       "version": "https://github.com/yasirkula/UnityIngameDebugConsole.git#v1.6.7",
       "depth": 0,

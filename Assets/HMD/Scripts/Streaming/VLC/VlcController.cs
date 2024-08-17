@@ -4,17 +4,15 @@ namespace HMD.Scripts.Streaming.VLC
     using Util;
     using UnityEngine;
     using UnityEngine.EventSystems;
+    using UnityEngine.Serialization;
     using UnityEngine.UI;
 
     ///This script controls all the GUI for the VLC Unity Canvas Example
     ///It sets up event handlers and updates the GUI every frame
     ///This example shows how to safely set up LibVLC events and a simple way to call Unity functions from them
-    public class VlcController : MonoBehaviour
+    public class VlcController : ControllerLike
     {
         public VlcScreen screen;
-        // public DashPanels dashPanels;
-
-        public GameObject icon;
 
         //GUI Elements
         //public RawImage screen;
@@ -24,17 +22,16 @@ namespace HMD.Scripts.Streaming.VLC
 
         public Slider seekBar;
 
-        public Button playButton;
-        public Button pauseButton;
-        public Button stopButton;
         public Button fileButton;
 
         public InputField pathInputField; // TODO: this won't be on the dashUI, will be moved to HUD
         public Button pathEnterButton;
 
         public Slider volumeBar;
+        public int maxVolume = 100;
+        //The highest volume the slider can reach. 100 is usually good but you can go higher.
 
-        public Text currentTimecode;
+        public Text currentTimeCode;
 
         public Slider aspectRatioBar;
         public GameObject aspectRatioText;
@@ -42,15 +39,12 @@ namespace HMD.Scripts.Streaming.VLC
         private bool _isDraggingAspectRatioBar; // TODO: cleanup, onValueChange is totally good enough
 
         //Configurable Options
-        public int
-            maxVolume = 100; //The highest volume the slider can reach. 100 is usually good but you can go higher.
 
         //State variables
-        private volatile bool
-            _isPlaying; //We use VLC events to track whether we are playing, rather than relying on IsPlaying 
+        private volatile bool _isPlaying;
+        //We use VLC events to track whether we are playing, rather than relying on IsPlaying 
 
-        private volatile bool
-            _isDraggingSeekBar; //We advance the seek bar every frame, unless the user is dragging it
+        private volatile bool _isDraggingSeekBar; //We advance the seek bar every frame, unless the user is dragging it
 
         ///Unity wants to do everything on the main thread, but VLC events use their own thread.
         ///These variables can be set to true in a VLC event handler indicate that a function should be called next Update.
@@ -76,13 +70,13 @@ namespace HMD.Scripts.Streaming.VLC
 
         public void Init()
         {
-            if (screen?.vlcFeed.Player is null)
+            if (screen?.feed.Player is null)
             {
                 Debug.LogError("VLC Player mediaPlayer not found");
                 return;
             }
 
-            var player = screen.vlcFeed.Player;
+            var player = screen.feed.Player;
 
             //VLC Event Handlers
             player.Playing += (_, _) =>
@@ -129,21 +123,19 @@ namespace HMD.Scripts.Streaming.VLC
             };
         }
 
-
-        public void BindUI()
+        public override void BindUI()
         {
             //Buttons
             rewind10Button.onClick.Rebind(() =>
             {
                 Debug.Log("Rewind10Button");
-                screen.vlcFeed.SeekBack10();
+                screen.feed.SeekBack10();
             });
             ffw10Button.onClick.Rebind(() =>
             {
                 Debug.Log("FFW10Button");
-                screen.vlcFeed.SeekForward10();
+                screen.feed.SeekForward10();
             });
-            pauseButton.onClick.Rebind(() => { screen.Pause(); });
 
             var updater = new AspectRatioUpdater(screen);
             updater.SyncAll();
@@ -154,6 +146,7 @@ namespace HMD.Scripts.Streaming.VLC
 
                 updater.SyncAll();
             });
+            pauseButton.onClick.Rebind(() => { screen.Pause(); });
             stopButton.onClick.Rebind(() => { screen.Stop(); });
 
             fileButton.onClick.Rebind(() => { screen.PromptUserFilePicker(); });
@@ -180,7 +173,7 @@ namespace HMD.Scripts.Streaming.VLC
                 pointerUp.callback.Rebind((_) =>
                 {
                     _isDraggingSeekBar = false;
-                    screen.vlcFeed.SetTime((long)((double)screen.vlcFeed.Duration * seekBar.value));
+                    screen.feed.SetTime((long)((double)screen.feed.Duration * seekBar.value));
                 });
                 events.triggers.Add(pointerUp);
             }
@@ -229,8 +222,8 @@ namespace HMD.Scripts.Streaming.VLC
             //Volume Bar
             volumeBar.wholeNumbers = true;
             volumeBar.maxValue = maxVolume; //You can go higher than 100 but you risk audio clipping
-            volumeBar.value = screen.vlcFeed.Volume;
-            volumeBar.onValueChanged.Rebind((_) => { screen.vlcFeed.SetVolume((int)volumeBar.value); });
+            volumeBar.value = screen.feed.Volume;
+            volumeBar.onValueChanged.Rebind((_) => { screen.feed.SetVolume((int)volumeBar.value); });
 
             // screen
             screen.BindUI();
@@ -259,19 +252,19 @@ namespace HMD.Scripts.Streaming.VLC
         private void UpdateSeekBar()
         {
             // Get the current playback time as a TimeSpan object
-            var currentTime = screen.vlcFeed.Time;
+            var currentTime = screen.feed.Time;
             var currentTimeSpan = TimeSpan.FromMilliseconds(currentTime);
 
             // Format the TimeSpan object as a string in the desired format
             var timecode = currentTimeSpan.ToString(@"hh\:mm\:ss");
 
-            currentTimecode.text = timecode;
+            currentTimeCode.text = timecode;
 
             if (!_isDraggingSeekBar)
             {
-                var duration = screen.vlcFeed.Duration;
+                var duration = screen.feed.Duration;
                 if (duration > 0)
-                    seekBar.value = (float)((double)screen.vlcFeed.Time / duration);
+                    seekBar.value = (float)((double)screen.feed.Time / duration);
             }
         }
     }
