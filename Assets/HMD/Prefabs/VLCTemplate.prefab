@@ -187,7 +187,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c89dd14ad8964a1cbd5eb20e7ec211ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  logToConsole: 1
+  loggerVerbosity: 1
   loggerPrefix: 
   videoMode: 0
   leftEyeScreen: {fileID: 5901520287386114087}
@@ -196,7 +196,6 @@ MonoBehaviour:
   deformBar: {fileID: 0}
   horizontalBar: {fileID: 0}
   verticalBar: {fileID: 0}
-  cone: {fileID: 7841761059384952525}
   m_lMaterial: {fileID: 2100000, guid: 4a448906e5ec28541b18c91590a37d3d, type: 2}
   m_rMaterial: {fileID: 2100000, guid: 17bebe1b94c264c4f9a56754e76cd12b, type: 2}
   m_monoMaterial: {fileID: 2100000, guid: 82072d1bd4e86664f8138d3cb31d9a4d, type: 2}
@@ -648,7 +647,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd777f6533fa4bea927c2e28a462cc8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  logToConsole: 1
+  loggerVerbosity: 1
   loggerPrefix: 
   flipTextureX: 0
   flipTextureY: 0
@@ -701,6 +700,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   screen: {fileID: 4956579401209540483}
+  icon: {fileID: 7841761059384952525}
   rewind10Button: {fileID: 0}
   ffw10Button: {fileID: 0}
   seekBar: {fileID: 0}
@@ -756,7 +756,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8712827858149353205}
   m_Layer: 0
-  m_Name: Icon
+  m_Name: VLCIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -10682,6 +10682,11 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 2
+--- !u!1 &892238301 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1926020646996780, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
+  m_PrefabInstance: {fileID: 1123132617}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &919658579
 GameObject:
   m_ObjectHideFlags: 0
@@ -26535,6 +26540,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4956579401209540483, guid: 90e54ac8b34219b438a39bdd8c9b9d70, type: 3}
+      propertyPath: icon
+      value: 
+      objectReference: {fileID: 892238301}
     - target: {fileID: 4956579401209540483, guid: 90e54ac8b34219b438a39bdd8c9b9d70, type: 3}
       propertyPath: deformBar
       value: 

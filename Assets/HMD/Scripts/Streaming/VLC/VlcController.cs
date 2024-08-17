@@ -14,6 +14,8 @@ namespace HMD.Scripts.Streaming.VLC
         public VlcScreen screen;
         // public DashPanels dashPanels;
 
+        public GameObject icon;
+
         //GUI Elements
         //public RawImage screen;
         //public AspectRatioFitter screenAspectRatioFitter;

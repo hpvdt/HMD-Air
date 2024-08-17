@@ -91,19 +91,23 @@ public class DashPanels : MonoBehaviourWithLogging
             }
         }
 
-        public DraggingMode Dragging;
+        public DraggingMode Dragging = DraggingMode.Disabled;
 
         public void Focus()
         {
             Controller.BindUI();
             Outer.FocusedPlayerID = ID;
+
+            Outer._syncIcons();
         }
 
-        // TODO: icon is also used to mark player with no video, need to highlight icon
-        // public void Select()
-        // {
-        //     Controller.screen.cone.SetActive(true);
-        // }
+        public bool IconIsVisible
+        {
+            set
+            {
+                Controller.icon.SetActive(value);
+            }
+        }
 
         public void Dispose()
         {
@@ -124,6 +128,11 @@ public class DashPanels : MonoBehaviourWithLogging
             if (player?.Dragging is Player.DraggingMode._3D v)
             {
                 var rotation = v.Offset * fovController.mainCamera.transform.rotation;
+                player.Prefab.transform.rotation = rotation;
+            }
+            else if (player?.Dragging is Player.DraggingMode._2D v2)
+            {
+                var rotation = v2.Offset * fovController.mainCamera.transform.rotation.DropRoll();
                 player.Prefab.transform.rotation = rotation;
             }
             // TODO: add 2D
@@ -168,6 +177,30 @@ public class DashPanels : MonoBehaviourWithLogging
     {
         ExtendDisplayOnce();
         ToggleElement(playerTab);
+
+        _syncIcons();
+    }
+
+    private void _syncIcons()
+    {
+
+        foreach (var player in _activePlayers.Values)
+        {
+            player.IconIsVisible = false;
+        }
+
+        if (playerTab.activeInHierarchy)
+        {
+            foreach (var player in FocusedPlayers)
+            {
+                player.IconIsVisible = true;
+            }
+        }
+    }
+
+    public void HideIcons()
+    {
+
     }
 
     private List<Display>? _extendDisplay;
@@ -419,9 +452,11 @@ public class DashPanels : MonoBehaviourWithLogging
                         Log.V("dragging in 3D ...");
                         foreach (var player in FocusedPlayers)
                         {
-                            var offset = Quaternion.Inverse(fovController.mainCamera.transform.rotation)
-                                * player.Prefab.transform.rotation;
-                            player.Dragging = new Player.DraggingMode._3D { Offset = offset };
+                            player.Dragging = new Player.DraggingMode._3D
+                            {
+                                Offset = player.Prefab.transform.rotation
+                                    * Quaternion.Inverse(fovController.mainCamera.transform.rotation)
+                            };
                         }
                     }
                 );
@@ -448,11 +483,12 @@ public class DashPanels : MonoBehaviourWithLogging
                         Log.V("dragging in 2D ...");
                         foreach (var player in FocusedPlayers)
                         {
-                            var withoutRoll = player.Prefab.transform.rotation.DropRoll();
+                            var withoutRoll = fovController.mainCamera.transform.rotation.DropRoll();
 
-                            var offset = Quaternion.Inverse(withoutRoll)
-                                * player.Prefab.transform.rotation;
-                            player.Dragging = new Player.DraggingMode._2D { Offset = offset };
+                            player.Dragging = new Player.DraggingMode._2D
+                            {
+                                Offset = player.Prefab.transform.rotation * Quaternion.Inverse(withoutRoll)
+                            };
                         }
                     }
                 );

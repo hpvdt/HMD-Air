@@ -52,9 +52,6 @@ namespace HMD.Scripts.Streaming
         // [SerializeField] public Slider depthBar; // affect distance between left/right eyes
         // [SerializeField] public Slider focusBar; // affect viewing angle of left/right eyes
 
-        // TODO: group them
-        public GameObject icon;
-
         private bool _flipStereo = false;
 
         public Material m_lMaterial;
