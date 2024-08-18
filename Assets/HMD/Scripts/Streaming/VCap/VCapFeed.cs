@@ -2,6 +2,7 @@
 namespace HMD.Scripts.Streaming.VCap
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using NullableExtension;
     using Pickle;
@@ -78,43 +79,40 @@ namespace HMD.Scripts.Streaming.VCap
             }
         }
 
-        public void PromptAllDevices()
+        public void LogAllDevices()
         {
             var devices = Devices;
-            Debug.Log($"Found {devices.Length} capture devices >>>>>");
+
+            var selectors = new List<DeviceSelector>();
 
             foreach (var dd in devices)
             {
                 var resList = dd.availableResolutions;
 
                 {
-                    var device = new DeviceSelector()
+                    var v = new DeviceSelector()
                     {
                         Name = dd.name
                     };
-                    var str = _pickler.Fwd(device);
-
-                    Debug.Log(str);
+                    selectors.Add(v);
                 }
 
                 if (resList != null)
                 {
                     foreach (var res in resList)
                     {
-                        var device = new DeviceSelector()
+                        var v = new DeviceSelector()
                         {
                             Name = dd.name,
                             Resolution = res
                         };
-                        var str = _pickler.Fwd(device);
-
-                        Debug.Log(str);
+                        selectors.Add(v);
                     }
                 }
-
             }
 
-            Debug.Log("<<<<<");
+            var yamls = _pickler.Fwd(selectors);
+            Debug.Log($"Found {devices.Length} capture devices >>>>>\n" + yamls + "\n<<<<<");
         }
 
         public void Open(string selectorStr)
@@ -128,14 +126,15 @@ namespace HMD.Scripts.Streaming.VCap
         public void Open(DeviceSelector selector)
         {
             Stop();
-            // _cameraTexture?.IsDestroyed()
+
+            var found = Devices.FirstOrDefault(x => x.name.Contains(selector.Name));
 
             if (selector.Resolution.HasValue)
             {
                 var res = selector.Resolution.Value;
                 var fps = selector.Resolution.Value.refreshRateRatio.value;
                 _webCamTex = new WebCamTexture(
-                    selector.Name,
+                    found.name,
                     res.height,
                     res.width,
                     (int)fps

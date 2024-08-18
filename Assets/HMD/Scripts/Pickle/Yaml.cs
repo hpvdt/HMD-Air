@@ -5,12 +5,14 @@
 
     public class Yaml
     {
+        public static readonly INamingConvention convention = CamelCaseNamingConvention.Instance;
+
         public readonly ISerializer Serializer = new SerializerBuilder()
-            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+            .WithNamingConvention(convention)
             .Build();
 
         public readonly IDeserializer Deserializer = new DeserializerBuilder()
-            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+            .WithNamingConvention(convention)
             .Build();
 
         public string Fwd<T>(T value)

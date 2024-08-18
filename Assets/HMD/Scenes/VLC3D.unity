@@ -9574,19 +9574,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 834860605}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2089846052}
-        m_TargetAssemblyTypeName: DashPanels, Assembly-CSharp
-        m_MethodName: ToggleTrackTab
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &834860605
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26521,6 +26509,10 @@ PrefabInstance:
       propertyPath: pauseButton
       value: 
       objectReference: {fileID: 1603396387}
+    - target: {fileID: 6220533081583540002, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
+      propertyPath: devicesButton
+      value: 
+      objectReference: {fileID: 834860604}
     - target: {fileID: 7159244430690923377, guid: 0c1e70eb007d84b4da43eb4ea50a430f, type: 3}
       propertyPath: deformBar
       value: 

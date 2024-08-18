@@ -9,6 +9,8 @@
 
         public Button fileButton;
 
+        public Button devicesButton;
+
         // TODO: do we need buttons for next/previous track/vCapDevice?
 
         private void Start()
@@ -37,6 +39,8 @@
             stopButton.onClick.Rebind(() => { screen.Stop(); });
 
             fileButton.onClick.Rebind(() => { screen.PromptUserFilePicker(); });
+
+            devicesButton.onClick.Rebind(() => { screen.feed.LogAllDevices(); });
 
             screen.BindUI();
         }

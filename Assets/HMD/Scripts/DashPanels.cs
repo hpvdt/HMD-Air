@@ -424,7 +424,7 @@ public class DashPanels : MonoBehaviourWithLogging
         _pictureSettingsPopup = gameObject.ByName("PictureSettingsPopup").Only();
     }
 
-    private const string NEW_VLC = "New VLC ...";
+    private const string NEW_VLC_WINDOWS = "New VLC (Windows) ...";
     private const string NEW_V_CAP = "New Video Capture ...";
 
 
@@ -436,7 +436,7 @@ public class DashPanels : MonoBehaviourWithLogging
 
         // playerDropdown.RefreshShownValue();
 
-        playerMenu.options.Add(new Dropdown.OptionData(NEW_VLC));
+        playerMenu.options.Add(new Dropdown.OptionData(NEW_VLC_WINDOWS));
         playerMenu.options.Add(new Dropdown.OptionData(NEW_V_CAP));
         playerMenu.RefreshShownValue();
 
@@ -445,7 +445,7 @@ public class DashPanels : MonoBehaviourWithLogging
             {
                 var option = playerMenu.options[value];
 
-                if (option.text == NEW_VLC)
+                if (option.text == NEW_VLC_WINDOWS)
                 {
                     SetupVlc();
                 }

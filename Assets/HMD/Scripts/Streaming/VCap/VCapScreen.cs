@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using SFB;
+    using Unity.VisualScripting;
     using UnityEngine;
 
     public class VCapScreen : ScreenLike
@@ -68,7 +69,7 @@
 
         public void PromptUserFilePicker()
         {
-            feed.PromptAllDevices();
+            // feed.PromptAllDevices();
 
             var yaml = new List<string>
             {
@@ -84,7 +85,7 @@
             var paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", fileTypes, false);
             var path = paths.FirstOrDefault();
 
-            if (path == null)
+            if (path.NullIfEmpty() == null)
             {
                 Debug.Log("Operation cancelled");
             }
