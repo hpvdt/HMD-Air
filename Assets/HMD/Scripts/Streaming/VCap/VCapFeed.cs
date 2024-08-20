@@ -3,6 +3,7 @@ namespace HMD.Scripts.Streaming.VCap
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using NullableExtension;
     using Pickle;
@@ -115,9 +116,15 @@ namespace HMD.Scripts.Streaming.VCap
             Debug.Log($"Found {devices.Length} capture devices >>>>>\n" + yamls + "\n<<<<<");
         }
 
-        public void Open(string selectorStr)
+        public void Open(string path)
         {
+            var urlContent = File.ReadAllText(path);
+            var lines = urlContent.Split('\n').ToList();
+            lines.RemoveAll(string.IsNullOrEmpty);
 
+            if (lines.Count <= 0) throw new IOException($"No line defined in file `${path}`");
+
+            var selectorStr = String.Join("\n", lines);
             var selector = _pickler.Rev<DeviceSelector>(selectorStr);
 
             Open(selector);
@@ -127,7 +134,17 @@ namespace HMD.Scripts.Streaming.VCap
         {
             Stop();
 
-            var found = Devices.FirstOrDefault(x => x.name.Contains(selector.Name));
+            var match = Devices.Where(x => x.name.Contains(selector.Name));
+
+            WebCamDevice found;
+            try
+            {
+                found = match.Single();
+            }
+            catch
+            {
+                throw new ArgumentException($"No device found matching `{selector.Name}`");
+            }
 
             if (selector.Resolution.HasValue)
             {
@@ -147,7 +164,7 @@ namespace HMD.Scripts.Streaming.VCap
             else
             {
                 _webCamTex = new WebCamTexture(
-                    selector.Name
+                    found.name
                 );
             }
 

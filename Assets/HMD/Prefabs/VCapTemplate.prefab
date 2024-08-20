@@ -76,10 +76,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2edc863a627a43ce8b0eb1000cb7ffff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loggerVerbosity: 1
+  loggerVerbosity: 0
   loggerPrefix: 
   flipTextureX: 0
-  flipTextureY: 0
+  flipTextureY: 1
   automaticallyFlipOnAndroid: 1
 --- !u!1 &1382681614020943171
 GameObject:
@@ -164,6 +164,7 @@ MonoBehaviour:
   stopButton: {fileID: 0}
   screen: {fileID: 7159244430690923377}
   fileButton: {fileID: 0}
+  devicesButton: {fileID: 0}
 --- !u!1 &3494572869652255093
 GameObject:
   m_ObjectHideFlags: 0
@@ -600,7 +601,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 787afed22ff34ee69e51b16a26d4b448, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loggerVerbosity: 1
+  loggerVerbosity: 0
   loggerPrefix: 
   videoMode: 0
   leftEyeScreen: {fileID: 4800436170063217065}

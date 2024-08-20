@@ -22,7 +22,8 @@
 
         public T Rev<T>(string yaml)
         {
-            return Deserializer.Deserialize<T>(yaml);
+            var result = Deserializer.Deserialize<T>(yaml);
+            return result;
         }
     }
 

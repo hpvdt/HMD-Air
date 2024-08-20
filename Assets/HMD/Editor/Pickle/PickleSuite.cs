@@ -1,25 +1,24 @@
-using NUnit.Framework;
-
-namespace HMD.Tests
+namespace HMD.Editor.Pickle
 {
-    using Scripts.Pickle;
-    using Scripts.Streaming.VCap;
+    using HMD.Scripts.Pickle;
+    using HMD.Scripts.Streaming.VCap;
+    using NUnit.Framework;
 
-    public class PickeSuite
+    public class PickleSuite
     {
         // A Test behaves as an ordinary method
         [Test]
-        public void PickeSuiteSimplePasses()
+        public void SpikeMissingField()
         {
             // Use the Assert class to test conditions
 
-            var str = "name: '/dev/video0'\n";
+            var str = "name: '/dev/video0'";
             var yaml = new Yaml();
 
             var obj = yaml.Rev<VCapFeed.DeviceSelector>(str);
             var str2 = yaml.Fwd(obj);
 
-            Assert.AreEqual(str, str2);
+            Assert.AreEqual(str2, "name: /dev/video0\nresolution: \n");
             // Use the Assert class to test conditions
         }
 

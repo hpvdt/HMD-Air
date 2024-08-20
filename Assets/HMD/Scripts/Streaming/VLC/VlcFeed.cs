@@ -181,6 +181,7 @@ namespace HMD.Scripts.Streaming.VLC
 
             if (_path.EndsWith(".url") || _path.EndsWith(".txt") || _path.EndsWith(".mrl"))
             {
+                // TODO: merge with file picker in VlcScreen
                 var urlContent = File.ReadAllText(path);
                 var lines = urlContent.Split('\n').ToList();
                 lines.RemoveAll(string.IsNullOrEmpty);

@@ -4,7 +4,6 @@
     using System.Linq;
     using SFB;
     using UnityEngine;
-    using UnityEngine.Serialization;
     using Util;
 
     public class VlcScreen : ScreenLike

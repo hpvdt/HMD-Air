@@ -17466,22 +17466,16 @@ MonoBehaviour:
   m_Text: 'by hpvdt.ca, University of Toronto
 
 
-    TODO:
+    TODO in next version:
 
 
-    - Reorganized + Simplified
-    UI
-
-
-    - Fixed bug where you had to manually switch modes after selecting video
-    for it to be visible
+    -
+    Reorganized + Simplified UI
 
 
     - Additional Depth + Focus Options Added
 
-
-    - Fixing
-    Youtube Support is still in progress'
+'
 --- !u!222 &1451498401
 CanvasRenderer:
   m_ObjectHideFlags: 0
