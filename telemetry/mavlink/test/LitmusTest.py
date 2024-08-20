@@ -1,4 +1,4 @@
-import __generated.HPVDT_falcon.Python as falcon
+import HPVDT_falcon.Python as falcon
 
 if __name__ == '__main__':
 
