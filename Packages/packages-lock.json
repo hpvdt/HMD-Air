@@ -1,5 +1,33 @@
 {
   "dependencies": {
+    "ca.hpvdt.mavlinkapi": {
+      "version": "file:MAVLinkAPI",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.textmeshpro": "3.0.9",
+        "com.yamldotnet.uni": "13.2.0",
+        "com.unity.nuget.newtonsoft-json": "3.2.1",
+        "io.github.gkngkc.unity-standalone-file-browser": "1.3.2",
+        "com.unity.xr.management": "4.5.1",
+        "com.unity.visualscripting": "1.9.7",
+        "com.jonagill.autofill": "1.0.7"
+      }
+    },
+    "com.ecasillas.missingrefsfinder": {
+      "version": "https://github.com/tribbloid/unity-missing-references-finder.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "0c2024efe13f648dd0efc4f70d86ec028f9e8bb6"
+    },
+    "com.jonagill.autofill": {
+      "version": "1.0.7",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://package.openupm.com"
+    },
     "com.tayx.graphy": {
       "version": "3.0.5",
       "depth": 0,
@@ -62,6 +90,13 @@
     "com.unity.ide.vscode": {
       "version": "1.2.5",
       "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.nuget.newtonsoft-json": {
+      "version": "3.2.1",
+      "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
@@ -187,7 +222,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.visualscripting": {
-      "version": "1.9.6",
+      "version": "1.9.8",
       "depth": 0,
       "source": "registry",
       "dependencies": {

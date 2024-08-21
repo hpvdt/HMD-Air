@@ -1,24 +1,23 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using MAVLinkAPI.Ext;
+using MAVLinkAPI.Routing;
+// using MAVLinkAPI.Ext;
+using MAVLinkAPI.Routing;
+using MAVLinkAPI.Util.NullSafety;
+// using MAVLinkAPI.Streaming;
+using Unity.VisualScripting;
+using UnityEngine;
+
 namespace HMD.Scripts.Streaming.VCap
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using HMDCommons.Scripts;
-    using Pickle;
-    using Unity.VisualScripting;
-    using UnityEngine;
-
     public class VCapFeed : FeedLike
     {
-        private Yaml _pickler = new Yaml();
-
-        public struct DeviceSelector
-        {
-            public string Name;
-            public Resolution? Resolution;
-        }
+        private WebCamDevice? _activeDevice;
+        private readonly Yaml _pickler = new();
 
         private WebCamTexture? _webCamTex;
 
@@ -30,8 +29,6 @@ namespace HMD.Scripts.Streaming.VCap
                 return result;
             }
         }
-
-        private WebCamDevice? _activeDevice;
 
 
         public void PlayNext(Resolution? res)
@@ -53,9 +50,7 @@ namespace HMD.Scripts.Streaming.VCap
                 if (res == null)
                 {
                     Log.V($"Setting up camera `{d.name}`");
-                    Open(
-                        new DeviceSelector { Name = d.name }
-                    );
+                    Open(new ArgsT { Name = d.name });
                 }
                 else
                 {
@@ -67,7 +62,7 @@ namespace HMD.Scripts.Streaming.VCap
                         );
 
                     Open(
-                        new DeviceSelector
+                        new ArgsT
                         {
                             Name = d.name,
                             Resolution = res
@@ -81,16 +76,17 @@ namespace HMD.Scripts.Streaming.VCap
         {
             var devices = Devices;
 
-            var selectors = new List<DeviceSelector>();
+            var selectors = new List<ArgsT>();
 
-            foreach (var dd in devices)
+            foreach (var pair in devices.Select((v, i) => (v, i)))
             {
-                var resList = dd.availableResolutions;
+                var resList = pair.v.availableResolutions;
 
                 {
-                    var v = new DeviceSelector()
+                    var v = new ArgsT
                     {
-                        Name = dd.name
+                        Index = pair.i,
+                        Name = pair.v.name
                     };
                     selectors.Add(v);
                 }
@@ -98,9 +94,10 @@ namespace HMD.Scripts.Streaming.VCap
                 if (resList != null)
                     foreach (var res in resList)
                     {
-                        var v = new DeviceSelector()
+                        var v = new ArgsT
                         {
-                            Name = dd.name,
+                            Index = pair.i,
+                            Name = pair.v.name,
                             Resolution = res
                         };
                         selectors.Add(v);
@@ -120,12 +117,12 @@ namespace HMD.Scripts.Streaming.VCap
             if (lines.Count <= 0) throw new IOException($"No line defined in file `${path}`");
 
             var selectorStr = string.Join("\n", lines);
-            var selector = _pickler.Rev<DeviceSelector>(selectorStr);
+            var selector = _pickler.Rev<ArgsT>(selectorStr);
 
             Open(selector);
         }
 
-        public void Open(DeviceSelector selector)
+        public void Open(ArgsT selector)
         {
             Stop();
 
@@ -167,7 +164,7 @@ namespace HMD.Scripts.Streaming.VCap
             _webCamTex.GetPixels(); // otherwise width and height will always be 16x16
 
             Log.V(
-                $"Setting up camera:\n"
+                "Setting up camera:\n"
                 + $"    Seleccted: `{selector.Name}` ({selector.Resolution.ToSafeString()})\n"
                 + $"    Actual: `{_webCamTex.deviceName}` ({_webCamTex.width}x{_webCamTex.height} @ {_webCamTex.requestedFPS}fps)"
             );
@@ -212,8 +209,7 @@ namespace HMD.Scripts.Streaming.VCap
         {
             if (_webCamTex == null)
                 return (0, 0);
-            else
-                return ((uint)_webCamTex.width, (uint)_webCamTex.height);
+            return ((uint)_webCamTex.width, (uint)_webCamTex.height);
         }
 
         public override void Dispose()
@@ -222,6 +218,13 @@ namespace HMD.Scripts.Streaming.VCap
 
             Log.V("Destroy Camera Feed");
             _webCamTex = null;
+        }
+
+        public struct ArgsT
+        {
+            public int? Index;
+            public string Name;
+            public Resolution? Resolution;
         }
     }
 }

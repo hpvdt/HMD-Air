@@ -1,15 +1,62 @@
+#nullable enable
+using System;
+using System.Runtime.InteropServices;
+using MAVLinkAPI.Util.NullSafety;
+using UnityEngine;
+using UnityEngine.Experimental.XR.Interaction;
+using UnityEngine.SpatialTracking;
+
 namespace XRPoseAPI.Scripts
 {
-    using System;
-    using System.Runtime.InteropServices;
-    using UnityEngine;
-    using UnityEngine.Experimental.XR.Interaction;
-    using UnityEngine.SpatialTracking;
-    public class AirPoseProvider : BasePoseProvider
+    public class ZeroingPoseProvider : BasePoseProvider
     {
-        public bool useQuaternion = false;
+        [NonSerialized] protected Quaternion Zeroing = Quaternion.identity;
 
+        public BasePoseProvider? reference = null;
+
+        public void Zero(
+            bool x = false,
+            bool y = false,
+            bool z = false
+        )
+        {
+            _ = GetPoseFromProvider(out var currentPose);
+            var currentPoseEuler = currentPose.rotation.eulerAngles;
+
+            var zeroingEuler = Zeroing.eulerAngles;
+            Vector3 referenceEuler;
+            if (reference == null)
+            {
+                referenceEuler = Vector3.zero;
+            }
+            else
+            {
+                reference.GetPoseFromProvider(out var referencePose);
+                referenceEuler = referencePose.rotation.eulerAngles;
+            }
+
+            if (x) zeroingEuler.x -= currentPoseEuler.x - referenceEuler.x;
+            if (y) zeroingEuler.y -= currentPoseEuler.y - referenceEuler.y;
+            if (z) zeroingEuler.z -= currentPoseEuler.z - referenceEuler.z;
+            Zeroing = Quaternion.Euler(zeroingEuler);
+        }
+
+        public void ZeroXY()
+        {
+            Zero(true, true);
+        }
+
+        public void ZeroY()
+        {
+            Zero(y: true);
+        }
+    }
+
+    public class AirPoseProvider : ZeroingPoseProvider
+    {
         public bool verboseLogging = false;
+
+        public bool useQuaternion = false;
 
         public float mouseSensitivity = 100.0f;
 
@@ -40,17 +87,17 @@ namespace XRPoseAPI.Scripts
     public static extern IntPtr GetQuaternion();
 
 #else
-    [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int StartConnection();
+        [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int StartConnection();
 
-    [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int StopConnection();
+        [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int StopConnection();
 
-    [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr GetEuler();
+        [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr GetEuler();
 
-    [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr GetQuaternion();
+        [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr GetQuaternion();
 
 #endif
 
@@ -65,7 +112,7 @@ namespace XRPoseAPI.Scripts
 
         protected static ConnectionStates ConnectionState = ConnectionStates.Disconnected;
 
-        public bool IsConnecting()
+        public bool IsConnected()
         {
             return ConnectionState is ConnectionStates.Connected or ConnectionStates.StandBy;
         }
@@ -85,10 +132,9 @@ namespace XRPoseAPI.Scripts
             }
         }
 
-
         public void TryDisconnect()
         {
-            if (IsConnecting())
+            if (IsConnected())
             {
                 var code = StopConnection();
                 if (code == 1)
@@ -108,24 +154,16 @@ namespace XRPoseAPI.Scripts
             }
         }
 
-        private static readonly Quaternion Q_ID = Quaternion.identity.normalized;
+        // private static readonly Quaternion Q_ID = Quaternion.identity.normalized;
 
-        public class Rotation
+
+        public record RotationT(AirPoseProvider Outer)
         {
-            protected readonly AirPoseProvider Outer;
-
-            public Rotation(AirPoseProvider outer)
-            {
-                Outer = outer;
-            }
-
             public Quaternion Glasses = Quaternion.identity;
             public Quaternion Mouse = Quaternion.identity;
-            public Quaternion Zeroing = Quaternion.identity;
 
             private Vector3 _mouseEuler = Vector3.zero;
 
-            private Vector3 _zeroingEuler = Vector3.zero;
 
             private float[] GetEulerArray()
             {
@@ -144,20 +182,22 @@ namespace XRPoseAPI.Scripts
             protected Quaternion Read_direct()
             {
                 var ptr = GetQuaternion();
-                // receiving in WIJK order (left hand)
+                // receiving quaternion in WXYZ order (left hand)
                 // see https://github.com/xioTechnologies/Fusion/blob/e7d2b41e6506fa9c85492b91becf003262f14977/Fusion/FusionMath.h#L36
+
+                // converting to XYZW order (right hand)
+                // sequence (1, -3, -2, 0) is for chiral conversion
+                // see https://stackoverflow.com/questions/28673777/convert-quaternion-from-right-handed-to-left-handed-coordinate-system
+                // neutral position is 90 degree pitch downward
 
                 var arr = new float[4];
                 Marshal.Copy(ptr, arr, 0, 4);
 
                 var qRaw = new Quaternion(-arr[1], -arr[3], -arr[2], arr[0]);
 
-                if (Outer.verboseLogging) Debug.Log($"Quaternion raw: {qRaw.x}, {qRaw.y}, {qRaw.z}, {qRaw.w}");
+                if (Outer.verboseLogging)
+                    Debug.Log($"update from XR (Quaternion): {qRaw.x}, {qRaw.y}, {qRaw.z}, {qRaw.w}");
 
-                // converting to IKJW order (right hand)
-                // sequence (1, -3, -2, 0) is for chiral conversion
-                // see https://stackoverflow.com/questions/28673777/convert-quaternion-from-right-handed-to-left-handed-coordinate-system
-                // neutral position is 90 degree pitch downward
 
                 var qNormalised = qRaw.normalized;
                 // some driver may have all 0 reading, which will be converted to identity quaternion
@@ -181,7 +221,8 @@ namespace XRPoseAPI.Scripts
                 var yaw = arr[2];
 
                 var arr2 = new Vector3(-(pitch - 90f), -yaw, -roll);
-                if (Outer.verboseLogging) Debug.Log($"Euler raw: {arr2[0]}, {arr2[1]}, {arr2[2]}");
+                if (Outer.verboseLogging)
+                    Debug.Log($"update from XR (Euler): {arr2[0]}, {arr2[1]}, {arr2[2]}");
 
                 // converting to LDB order (right hand axes, right hand rotation)
                 // Left - pitch
@@ -197,13 +238,9 @@ namespace XRPoseAPI.Scripts
             protected virtual Quaternion Read()
             {
                 if (Outer.useQuaternion)
-                {
                     return Read_direct();
-                }
                 else
-                {
                     return Read_euler();
-                }
             }
 
             public void UpdateFromGlasses()
@@ -224,7 +261,7 @@ namespace XRPoseAPI.Scripts
                     }
                     else
                     {
-                        if (Outer.verboseLogging) Debug.Log("Glasses has no reading");
+                        if (Outer.verboseLogging) Debug.Log("XR has no reading");
                     }
                 }
                 else
@@ -245,27 +282,15 @@ namespace XRPoseAPI.Scripts
 
                 Mouse = Quaternion.Euler(-_mouseEuler);
             }
-
-            public void ZeroY()
-            {
-                var fromGlassesY = (Glasses * Mouse).eulerAngles.y;
-                _zeroingEuler.y = -fromGlassesY;
-                Zeroing = Quaternion.Euler(_zeroingEuler);
-            }
         }
 
-        protected Rotation AttitudeVar;
+        [NonSerialized] protected Maybe<RotationT> ExistingRotation;
 
-        protected virtual Rotation Attitude
-        {
-            get
-            {
-                if (AttitudeVar == null) AttitudeVar = new Rotation(this);
-                return AttitudeVar;
-            }
-        }
+        protected virtual RotationT Rotation => ExistingRotation.Lazy(() =>
+            new RotationT(this)
+        );
 
-        public class Translation // TODO: enable it
+        public record TranslationT(AirPoseProvider Outer) // TODO: enable it
         {
             private Vector3 _fromGlasses = Vector3.zero;
 
@@ -286,17 +311,14 @@ namespace XRPoseAPI.Scripts
         // Update Pose
         public override PoseDataFlags GetPoseFromProvider(out Pose output)
         {
-            if (IsConnecting()) Attitude.UpdateFromGlasses();
+            if (IsConnected()) Rotation.UpdateFromGlasses();
 
             var mousePressed = Input.GetMouseButton(1);
             var keyPressed = Input.GetKey(KeyCode.LeftAlt);
 
-            if (mousePressed || keyPressed)
-            {
-                Attitude.UpdateFromMouse();
-            }
+            if (mousePressed || keyPressed) Rotation.UpdateFromMouse();
 
-            var compound = Attitude.Mouse * Attitude.Zeroing * Attitude.Glasses;
+            var compound = Zeroing * Rotation.Mouse * Rotation.Glasses;
 
             output = new Pose(new Vector3(0, 0, 0), compound);
             return PoseDataFlags.Rotation;

@@ -1,0 +1,2 @@
+className: 'UdpSerial'
+portName: 'localhost:14445'

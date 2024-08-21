@@ -1,0 +1,21 @@
+{
+  "name": "HMD.Scripts",
+  "rootNamespace": "",
+  "references": [
+    "HMDCommons.Scripts",
+    "Unity.InputSystem",
+    "Unity.TextMeshPro",
+    "StandaloneFileBrowser",
+    "Unity.VisualScripting.Core",
+    "ca.hpvdt.mavlinkapi.Runtime"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

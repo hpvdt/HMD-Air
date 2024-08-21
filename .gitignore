@@ -97,6 +97,7 @@ out/
 # Gradle files
 .gradle/
 build/
+.build/
 
 # Local configuration file (sdk path, etc)
 local.properties
@@ -166,3 +167,8 @@ UserSettings
 # Python
 **/venv
 **/__pycache__
+
+# AI coding
+**/.windsurf
+**/.cursor
+**/.history                            

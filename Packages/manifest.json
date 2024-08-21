@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.ecasillas.missingrefsfinder": "https://github.com/tribbloid/unity-missing-references-finder.git",
     "com.tayx.graphy": "3.0.5",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.feature.development": "1.0.1",
@@ -13,7 +14,7 @@
     "com.unity.toolchain.win-x86_64-linux-x86_64": "2.0.10",
     "com.unity.ugui": "1.0.0",
     "com.unity.vectorgraphics": "2.0.0-preview.25",
-    "com.unity.visualscripting": "1.9.6",
+    "com.unity.visualscripting": "1.9.8",
     "com.unity.xr.management": "4.5.1",
     "com.yamldotnet.uni": "13.2.0",
     "com.yasirkula.ingamedebugconsole": "https://github.com/yasirkula/UnityIngameDebugConsole.git#v1.6.7",
@@ -57,7 +58,11 @@
       "scopes": [
         "com.tayx.graphy",
         "io.github.gkngkc.unity-standalone-file-browser",
-        "com.yamldotnet.uni"
+        "com.yamldotnet.uni",
+        "com.unity.uiextensions",
+        "com.yasirkula.ingamedebugconsole",
+        "com.jonagill.autofill",
+        "net.tnrd.autohook"
       ]
     }
   ]

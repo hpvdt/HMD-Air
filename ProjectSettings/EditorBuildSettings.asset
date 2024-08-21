@@ -8,5 +8,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/HMD/Scenes/Main.unity
     guid: b086cec284c7832438aa6c6aa7656481
+  - enabled: 0
+    path: Packages/ca.hpvdt.mavlinkapi/Scenes/MAVPoseDemo.unity
+    guid: 5dfb2db3294bcc847846837cedf32328
   m_configObjects:
-    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: cbe64ba4930602d4f99ca092ed233345, type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 9e7eabb4af9c950c8a10951620128702, type: 2}

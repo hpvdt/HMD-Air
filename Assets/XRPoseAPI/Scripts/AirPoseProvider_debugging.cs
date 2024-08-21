@@ -1,14 +1,11 @@
+using UnityEngine;
+
 namespace XRPoseAPI.Scripts
 {
-    using UnityEngine;
     public class AirPoseProvider_debugging : AirPoseProvider
     {
-        class Rotation_debugging : Rotation
+        private record RotationT_debugging(AirPoseProvider Outer) : RotationT(Outer)
         {
-            public Rotation_debugging(AirPoseProvider outer) : base(outer)
-            {
-            }
-
             private static Vector3 ClampTo180(Vector3 v)
             {
                 return new Vector3(
@@ -67,23 +64,12 @@ namespace XRPoseAPI.Scripts
 
 
                 if (Outer.useQuaternion)
-                {
                     return r1;
-                }
                 else
-                {
                     return r2;
-                }
             }
         }
 
-        protected override Rotation Attitude
-        {
-            get
-            {
-                if (AttitudeVar == null) AttitudeVar = new Rotation_debugging(this);
-                return AttitudeVar;
-            }
-        }
+        protected override RotationT Rotation => ExistingRotation.Lazy(() => new RotationT_debugging(this));
     }
 }

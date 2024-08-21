@@ -1,4 +1,5 @@
 using UnityEngine;
+
 public class cameraFollow : MonoBehaviour
 {
     public planeMovement planeMovement;
