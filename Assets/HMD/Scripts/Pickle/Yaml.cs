@@ -1,8 +1,8 @@
-﻿namespace HMD.Scripts.Pickle
-{
-    using YamlDotNet.Serialization;
-    using YamlDotNet.Serialization.NamingConventions;
+﻿using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
+namespace HMD.Scripts.Pickle
+{
     public class Yaml
     {
         public static readonly INamingConvention convention = CamelCaseNamingConvention.Instance;
@@ -26,5 +26,4 @@
             return result;
         }
     }
-
 }

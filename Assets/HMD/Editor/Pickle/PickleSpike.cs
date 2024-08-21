@@ -16,10 +16,12 @@ namespace HMD.Editor.Pickle
             var str = "name: '/dev/video0'";
             var yaml = new Yaml();
 
-            var obj = yaml.Rev<VCapFeed.DeviceSelector>(str);
+            var obj = yaml.Rev<VCapFeed.ArgsT>(str);
             var str2 = yaml.Fwd(obj);
 
-            Assert.AreEqual(str2, $"name: /dev/video0{Environment.NewLine}resolution: {Environment.NewLine}");
+            Assert.AreEqual(str2, $"index: {Environment.NewLine}" +
+                                  $"name: /dev/video0{Environment.NewLine}" +
+                                  $"resolution: {Environment.NewLine}");
             // Use the Assert class to test conditions
         }
 

@@ -1,10 +1,11 @@
+using System;
+using System.Runtime.InteropServices;
+using UnityEngine;
+using UnityEngine.Experimental.XR.Interaction;
+using UnityEngine.SpatialTracking;
+
 namespace XRPoseAPI.Scripts
 {
-    using System;
-    using System.Runtime.InteropServices;
-    using UnityEngine;
-    using UnityEngine.Experimental.XR.Interaction;
-    using UnityEngine.SpatialTracking;
     public class AirPoseProvider : BasePoseProvider
     {
         public bool useQuaternion = false;
@@ -40,17 +41,17 @@ namespace XRPoseAPI.Scripts
     public static extern IntPtr GetQuaternion();
 
 #else
-    [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int StartConnection();
+        [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int StartConnection();
 
-    [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int StopConnection();
+        [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int StopConnection();
 
-    [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr GetEuler();
+        [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr GetEuler();
 
-    [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr GetQuaternion();
+        [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr GetQuaternion();
 
 #endif
 
@@ -65,7 +66,7 @@ namespace XRPoseAPI.Scripts
 
         protected static ConnectionStates ConnectionState = ConnectionStates.Disconnected;
 
-        public bool IsConnecting()
+        public bool IsConnected()
         {
             return ConnectionState is ConnectionStates.Connected or ConnectionStates.StandBy;
         }
@@ -85,10 +86,9 @@ namespace XRPoseAPI.Scripts
             }
         }
 
-
         public void TryDisconnect()
         {
-            if (IsConnecting())
+            if (IsConnected())
             {
                 var code = StopConnection();
                 if (code == 1)
@@ -108,7 +108,7 @@ namespace XRPoseAPI.Scripts
             }
         }
 
-        private static readonly Quaternion Q_ID = Quaternion.identity.normalized;
+        // private static readonly Quaternion Q_ID = Quaternion.identity.normalized;
 
         public class Rotation
         {
@@ -144,8 +144,13 @@ namespace XRPoseAPI.Scripts
             protected Quaternion Read_direct()
             {
                 var ptr = GetQuaternion();
-                // receiving in WIJK order (left hand)
+                // receiving quaternion in WXYZ order (left hand)
                 // see https://github.com/xioTechnologies/Fusion/blob/e7d2b41e6506fa9c85492b91becf003262f14977/Fusion/FusionMath.h#L36
+
+                // converting to XYZW order (right hand)
+                // sequence (1, -3, -2, 0) is for chiral conversion
+                // see https://stackoverflow.com/questions/28673777/convert-quaternion-from-right-handed-to-left-handed-coordinate-system
+                // neutral position is 90 degree pitch downward
 
                 var arr = new float[4];
                 Marshal.Copy(ptr, arr, 0, 4);
@@ -154,10 +159,6 @@ namespace XRPoseAPI.Scripts
 
                 if (Outer.verboseLogging) Debug.Log($"Quaternion raw: {qRaw.x}, {qRaw.y}, {qRaw.z}, {qRaw.w}");
 
-                // converting to IKJW order (right hand)
-                // sequence (1, -3, -2, 0) is for chiral conversion
-                // see https://stackoverflow.com/questions/28673777/convert-quaternion-from-right-handed-to-left-handed-coordinate-system
-                // neutral position is 90 degree pitch downward
 
                 var qNormalised = qRaw.normalized;
                 // some driver may have all 0 reading, which will be converted to identity quaternion
@@ -197,13 +198,9 @@ namespace XRPoseAPI.Scripts
             protected virtual Quaternion Read()
             {
                 if (Outer.useQuaternion)
-                {
                     return Read_direct();
-                }
                 else
-                {
                     return Read_euler();
-                }
             }
 
             public void UpdateFromGlasses()
@@ -246,10 +243,16 @@ namespace XRPoseAPI.Scripts
                 Mouse = Quaternion.Euler(-_mouseEuler);
             }
 
-            public void ZeroY()
+            public void Zero(
+                bool x = false,
+                bool y = false,
+                bool z = false
+            )
             {
-                var fromGlassesY = (Glasses * Mouse).eulerAngles.y;
-                _zeroingEuler.y = -fromGlassesY;
+                var fromOthers = (Glasses * Mouse).eulerAngles;
+                if (x) _zeroingEuler.x = -fromOthers.x;
+                if (y) _zeroingEuler.y = -fromOthers.y;
+                if (z) _zeroingEuler.z = -fromOthers.z;
                 Zeroing = Quaternion.Euler(_zeroingEuler);
             }
         }
@@ -286,20 +289,27 @@ namespace XRPoseAPI.Scripts
         // Update Pose
         public override PoseDataFlags GetPoseFromProvider(out Pose output)
         {
-            if (IsConnecting()) Attitude.UpdateFromGlasses();
+            if (IsConnected()) Attitude.UpdateFromGlasses();
 
             var mousePressed = Input.GetMouseButton(1);
             var keyPressed = Input.GetKey(KeyCode.LeftAlt);
 
-            if (mousePressed || keyPressed)
-            {
-                Attitude.UpdateFromMouse();
-            }
+            if (mousePressed || keyPressed) Attitude.UpdateFromMouse();
 
             var compound = Attitude.Mouse * Attitude.Zeroing * Attitude.Glasses;
 
             output = new Pose(new Vector3(0, 0, 0), compound);
             return PoseDataFlags.Rotation;
+        }
+
+        public void ZeroXY()
+        {
+            Attitude.Zero(true, true);
+        }
+
+        public void ZeroY()
+        {
+            Attitude.Zero(y: true);
         }
     }
 }

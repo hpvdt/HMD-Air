@@ -1,9 +1,9 @@
+using System;
+using HMD.Scripts.Util;
+using UnityEngine;
+
 namespace HMD.Scripts.Streaming
 {
-    using System;
-    using UnityEngine;
-    using Util;
-
     public abstract class FeedLike : MonoBehaviourWithLogging, IDisposable
     {
         protected abstract (uint, uint) GetSize();
@@ -24,10 +24,8 @@ namespace HMD.Scripts.Streaming
                 var res = TryGetTextureIfValid(existing);
 
                 if (existing != null && res != null && res != existing)
-                {
                     Warning.V($"existing texture {existing} is obsolete\n"
-                        + $"creating new one {res}\n");
-                }
+                              + $"creating new one {res}\n");
 
                 return res;
             }
@@ -53,17 +51,9 @@ namespace HMD.Scripts.Streaming
         public bool flipTextureX; //No particular reason you'd need this but it is sometimes useful
         public bool flipTextureY; //Set to false on Android, to true on Windows
         public bool automaticallyFlipOnAndroid = true; //Automatically invert Y on Android
-        protected Vector2 Transform
-        {
-            get
-            {
-                return new Vector2(flipTextureX ? -1 : 1, flipTextureY ? -1 : 1);
-            }
-        }
-        protected Vector2 Offset
-        {
-            get;
-        } = Vector2.one;
+        protected Vector2 Transform => new(flipTextureX ? -1 : 1, flipTextureY ? -1 : 1);
+
+        protected Vector2 Offset { get; } = Vector2.one;
 
         protected new virtual void Awake()
         {

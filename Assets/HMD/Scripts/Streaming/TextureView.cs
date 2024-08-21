@@ -1,10 +1,9 @@
+using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace HMD.Scripts.Streaming
 {
-    using System;
-    using Unity.VisualScripting;
-
     public class TextureView : IDisposable
     // immutable, can only be initialised once, all derivative textures can only be destroyed together
     {
@@ -14,6 +13,16 @@ namespace HMD.Scripts.Streaming
         public readonly Lazy<(int, int)> Size;
 
         public Lazy<string> NativeAspectRatioText; // width:height
+
+        ~TextureView()
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            _cache.Release();
+        }
 
         public TextureView(Texture source)
         {
@@ -29,30 +38,11 @@ namespace HMD.Scripts.Streaming
             NativeAspectRatioText = new Lazy<string>(() => $"{Size.Value.Item1}:{Size.Value.Item2}");
         }
 
-        public Texture Source
-        {
-            get { return _source; }
-        }
+        public Texture Source => _source;
 
-        public RenderTexture Cache
-        {
-            get { return _cache; }
-        }
+        public RenderTexture Cache => _cache;
 
-        public Texture Effective
-        {
-            get { return Cache; }
-        }
-
-        public void Dispose()
-        {
-            _cache.Release();
-        }
-
-        private TextureView()
-        {
-            Dispose();
-        }
+        public Texture Effective => Cache;
 
         public override string ToString()
         {

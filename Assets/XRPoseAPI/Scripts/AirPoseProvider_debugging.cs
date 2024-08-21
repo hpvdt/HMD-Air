@@ -1,6 +1,7 @@
+using UnityEngine;
+
 namespace XRPoseAPI.Scripts
 {
-    using UnityEngine;
     public class AirPoseProvider_debugging : AirPoseProvider
     {
         class Rotation_debugging : Rotation
