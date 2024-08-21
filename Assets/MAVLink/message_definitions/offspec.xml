@@ -18,8 +18,8 @@
 			<field type="char[230]" name="uri">Video stream URI (TCP or RTSP URI ground station should connect to) or port number (UDP port ground station should listen to).</field>
 		</message>
 	</messages>
-	<enums>
+<!--	<enums>-->
 
-	</enums>
+<!--	</enums>-->
 </mavlink>
 
