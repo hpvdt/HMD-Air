@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Collections.Generic;
 using HMD.Scripts.Util;
+using MAVLinkAPI.Scripts.Util;
 using HMDCommons.Scripts;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,6 +13,12 @@ public class FOVController : MonoBehaviourWithLogging
     // TODO : enable this after gimbal or professional AR camera support
     // [SerializeField] private Camera leftCamera;
     // [SerializeField] private Camera rightCamera;
+
+
+    private List<Camera>? _mainCameras;
+
+    private List<Camera> MainCameras =>
+        LazyHelper.EnsureInitialized(ref _mainCameras, () => new List<Camera> { mainCamera });
 
     [Required] [SerializeField] private Slider fovBar = null!;
 
@@ -33,30 +40,13 @@ public class FOVController : MonoBehaviourWithLogging
     private static float maxFocal = 15.0f;
     private static float minFocal = -15.0f;
 
-    private List<Camera>? _mainCameras;
-    private List<Camera> MainCameras
-    {
-        get
-        {
-            return _mainCameras ??= new List<Camera> { mainCamera };
-        }
-    }
 
     private List<Camera>? _allCameras;
-    private List<Camera> AllCameras
-    {
-        get
-        {
-            return _allCameras ??= MainCameras;
-        }
-    }
+    private List<Camera> AllCameras => LazyHelper.EnsureInitialized(ref _allCameras, () => MainCameras);
 
     private float FOV // 20 for 2D 140 for spherical
     {
-        get
-        {
-            return mainCamera.fieldOfView;
-        }
+        get => mainCamera.fieldOfView;
         set
         {
             foreach (var c in AllCameras) c.fieldOfView = value;
@@ -65,6 +55,7 @@ public class FOVController : MonoBehaviourWithLogging
 
 
     #region unity
+
     protected void Start()
     {
         BindUI();
@@ -85,6 +76,7 @@ public class FOVController : MonoBehaviourWithLogging
 
         fovBar.value = FOV;
     }
+
     #endregion
 
     private void OnFOVSliderUpdated(float value)

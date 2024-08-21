@@ -5,10 +5,10 @@
 
     public class AspectRatioUpdater
     {
-        public readonly VlcScreen Screen;
+        public readonly VLCScreen Screen;
         public readonly Frac Value;
 
-        public AspectRatioUpdater(VlcScreen screen)
+        public AspectRatioUpdater(VLCScreen screen)
         {
             this.Screen = screen;
             Value = screen.AspectRatio;

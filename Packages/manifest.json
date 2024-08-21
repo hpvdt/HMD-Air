@@ -57,7 +57,8 @@
       "scopes": [
         "com.tayx.graphy",
         "io.github.gkngkc.unity-standalone-file-browser",
-        "com.yamldotnet.uni"
+        "com.yamldotnet.uni",
+        "com.github-glitchenzo.nugetforunity"
       ]
     }
   ]

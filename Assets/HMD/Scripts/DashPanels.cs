@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using HMD.Scripts.Streaming;
 using HMD.Scripts.Util;
+using MAVLinkAPI.Editor.Util;
+using MAVLinkAPI.Scripts.Util;
 using HMDCommons.Scripts;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -14,20 +16,17 @@ public class DashPanels : MonoBehaviourWithLogging
     // [HideInInspector]
     // public VlcController controller;
 
+    [Required] public GameObject playerRig = null!;
     [Required] public GameObject vlcPlayerTemplate = null!;
     [Required] public GameObject vCapPlayerTemplate = null!;
 
     [Required] public Dropdown playerMenu = null!;
 
-    private Dictionary<string, Player> _activePlayers = new Dictionary<string, Player>
-        { };
+    private Dictionary<string, Player> _activePlayers = new();
 
     private string FocusedPlayerID
     {
-        get
-        {
-            return playerMenu.options[playerMenu.value].text;
-        }
+        get => playerMenu.options[playerMenu.value].text;
         set
         {
             var newIndex = playerMenu.options.FindIndex(option => option.text == value);
@@ -66,14 +65,12 @@ public class DashPanels : MonoBehaviourWithLogging
 
         private ControllerLike? _controller;
 
-        public ControllerLike Controller
-        {
-            get { return _controller ??= Prefab.GetComponent<ControllerLike>(); }
-        }
+        public ControllerLike Controller =>
+            LazyHelper.EnsureInitialized(ref _controller, () => Prefab.GetComponent<ControllerLike>());
 
         public class DraggingMode
         {
-            public static readonly DraggingMode Disabled = new DraggingMode();
+            public static readonly DraggingMode Disabled = new();
 
             public class Enabled : DraggingMode
             {
@@ -101,10 +98,7 @@ public class DashPanels : MonoBehaviourWithLogging
 
         public bool IconIsVisible
         {
-            set
-            {
-                Controller.icon.SetActive(value);
-            }
+            set => Controller.icon.SetActive(value);
         }
 
         public void Dispose()
@@ -114,7 +108,7 @@ public class DashPanels : MonoBehaviourWithLogging
         }
     }
 
-    private AtomicInt _incCounter = new AtomicInt();
+    private AtomicLong _incCounter = new();
 
 
     // private Player? _focusedPlayer;
@@ -138,7 +132,7 @@ public class DashPanels : MonoBehaviourWithLogging
     private Player _setupPlayerFromPrefab(GameObject prefab, string playerName)
     {
         prefab.SetActive(true);
-        var id = playerName + "(" + _incCounter.Next() + ")";
+        var id = playerName + "(" + _incCounter.Increment() + ")";
 
         var player = new Player { Outer = this, Prefab = prefab, ID = id };
         _activePlayers.Add(id, player);
@@ -152,7 +146,10 @@ public class DashPanels : MonoBehaviourWithLogging
     private Player _setupPlayerFromTemplate(GameObject template, string prefix, bool focus = true)
     {
         var heading = fovController.mainCamera.transform.rotation;
-        var prefab = Instantiate(template, Vector3.zero, heading);
+
+
+        var prefab =
+            Instantiate(template, Vector3.zero, heading, playerRig.transform);
 
         var player = _setupPlayerFromPrefab(prefab, prefix);
 
@@ -213,7 +210,7 @@ public class DashPanels : MonoBehaviourWithLogging
             foreach (var d in result)
             {
                 Debug.Log("display" + d.systemWidth + "x" + d.systemHeight + " : " + d.renderingWidth + "x"
-                    + d.renderingHeight);
+                          + d.renderingHeight);
                 d.Activate();
             }
 
@@ -249,19 +246,13 @@ public class DashPanels : MonoBehaviourWithLogging
 
     private List<Button>? _allTabs;
 
-    private List<Button> AllTabs
+    private List<Button> AllTabs => LazyHelper.EnsureInitialized(ref _allTabs, () => new List<Button>
     {
-        get
-        {
-            return _allTabs ??= new List<Button>
-            {
-                playerTab.GetComponent<Button>(),
-                consoleTab.GetComponent<Button>(),
-                trackTab.GetComponent<Button>(),
-                volumeTab.GetComponent<Button>()
-            };
-        }
-    }
+        playerTab.GetComponent<Button>(),
+        consoleTab.GetComponent<Button>(),
+        trackTab.GetComponent<Button>(),
+        volumeTab.GetComponent<Button>()
+    });
 
     //Enable a GameObject if it is disabled, or disable it if it is enabled
     private static bool ToggleElement(GameObject element)
@@ -279,17 +270,11 @@ public class DashPanels : MonoBehaviourWithLogging
 
     private List<GameObject>? _allMenus;
 
-    private List<GameObject> AllMenus
+    private List<GameObject> AllMenus => LazyHelper.EnsureInitialized(ref _allMenus, () => new List<GameObject>
     {
-        get
-        {
-            return _allMenus ??= new List<GameObject>
-            {
-                _rootMenu,
-                _appMenu
-            };
-        }
-    }
+        _rootMenu,
+        _appMenu
+    });
 
     private GameObject _optionsButton;
 
@@ -303,20 +288,14 @@ public class DashPanels : MonoBehaviourWithLogging
 
     private List<GameObject>? _allPopups;
 
-    private List<GameObject> AllPopups
+    private List<GameObject> AllPopups => LazyHelper.EnsureInitialized(ref _allPopups, () => new List<GameObject>
     {
-        get
-        {
-            return _allPopups ??= new List<GameObject>
-            {
-                _aspectRatioPopup,
-                _screenPopup,
-                _formatPopup,
-                _releaseInfoPopup,
-                _pictureSettingsPopup
-            };
-        }
-    }
+        _aspectRatioPopup,
+        _screenPopup,
+        _formatPopup,
+        _releaseInfoPopup,
+        _pictureSettingsPopup
+    });
 
     // private MenuID _visibleMenuID;
 
@@ -465,7 +444,7 @@ public class DashPanels : MonoBehaviourWithLogging
                             player.Dragging = new Player.DraggingMode._3D
                             {
                                 Offset = player.Prefab.transform.rotation
-                                    * Quaternion.Inverse(fovController.mainCamera.transform.rotation)
+                                         * Quaternion.Inverse(fovController.mainCamera.transform.rotation)
                             };
                     }
                 );
