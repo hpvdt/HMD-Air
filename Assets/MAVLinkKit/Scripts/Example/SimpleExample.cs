@@ -1,16 +1,10 @@
-﻿// using System;
-// using System.Collections.Generic;
-// using System.ComponentModel;
-// using System.Data;
-// using System.Drawing;
-// using System.IO.Ports;
-// using System.Linq;
-// using System.Text;
-// using System.Threading.Tasks;
-// using System.Windows.Forms;
-//
-// namespace SimpleExample
+// namespace MAVLinkAPI.Scripts.Example
 // {
+//     using System;
+//     using System.ComponentModel;
+//     using System.IO.Ports;
+//     using System.Windows.Forms;
+//
 //     public partial class simpleexample : Form
 //     {
 //         MAVLink.MavlinkParse mavlink = new MAVLink.MavlinkParse();
@@ -64,7 +58,7 @@
 //                     {
 //                         // read any valid packet from the port
 //                         packet = mavlink.ReadPacket(serialPort1.BaseStream);
-//                         
+//
 //                         // check its valid
 //                         if (packet == null || packet.data == null)
 //                             continue;
@@ -101,15 +95,15 @@
 //                     if (sysid != packet.sysid || compid != packet.compid)
 //                         continue;
 //
-//                     Console.WriteLine(packet.msgtypename);
-//                     
+//                     Console.WriteLine((string)packet.msgtypename);
+//
 //                     if (packet.msgid == (byte)MAVLink.MAVLINK_MSG_ID.ATTITUDE)
-//                     //or
-//                     //if (packet.data.GetType() == typeof(MAVLink.mavlink_attitude_t))
+//                         //or
+//                         //if (packet.data.GetType() == typeof(MAVLink.mavlink_attitude_t))
 //                     {
 //                         var att = (MAVLink.mavlink_attitude_t)packet.data;
 //
-//                         Console.WriteLine(att.pitch*57.2958 + " " + att.roll*57.2958);
+//                         Console.WriteLine(att.pitch * 57.2958 + " " + att.roll * 57.2958);
 //                     }
 //                 }
 //                 catch
@@ -120,7 +114,7 @@
 //             }
 //         }
 //
-//         T readsomedata<T>(byte sysid,byte compid,int timeout = 2000)
+//         T readsomedata<T>(byte sysid, byte compid, int timeout = 2000)
 //         {
 //             DateTime deadline = DateTime.Now.AddMilliseconds(timeout);
 //
@@ -135,11 +129,11 @@
 //                     if (packet == null || sysid != packet.sysid || compid != packet.compid)
 //                         continue;
 //
-//                     Console.WriteLine(packet);
+//                     Console.WriteLine((object)packet);
 //
-//                     if (packet.data.GetType() == typeof (T))
+//                     if (packet.data.GetType() == typeof(T))
 //                     {
-//                         return (T) packet.data;
+//                         return (T)packet.data;
 //                     }
 //                 }
 //             }
@@ -174,13 +168,13 @@
 //             try
 //             {
 //                 var ack = readsomedata<MAVLink.mavlink_command_ack_t>(sysid, compid);
-//                 if (ack.result == (byte)MAVLink.MAV_RESULT.ACCEPTED) 
+//                 if (ack.result == (byte)MAVLink.MAV_RESULT.ACCEPTED)
 //                 {
 //
 //                 }
 //             }
-//             catch 
-//             { 
+//             catch
+//             {
 //             }
 //         }
 //
@@ -218,10 +212,10 @@
 //
 //                 req2.frame = (byte)MAVLink.MAV_FRAME.GLOBAL_RELATIVE_ALT;
 //
-//                 req2.y = (int) (115 * 1.0e7);
-//                 req2.x = (int) (-35 * 1.0e7);
+//                 req2.y = (int)(115 * 1.0e7);
+//                 req2.x = (int)(-35 * 1.0e7);
 //
-//                 req2.z = (float) (2.34);
+//                 req2.z = (float)(2.34);
 //
 //                 req2.param1 = 0;
 //                 req2.param2 = 0;
@@ -237,7 +231,7 @@
 //                     serialPort1.Write(packet, 0, packet.Length);
 //
 //                     var ack2 = readsomedata<MAVLink.mavlink_mission_ack_t>(sysid, compid);
-//                     if ((MAVLink.MAV_MISSION_RESULT) ack2.type != MAVLink.MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED)
+//                     if ((MAVLink.MAV_MISSION_RESULT)ack2.type != MAVLink.MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED)
 //                     {
 //
 //                     }
