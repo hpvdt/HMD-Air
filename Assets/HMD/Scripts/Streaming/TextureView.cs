@@ -15,6 +15,16 @@ namespace HMD.Scripts.Streaming
 
         public Lazy<string> NativeAspectRatioText; // width:height
 
+        ~TextureView()
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            _cache.Release();
+        }
+
         public TextureView(Texture source)
         {
             _source = source;
@@ -29,30 +39,11 @@ namespace HMD.Scripts.Streaming
             NativeAspectRatioText = new Lazy<string>(() => $"{Size.Value.Item1}:{Size.Value.Item2}");
         }
 
-        public Texture Source
-        {
-            get { return _source; }
-        }
+        public Texture Source => _source;
 
-        public RenderTexture Cache
-        {
-            get { return _cache; }
-        }
+        public RenderTexture Cache => _cache;
 
-        public Texture Effective
-        {
-            get { return Cache; }
-        }
-
-        public void Dispose()
-        {
-            _cache.Release();
-        }
-
-        private TextureView()
-        {
-            Dispose();
-        }
+        public Texture Effective => Cache;
 
         public override string ToString()
         {
