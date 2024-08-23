@@ -1,4 +1,4 @@
-// namespace MAVLinkAPI.Scripts.Example
+// namespace MAVLinkKit.Scripts.Example
 // {
 //     using System;
 //     using System.ComponentModel;
@@ -7,6 +7,8 @@
 //
 //     public partial class simpleexample : Form
 //     {
+//         private SerialPort serialPort1;
+//
 //         MAVLink.MavlinkParse mavlink = new MAVLink.MavlinkParse();
 //         bool armed = false;
 //         // locking to prevent multiple reads on serial port
@@ -15,11 +17,6 @@
 //         byte sysid;
 //         // our target compid
 //         byte compid;
-//
-//         public simpleexample()
-//         {
-//             InitializeComponent();
-//         }
 //
 //         private void but_connect_Click(object sender, EventArgs e)
 //         {

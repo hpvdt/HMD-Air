@@ -20,7 +20,7 @@ declare -A languages
 
 languages["CS"]="Scripts"
 languages["Python"]="src/main/python/mavlink"
-languages["Java"]="src/main/java/com/MAVLink"
+#languages["Java"]="src/main/java/com/MAVLink"
 
 for K in "${!languages[@]}"; do
 
