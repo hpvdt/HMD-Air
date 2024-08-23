@@ -15,10 +15,14 @@ FWDIR="$(
 
 cd "$FWDIR" || exit
 
-#languages=("Python" "C" "CS")
-languages=("CS")
 
-for k in "${languages[@]}"; do
+declare -A languages
+
+languages["CS"]="Scripts"
+languages["Python"]="src/main/python/mavlink"
+languages["Java"]="src/main/java/com/MAVLink"
+
+for K in "${!languages[@]}"; do
 
   declare -a paths
 
@@ -27,8 +31,13 @@ for k in "${languages[@]}"; do
     paths+=("$FWDIR/message_definitions/${kk}.xml")
   done
 
-mkdir -p Scripts
+  target_dir="${FWDIR}/${languages[$K]}"
 
-  mavgen.py --lang="$k" --wire-protocol=2.0 \
-    --output="Scripts" "${paths[@]}"
+# disabled for safety
+#  rm -r "${target_dir}*"
+#  find . -name '${target_dir}*' -delete
+#  mkdir -p "$target_dir"
+
+  mavgen.py --lang="$K" --wire-protocol=2.0 \
+    --output="$target_dir" "${paths[@]}"
 done
