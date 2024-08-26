@@ -1,9 +1,6 @@
-using UnityEngine;
-using Quaternion = UnityEngine.Quaternion;
-using Vector3 = UnityEngine.Vector3;
-
-namespace AirAPI.Scripts
+namespace XRPose.Scripts
 {
+    using UnityEngine;
     public class AirPoseProvider_debugging : AirPoseProvider
     {
         class Rotation_debugging : Rotation

@@ -4,7 +4,7 @@ namespace HMD.Editor.Pickle
     using HMD.Scripts.Streaming.VCap;
     using NUnit.Framework;
 
-    public class PickleSuite
+    public class PickleSpec
     {
         // A Test behaves as an ordinary method
         [Test]

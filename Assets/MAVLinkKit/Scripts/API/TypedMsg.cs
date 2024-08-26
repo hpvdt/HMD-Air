@@ -5,10 +5,16 @@
 
     public class MsgInfoLookup
     {
-        public Dictionary<uint, MAVLink.message_info> ByID = new Dictionary<uint, MAVLink.message_info>();
-        public Dictionary<Type, MAVLink.message_info> ByType = new Dictionary<Type, MAVLink.message_info>();
+        public readonly Dictionary<uint, MAVLink.message_info> ByID = new Dictionary<uint, MAVLink.message_info>();
+        public readonly Dictionary<Type, MAVLink.message_info> ByType = new Dictionary<Type, MAVLink.message_info>();
 
         public static MsgInfoLookup global = new MsgInfoLookup();
+
+        // constuctor
+        public MsgInfoLookup()
+        {
+            Compile();
+        }
 
         public void Compile()
         {
@@ -20,48 +26,51 @@
         }
     }
 
-    // mavlink msg id is automatically inferred by reflection
-    public class TypedMsg<T> where T : struct
+    public static class MsgExtension
     {
-        public T Data;
+        public static TypedMsg<T> As<T>(this MAVLink.MAVLinkMessage msg) where T : struct
+        {
+            return new TypedMsg<T>
+            {
+                Lookup = MsgInfoLookup.global,
+                Msg = msg
+            };
+        }
+    }
+
+    // mavlink msg id is automatically inferred by reflection
+    public struct TypedMsg<T> where T : struct
+    {
+        public MsgInfoLookup Lookup;
+
+        public MAVLink.MAVLinkMessage Msg;
+
+        public T Data
+        {
+            get
+            {
+                return (T)Msg.data;
+            }
+        }
 
         public MAVLink.message_info Info
         {
             get
             {
-                return MsgInfoLookup.global.ByType[typeof(T)];
+                var id1 = Lookup.ByType[typeof(T)];
+
+                return id1;
+                // TODO: add verified info that also run the lookup by 
             }
         }
 
-        public MAVLink.MAVLINK_MSG_ID MsgType
+
+        public MAVLink.MAVLINK_MSG_ID TypeID
         {
             get
             {
                 return (MAVLink.MAVLINK_MSG_ID)Info.msgid;
             }
         }
-
-        // public TypedMsg(MAVLink.message_info info)
-        // {
-        //     this.info = info;
-        // }
-        //
-        // public TypedMsg(MAVLink.message_info info, T data)
-        // {
-        //     this.info = info;
-        //     this.data = data;
-        // }
-        //
-        // public TypedMsg(MAVLink.MAVLinkMessage msg)
-        // {
-        //     info = MsgCache.global.ByID[msg.msgid];
-        //     data = (T)info.type.GetConstructor(new Type[] { }).Invoke(new object[] { });
-        //     MAVLink.Deserialize(msg, ref data);
-        // }
-
-        // public MAVLink.MAVLinkMessage Pack(byte sysid, byte compid)
-        // {
-        //     return MAVLink.Pack(sysid, compid, info.msgid, data);
-        // }
     }
 }

@@ -1,13 +1,10 @@
-using System;
-using System.Runtime.InteropServices;
-using UnityEngine;
-using UnityEngine.Experimental.XR.Interaction;
-using UnityEngine.SpatialTracking;
-using Quaternion = UnityEngine.Quaternion;
-using Vector3 = UnityEngine.Vector3;
-
-namespace AirAPI.Scripts
+namespace XRPose.Scripts
 {
+    using System;
+    using System.Runtime.InteropServices;
+    using UnityEngine;
+    using UnityEngine.Experimental.XR.Interaction;
+    using UnityEngine.SpatialTracking;
     public class AirPoseProvider : BasePoseProvider
     {
         public bool useQuaternion = false;
@@ -43,17 +40,17 @@ namespace AirAPI.Scripts
     public static extern IntPtr GetQuaternion();
 
 #else
-    [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int StartConnection();
+        [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int StartConnection();
 
-    [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int StopConnection();
+        [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int StopConnection();
 
-    [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr GetEuler();
+        [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr GetEuler();
 
-    [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr GetQuaternion();
+        [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr GetQuaternion();
 
 #endif
 
@@ -68,7 +65,7 @@ namespace AirAPI.Scripts
 
         protected static ConnectionStates ConnectionState = ConnectionStates.Disconnected;
 
-        public bool IsConnecting()
+        public bool IsConnected()
         {
             return ConnectionState is ConnectionStates.Connected or ConnectionStates.StandBy;
         }
@@ -88,10 +85,9 @@ namespace AirAPI.Scripts
             }
         }
 
-
         public void TryDisconnect()
         {
-            if (IsConnecting())
+            if (IsConnected())
             {
                 var code = StopConnection();
                 if (code == 1)
@@ -249,10 +245,16 @@ namespace AirAPI.Scripts
                 Mouse = Quaternion.Euler(-_mouseEuler);
             }
 
-            public void ZeroY()
+            public void Zero(
+                bool x = false,
+                bool y = false,
+                bool z = false
+                )
             {
-                var fromGlassesY = (Glasses * Mouse).eulerAngles.y;
-                _zeroingEuler.y = -fromGlassesY;
+                var fromOthers = (Glasses * Mouse).eulerAngles;
+                if (x) _zeroingEuler.x = -fromOthers.x;
+                if (y) _zeroingEuler.y = -fromOthers.y;
+                if (z) _zeroingEuler.z = -fromOthers.z;
                 Zeroing = Quaternion.Euler(_zeroingEuler);
             }
         }
@@ -289,7 +291,7 @@ namespace AirAPI.Scripts
         // Update Pose
         public override PoseDataFlags GetPoseFromProvider(out Pose output)
         {
-            if (IsConnecting()) Attitude.UpdateFromGlasses();
+            if (IsConnected()) Attitude.UpdateFromGlasses();
 
             var mousePressed = Input.GetMouseButton(1);
             var keyPressed = Input.GetKey(KeyCode.LeftAlt);
@@ -303,6 +305,16 @@ namespace AirAPI.Scripts
 
             output = new Pose(new Vector3(0, 0, 0), compound);
             return PoseDataFlags.Rotation;
+        }
+
+        public void ZeroXY()
+        {
+            Attitude.Zero(x: true, y: true);
+        }
+
+        public void ZeroY()
+        {
+            Attitude.Zero(y: true);
         }
     }
 }
