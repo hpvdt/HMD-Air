@@ -13305,8 +13305,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1233077425}
-        m_TargetAssemblyTypeName: AirPoseProvider, Assembly-CSharp
+      - m_Target: {fileID: 1455054243}
+        m_TargetAssemblyTypeName: MAVLinkKit.Scripts.Pose.MavPoseProvider, Assembly-CSharp
         m_MethodName: TryDisconnect
         m_Mode: 1
         m_Arguments:
@@ -17776,8 +17776,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1233077425}
-        m_TargetAssemblyTypeName: AirPoseProvider, Assembly-CSharp
+      - m_Target: {fileID: 1455054243}
+        m_TargetAssemblyTypeName: MAVLinkKit.Scripts.Pose.MavPoseProvider, Assembly-CSharp
         m_MethodName: TryConnect
         m_Mode: 1
         m_Arguments:

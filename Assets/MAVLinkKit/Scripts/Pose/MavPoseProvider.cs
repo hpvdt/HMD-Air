@@ -1,10 +1,10 @@
 #nullable enable
-namespace MAVLinkKit.Scripts.API
+namespace MAVLinkKit.Scripts.Pose
 {
     using System.Linq;
+    using API;
     using UnityEngine;
     using UnityEngine.Experimental.XR.Interaction;
-    using UnityEngine.Serialization;
     using UnityEngine.SpatialTracking;
 
     public class MavPoseProvider : BasePoseProvider
@@ -16,7 +16,7 @@ namespace MAVLinkKit.Scripts.API
 
         private UsbStream<Quaternion>? _attitudeStream;
 
-        private void TryConnect()
+        public void TryConnect()
         {
             _connection = UsbConnection.OpenFirst(new System.Text.RegularExpressions.Regex(pattern), baudRate);
 
@@ -30,7 +30,7 @@ namespace MAVLinkKit.Scripts.API
                 .Build();
         }
 
-        private void TryDisconnect()
+        public void TryDisconnect()
         {
             _connection?.Dispose();
             _connection = null;
