@@ -10,9 +10,9 @@ namespace HMD.Scripts.Streaming.VLC
     ///This script controls all the GUI for the VLC Unity Canvas Example
     ///It sets up event handlers and updates the GUI every frame
     ///This example shows how to safely set up LibVLC events and a simple way to call Unity functions from them
-    public class VlcController : ControllerLike
+    public class VLCController : ControllerLike
     {
-        public VlcScreen screen;
+        public VLCScreen screen;
 
         //GUI Elements
         //public RawImage screen;

@@ -15,6 +15,11 @@ namespace HMD.Scripts.Streaming
 
         public Lazy<string> NativeAspectRatioText; // width:height
 
+        ~TextureView()
+        {
+            Dispose();
+        }
+
         public TextureView(Texture source)
         {
             _source = source;

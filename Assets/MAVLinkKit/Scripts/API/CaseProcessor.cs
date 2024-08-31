@@ -5,18 +5,18 @@ namespace MAVLinkKit.Scripts.API
     using System.Collections.Generic;
     using System.Linq;
 
-    public abstract class Processor<T>
+    public abstract class CaseProcessor<T>
     {
         public abstract List<T>? Process(MAVLink.MAVLinkMessage message);
 
-        public static Direct OfDirect(Func<MAVLink.MAVLinkMessage, List<T>> fn)
+        public static Direct OfDirect(Func<MAVLink.MAVLinkMessage, List<T>?> fn)
         {
             return new Direct { Fn = fn };
         }
 
-        public class Direct : Processor<T>
+        public class Direct : CaseProcessor<T>
         {
-            public Func<MAVLink.MAVLinkMessage, List<T>?> Fn;
+            public Func<MAVLink.MAVLinkMessage, List<T>?> Fn = null!;
             public override List<T>? Process(MAVLink.MAVLinkMessage message)
             {
                 return Fn(message);
@@ -26,10 +26,10 @@ namespace MAVLinkKit.Scripts.API
         // public class CutElimination
         // TODO: this has to be implemented later, composed function in C# doesn't have reference transparency
 
-        public abstract class Derived : Processor<T>
+        public abstract class Derived : CaseProcessor<T>
         {
-            public Processor<T> Left;
-            public Processor<T> Right;
+            public CaseProcessor<T> Left = null!;
+            public CaseProcessor<T> Right = null!;
         }
 
         public class Both : Derived
@@ -63,19 +63,19 @@ namespace MAVLinkKit.Scripts.API
 
     public static class ProcessorExtensions
     {
-        public static Processor<T>? Add<T>(this Processor<T>? left, Processor<T>? right)
+        public static CaseProcessor<T>? Add<T>(this CaseProcessor<T>? left, CaseProcessor<T>? right)
         {
             var result = (left, right).NullableReduce(
-                (x, y) => new Processor<T>.Both { Left = x, Right = y }
+                (x, y) => new CaseProcessor<T>.Both { Left = x, Right = y }
             );
 
             return result;
         }
 
-        public static Processor<T>? OrElse<T>(this Processor<T>? left, Processor<T>? right)
+        public static CaseProcessor<T>? OrElse<T>(this CaseProcessor<T>? left, CaseProcessor<T>? right)
         {
             var result = (left, right).NullableReduce(
-                (x, y) => new Processor<T>.OrElse { Left = x, Right = y }
+                (x, y) => new CaseProcessor<T>.OrElse { Left = x, Right = y }
             );
 
             return result;

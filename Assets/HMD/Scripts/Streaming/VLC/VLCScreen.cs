@@ -6,13 +6,11 @@
     using UnityEngine;
     using Util;
 
-    public class VlcScreen : ScreenLike
+    public class VLCScreen : ScreenLike
     {
+        [HideInInspector] public VLCController controller;
 
-        [HideInInspector]
-        public VlcController controller;
-
-        [SerializeField] public VlcFeed feed;
+        [SerializeField] public VLCFeed feed;
 
         protected override FeedLike Feed
         {

@@ -9,11 +9,12 @@ namespace HMD.Scripts.Streaming.VLC
     using UnityEngine;
     using UnityEngine.Assertions;
     using Application = UnityEngine.Device.Application;
-    public class VlcFeed : FeedLike
+
+    public class VLCFeed : FeedLike
     {
         public bool DebugVLCPlayer;
 
-        public VlcArgs Args;
+        public VLCArgs Args;
 
         private LibVLC _libVLC;
 
@@ -70,6 +71,7 @@ namespace HMD.Scripts.Streaming.VLC
                     Log.V($"LibVLCSharp version {typeof(LibVLC).Assembly.GetName().Version}");
                     _player = new MediaPlayer(libVLC);
                 }
+
                 return _player;
             }
         }
@@ -188,11 +190,11 @@ namespace HMD.Scripts.Streaming.VLC
 
                 if (lines.Count <= 0) throw new IOException($"No line defined in file `${path}`");
 
-                Args = new VlcArgs(lines.ToList(), FromType.FromLocation);
+                Args = new VLCArgs(lines.ToList(), FromType.FromLocation);
             }
             else
             {
-                Args = new VlcArgs(new List<string> { path }, FromType.FromPath);
+                Args = new VLCArgs(new List<string> { path }, FromType.FromPath);
             }
 
             _openArgs();
@@ -382,5 +384,4 @@ namespace HMD.Scripts.Streaming.VLC
             Player?.Unselect(type);
         }
     }
-
 }
