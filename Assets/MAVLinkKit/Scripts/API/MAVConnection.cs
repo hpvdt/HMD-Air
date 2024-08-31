@@ -32,7 +32,7 @@ namespace MAVLinkKit.Scripts.API
                 // Close the serial port
                 Port.Close();
 
-                Debug.Log("Port closed");
+                // Debug.Log("Port closed");
             }
             catch (Exception ex)
             {
@@ -135,7 +135,7 @@ namespace MAVLinkKit.Scripts.API
             var minBytes = 8;
             //sanity check, port is deemed unusable if it doesn't receive any data
 
-            retry.Execute((_, tt) =>
+            retry.Run((_, tt) =>
                 {
                     if (Port.BytesToRead >= minBytes)
                     {
@@ -234,12 +234,12 @@ namespace MAVLinkKit.Scripts.API
                 Cases.Index.Clear();
             }
 
-            public OnCase<TMav> On<TMav>() where TMav : struct
+            public SubReader<TMav> On<TMav>() where TMav : struct
             {
-                return new OnCase<TMav> { Outer = this };
+                return new SubReader<TMav> { Outer = this };
             }
 
-            public class OnCase<TMav> : Dependent<ReadAPI<T>> where TMav : struct
+            public class SubReader<TMav> : Dependent<ReadAPI<T>> where TMav : struct
             {
                 public struct Context
                 {

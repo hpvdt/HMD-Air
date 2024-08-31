@@ -1,3 +1,4 @@
+#nullable enable
 using System.Diagnostics;
 
 namespace MAVLinkKit.Scripts.Util
@@ -49,7 +50,7 @@ namespace MAVLinkKit.Scripts.Util
         {
             public Args Args;
 
-            public T Execute<T>(Func<int, TimeSpan, T> operation)
+            public T Run<T>(Func<int, TimeSpan, T> operation)
             {
                 if (operation == null)
                     throw new ArgumentNullException(nameof(operation));
@@ -78,12 +79,12 @@ namespace MAVLinkKit.Scripts.Util
                 }
             }
 
-            public void Execute(Action<int, TimeSpan> operation)
+            public void Run(Action<int, TimeSpan> operation)
             {
                 if (operation == null)
                     throw new ArgumentNullException(nameof(operation));
 
-                Execute<object>((attempt, elapsed) =>
+                Run<object>((attempt, elapsed) =>
                 {
                     operation(attempt, elapsed);
                     return null;

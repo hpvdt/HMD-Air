@@ -36,13 +36,15 @@ namespace MAVLinkKit.Scripts.Pose
         }
 
 
-        private static Reader<Quaternion> CreateReader(MAVPoseFeed.Args args)
+        private static Reader<Quaternion> CreateReader(Args args)
         {
             var candidates = MAVConnection.Discover(new Regex(args.regexPattern));
             // var candidates = MAVConnection.Discover(GlobPatternConverter.GlobToRegex(pattern));
 
+            var ees = new List<Exception>();
+
             var readers = candidates.AsParallel()
-                .SelectMany<MAVConnection, Reader<Quaternion>>(
+                .SelectMany(
                     connection =>
                     {
                         // for each connection, setup a monitor stream
@@ -51,10 +53,12 @@ namespace MAVLinkKit.Scripts.Pose
 
                         try
                         {
+                            var cc = connection;
+
                             var reader = connection.OpenWith(
                                 () =>
                                 {
-                                    var api = connection.ReadWithMonitor<Quaternion>();
+                                    var api = cc.ReadAndMonitor<Quaternion>();
 
                                     api
                                         .On<MAVLink.mavlink_attitude_quaternion_t>()
@@ -74,7 +78,7 @@ namespace MAVLinkKit.Scripts.Pose
                         }
                         catch (Exception e)
                         {
-                            Debug.LogException(e);
+                            ees.Add(e);
                             connection.Dispose();
 
                             return new List<Reader<Quaternion>>();
@@ -82,9 +86,13 @@ namespace MAVLinkKit.Scripts.Pose
                     }
                 );
 
-            var chosen = readers.Where(
-                    (v, i) => i == 0)
-                .First();
+            var chosen = readers.Select(
+                    (v, i) =>
+                    {
+                        if (i != 0) v.Outer.Dispose();
+                        return v;
+                    })
+                .FirstOrDefault();
 
             return chosen;
         }
