@@ -1,5 +1,5 @@
 #nullable enable
-namespace MAVLinkKit.Scripts.API
+namespace MAVLinkPack.Scripts.API
 {
     using System;
     using System.Collections.Generic;
@@ -17,6 +17,7 @@ namespace MAVLinkKit.Scripts.API
         public class Direct : CaseProcessor<T>
         {
             public Func<MAVLink.MAVLinkMessage, List<T>?> Fn = null!;
+
             public override List<T>? Process(MAVLink.MAVLinkMessage message)
             {
                 return Fn(message);
@@ -56,6 +57,7 @@ namespace MAVLinkKit.Scripts.API
                 {
                     return result;
                 }
+
                 return Right.Process(message);
             }
         }

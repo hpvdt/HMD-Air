@@ -1,4 +1,4 @@
-namespace MAVLinkKit.Scripts.API
+namespace MAVLinkPack.Scripts.API
 {
     public struct MAVComponent
     {

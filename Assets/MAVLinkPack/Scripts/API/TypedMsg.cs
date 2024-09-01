@@ -1,6 +1,7 @@
-﻿using HMD.Scripts.Util;
+﻿#nullable enable
+using HMD.Scripts.Util;
 
-namespace MAVLinkKit.Scripts.API
+namespace MAVLinkPack.Scripts.API
 {
     using System;
     using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace MAVLinkKit.Scripts.API
 
         public static readonly TypeLookup Global = new TypeLookup();
 
-        // constuctor
+        // constructor
         private TypeLookup()
         {
             Compile();
@@ -20,52 +21,16 @@ namespace MAVLinkKit.Scripts.API
 
         public void Compile()
         {
+            var report = new List<string>();
             foreach (var info in MAVLink.MAVLINK_MESSAGE_INFOS)
             {
                 ByID.Add(info.msgid, info);
                 ByType.Add(info.type, info);
-            }
-        }
-    }
-
-    public struct IndexedByType<T>
-    {
-        public TypeLookup Lookup;
-
-        public Dictionary<uint, T> Index;
-
-        public class Accessor : Dependent<IndexedByType<T>>
-        {
-            public uint ID;
-
-            public T Value
-            {
-                get => Outer.Index[ID];
-                set => Outer.Index[ID] = value;
+                report.Add($"{info.msgid} -> {info.type.Name}");
             }
 
-            public T ValueOrDefault => Outer.Index.GetValueOrDefault(ID);
-
-            public void Remove()
-            {
-                Outer.Index.Remove(ID);
-            }
-
-            public MAVLink.message_info Info => Outer.Lookup.ByID[ID];
+            Console.WriteLine("MAVLink message lookup compiled:\n" + string.Join("\n", report));
         }
-
-        public readonly Accessor Get(uint id)
-        {
-            return new Accessor { ID = id };
-        }
-
-        public readonly Accessor Get<TMav>() where TMav : struct
-        {
-            var id = TypeLookup.Global.ByType[typeof(TMav)].msgid;
-            return Get(id);
-        }
-
-        // do we need by systemID and componentID?
     }
 
     // mavlink msg id is automatically inferred by reflection

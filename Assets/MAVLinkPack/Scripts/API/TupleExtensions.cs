@@ -1,5 +1,5 @@
 #nullable enable
-namespace MAVLinkKit.Scripts.API
+namespace MAVLinkPack.Scripts.API
 {
     using System;
 

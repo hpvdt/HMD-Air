@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MAVLinkKit.Scripts.Util
+namespace MAVLinkPack.Scripts.Util
 {
     // once created, will repeatedly do something
     public abstract class RecurrentJob : IDisposable

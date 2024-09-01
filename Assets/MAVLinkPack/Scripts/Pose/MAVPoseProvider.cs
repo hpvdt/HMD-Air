@@ -1,5 +1,5 @@
 #nullable enable
-namespace MAVLinkKit.Scripts.Pose
+namespace MAVLinkPack.Scripts.Pose
 {
     using System.Linq;
     using API;
@@ -9,7 +9,7 @@ namespace MAVLinkKit.Scripts.Pose
 
     public class MAVPoseProvider : BasePoseProvider
     {
-        public MAVPoseFeed.Args args = MAVPoseFeed.Args.MatchAll;
+        public MAVPoseFeed.ArgsAPI args = MAVPoseFeed.ArgsAPI.MatchAll;
 
         private MAVPoseFeed? _feed;
 
@@ -42,8 +42,7 @@ namespace MAVLinkKit.Scripts.Pose
             get
             {
                 if (_feed == null) return null;
-                if (!_feed.Reader.IsValueCreated) return null;
-                return _feed.Reader.Value;
+                return _feed.Reader;
             }
         }
 

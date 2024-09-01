@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using MAVLinkKit.Scripts.Util;
+using MAVLinkPack.Scripts.Util;
 using Unity.VisualScripting;
 
-namespace MAVLinkKit.Scripts.API.Minimal
+namespace MAVLinkPack.Scripts.API.Minimal
 {
     // public class Monitor<T>
     // {
@@ -53,16 +53,27 @@ namespace MAVLinkKit.Scripts.API.Minimal
 
             var reader = api.Build();
 
-            var retry = Retry.Of(12, TimeSpan.FromSeconds(0.2)).FixedInterval;
+            var retry = Retry.Of(24, TimeSpan.FromSeconds(0.2)).FixedInterval;
 
             retry.Run(
                 (_, tt) =>
                 {
+                    connection.WriteData(
+                        new MAVLink.mavlink_heartbeat_t() // this should be sent regardless of received heartbeat
+                        {
+                            custom_mode = 0, // not sure how to use this
+                            mavlink_version = 3,
+                            type = (byte)MAVLink.MAV_TYPE.GCS,
+                            autopilot = (byte)MAVLink.MAV_AUTOPILOT.INVALID,
+                            base_mode = 0
+                        }
+                    );
+
                     reader.Drain();
 
-                    if (api.Outer.Stats.Counter.Get<MAVLink.mavlink_heartbeat_t>().Value <= 0)
+                    if (api.Outer.Stats.Counter.Get<MAVLink.mavlink_heartbeat_t>().ValueOrDefault <= 0)
                     {
-                        throw new InvalidConnectionException($"No heartbeat received after {tt}");
+                        throw new InvalidConnectionException($"No heartbeat received after {tt.TotalSeconds} seconds");
                     }
                 }
             );

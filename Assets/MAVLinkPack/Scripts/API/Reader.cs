@@ -1,5 +1,7 @@
 #nullable enable
-namespace MAVLinkKit.Scripts.API
+using System.Linq;
+
+namespace MAVLinkPack.Scripts.API
 {
     using System.Collections.Generic;
     using HMD.Scripts.Util;
@@ -16,10 +18,15 @@ namespace MAVLinkKit.Scripts.API
 
         public IEnumerable<T> Draining()
         {
-            foreach (var e in Basic)
+            if (Outer.Port.BytesToRead <= 0)
             {
-                if (Outer.Port.BytesToRead > 0) yield return e;
+                // return empty
+                return Enumerable.Empty<T>();
             }
+
+            var truncated = Basic.TakeWhile(_ => Outer.Port.BytesToRead > 0);
+
+            return truncated;
         }
 
         public List<T> Drain()

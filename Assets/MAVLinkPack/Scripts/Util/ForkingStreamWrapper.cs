@@ -1,4 +1,4 @@
-namespace MAVLinkKit.Scripts.Util
+namespace MAVLinkPack.Scripts.Util
 {
     using System;
     using System.Collections.Generic;
@@ -41,6 +41,7 @@ namespace MAVLinkKit.Scripts.Util
             {
                 _forks.Add(fork);
             }
+
             return fork;
         }
 
@@ -67,15 +68,16 @@ namespace MAVLinkKit.Scripts.Util
         public override bool CanSeek => false;
         public override bool CanWrite => true;
         public override long Length => throw new NotSupportedException();
+
         public override long Position
         {
             get => throw new NotSupportedException();
             set => throw new NotSupportedException();
         }
 
-        public override void Flush()                              => _serialPort.BaseStream.Flush();
+        public override void Flush() => _serialPort.BaseStream.Flush();
         public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
-        public override void SetLength(long value)                => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException();
 
         protected override void Dispose(bool disposing)
         {
@@ -86,8 +88,10 @@ namespace MAVLinkKit.Scripts.Util
                 {
                     fork.Dispose();
                 }
+
                 _forks.Clear();
             }
+
             base.Dispose(disposing);
         }
     }

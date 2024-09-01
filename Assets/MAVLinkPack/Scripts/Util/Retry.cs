@@ -1,7 +1,7 @@
 #nullable enable
 using System.Diagnostics;
 
-namespace MAVLinkKit.Scripts.Util
+namespace MAVLinkPack.Scripts.Util
 {
     using System;
     using System.Threading;
@@ -87,7 +87,7 @@ namespace MAVLinkKit.Scripts.Util
                 Run<object>((attempt, elapsed) =>
                 {
                     operation(attempt, elapsed);
-                    return null;
+                    return null!;
                 });
             }
         }

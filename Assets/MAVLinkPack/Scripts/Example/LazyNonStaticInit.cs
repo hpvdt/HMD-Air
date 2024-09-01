@@ -1,7 +1,7 @@
 using System;
 using System.IO.Ports;
 
-namespace MAVLinkKit.Scripts.Example
+namespace MAVLinkPack.Scripts.Example
 {
     public class LazyNonStaticInit
     {

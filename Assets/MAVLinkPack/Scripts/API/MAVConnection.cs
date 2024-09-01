@@ -1,7 +1,8 @@
 ﻿#nullable enable
-using MAVLinkKit.Scripts.Util;
+using MAVLinkPack.Scripts.Util;
+using UnityEngine.XR;
 
-namespace MAVLinkKit.Scripts.API
+namespace MAVLinkPack.Scripts.API
 {
     using System;
     using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace MAVLinkKit.Scripts.API
         // TODO: generalised this to read from any () => Stream
         public SerialPort Port = null!;
 
-        private readonly MAVLink.MavlinkParse _link = new MAVLink.MavlinkParse();
+        private readonly MAVLink.MavlinkParse _mavlink = new MAVLink.MavlinkParse();
 
         ~MAVConnection()
         {
@@ -30,9 +31,7 @@ namespace MAVLinkKit.Scripts.API
             try
             {
                 // Close the serial port
-                Port.Close();
-
-                // Debug.Log("Port closed");
+                IsOpen = false;
             }
             catch (Exception ex)
             {
@@ -57,8 +56,9 @@ namespace MAVLinkKit.Scripts.API
         // bool armed = false;
         // locking to prevent multiple reads on serial port
         readonly object _readLock = new object();
+        readonly object _writeLock = new object();
 
-        static readonly int[] DefaultPreferredBaudRates = { 57600, 115200 };
+        public static readonly int[] DefaultPreferredBaudRates = { 57600, 115200 };
 
         // public static IEnumerable<UsbConnection> FindAll(Regex pattern)
         // {
@@ -87,126 +87,175 @@ namespace MAVLinkKit.Scripts.API
 
                 yield return new MAVConnection { Port = port };
             }
-
-            throw new IOException("None of the serial ports could be opened");
         }
 
-        public T OpenWith<T>(Func<T> action, int[]? preferredBaudRates = null)
+        public T Initialise<T>(Func<T> handshake, int[]? preferredBaudRates = null)
         {
             var bauds = preferredBaudRates ?? DefaultPreferredBaudRates;
-            if ((bauds).Length == 0)
+
+            if (bauds.Length == 0)
             {
-                Open();
-                return action();
+                return _initialise(handshake);
             }
-            else
+
+            var errors = new Dictionary<int, Exception>();
+
+            foreach (var baud in bauds)
             {
-                foreach (var baud in bauds)
+                try
                 {
-                    try
-                    {
-                        Open();
-                        Port.BaudRate = baud;
-                        return action();
-                    }
-                    catch (Exception ex)
-                    {
-                        // Debug.LogException(ex);
-                        Close();
-                    }
+                    return _initialise(handshake);
                 }
-
-                throw new IOException("None of the baud rates could be used");
+                catch
+                {
+                    errors[baud] = new Exception("Failed to connect");
+                }
             }
-        }
 
-        public void ReOpen()
-        {
-            Close();
-            Open();
-        }
-
-        public void Open()
-        {
-            if (!Port.IsOpen) Port.Open();
-
-            var retry = Retry.Of(12, TimeSpan.FromSeconds(0.2)).FixedInterval;
-
-            var minBytes = 8;
-            //sanity check, port is deemed unusable if it doesn't receive any data
-
-            retry.Run((_, tt) =>
-                {
-                    if (Port.BytesToRead >= minBytes)
-                    {
-                        Debug.Log(
-                            $"Start reading serial port {Port.PortName} (with baud rate {Port.BaudRate}), received {Port.BytesToRead} byte(s)");
-                    }
-                    else
-                    {
-                        throw new TimeoutException(
-                            $"Error reading serial port {Port.PortName} (with baud rate {Port.BaudRate}),"
-                            + $" only received {Port.BytesToRead} byte(s) after {tt}."
-                            + $" Expecting at least {minBytes} bytes");
-                    }
-                }
+            throw new IOException(
+                "All attempt(s) failed, tried with baud rate(s) " +
+                string.Join("\n", errors.Select(kv => $"Baud rate {kv.Key}: {kv.Value.Message}")
+                )
             );
         }
 
-        public void Close()
+
+        private T _initialise<T>(Func<T> handshake)
         {
-            Port.Close();
+            try
+            {
+                Connect();
+                return handshake();
+            }
+            catch (Exception)
+            {
+                IsOpen = false;
+                throw;
+            }
         }
 
-        // public static UsbConnection OpenFirst(Regex pattern, int baudRate = -1)
-        // {
-        // }
+        public void Connect(bool validate = false)
+        {
+            IsOpen = false;
+            IsOpen = true;
+
+            if (validate)
+            {
+                var retry = Retry.Of(12, TimeSpan.FromSeconds(0.2)).FixedInterval;
+
+                var minBytes = 8;
+                //sanity check, port is deemed unusable if it doesn't receive any data
+
+                retry.Run((_, tt) =>
+                    {
+                        if (Port.BytesToRead >= minBytes)
+                        {
+                            // Debug.Log(
+                            //     $"Start reading serial port {Port.PortName} (with baud rate {Port.BaudRate}), received {Port.BytesToRead} byte(s)");
+                        }
+                        else
+                        {
+                            throw new TimeoutException(
+                                $"Error reading serial port {Port.PortName} (with baud rate {Port.BaudRate})\n"
+                                + $" only received {Port.BytesToRead} byte(s) after {tt.TotalSeconds} seconds\n"
+                                + $" Expecting at least {minBytes} bytes");
+                        }
+                    }
+                );
+            }
+        }
+
+        public bool IsOpen
+        {
+            get => Port.IsOpen;
+            set
+            {
+                if (value != Port.IsOpen)
+                {
+                    if (value)
+                    {
+                        Port.Open();
+                        var fakeData = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+                        WriteRaw(fakeData);
+                    }
+                    else
+                    {
+                        Port.Close();
+                    }
+
+                    // assert
+                    if (value != Port.IsOpen)
+                    {
+                        throw new IOException(
+                            $"Failed to set port {Port.PortName} to {(value ? "open" : "closed")}, baud rate {Port.BaudRate}");
+                    }
+
+                    Debug.Log($"Port {Port.PortName} is now {(value ? "open" : "closed")}, baud rate {Port.BaudRate}");
+                }
+            }
+        }
+
+        public void WriteRaw(byte[] bytes)
+        {
+            lock (_writeLock)
+            {
+                Port.Write(bytes, 0, bytes.Length);
+            }
+        }
 
         public void Write<T>(TypedMsg<T> msg) where T : struct
         {
             // TODO: why not GenerateMAVLinkPacket20?
-            var buffer = _link.GenerateMAVLinkPacket10(
+            var bytes = _mavlink.GenerateMAVLinkPacket20(
                 msg.TypeID,
                 msg.Data,
                 sysid: Gcs.SystemID,
                 compid: Gcs.ComponentID
             );
 
-            Port.Write(buffer, 0, buffer.Length);
+            WriteRaw(bytes);
         }
 
         public MAVComponent Gcs = MAVComponent.Gcs();
 
         public void WriteData<T>(T data) where T : struct
         {
+            IsOpen = true;
             var msg = Gcs.Send(data);
 
             Write(msg);
         }
 
-        private IEnumerable<MAVLink.MAVLinkMessage>? _rawReadStream;
+        private IEnumerable<MAVLink.MAVLinkMessage>? _rawReadSource;
 
         public IEnumerable<MAVLink.MAVLinkMessage> RawReadSource()
         {
-            _rawReadStream ??= Create();
-            return _rawReadStream;
+            _rawReadSource ??= Create();
+            return _rawReadSource;
 
             IEnumerable<MAVLink.MAVLinkMessage> Create()
             {
+                IsOpen = true;
+
                 while (Port.IsOpen)
                 {
                     MAVLink.MAVLinkMessage result;
-                    var pending = Port.BytesToRead;
                     lock (_readLock)
                     {
-                        result = _link.ReadPacket(Port.BaseStream);
+                        result = _mavlink.ReadPacket(Port.BaseStream);
                     }
 
-                    if (result == null) Debug.Log($"unknown packet, {pending} byte(s) left");
+                    if (result == null)
+                    {
+                        var pending = Port.BytesToRead;
+                        Debug.Log($"unknown packet, {pending} byte(s) left");
+                    }
                     else
                     {
-                        Stats.Counter.Get(result.msgid).Value = Stats.Counter.Get(result.msgid).Value + 1;
-                        // Debug.Log($"received packet {result.msgid}");
+                        Stats.Counter.Get(result.msgid).Value = Stats.Counter.Get(result.msgid).ValueOrDefault + 1;
+                        var info = TypeLookup.Global.ByID.GetValueOrDefault(result.msgid);
+                        Debug.Log($"received packet, info={info}");
                         yield return result;
                     }
                 }
@@ -215,8 +264,6 @@ namespace MAVLinkKit.Scripts.API
 
         public ReadAPI<T> Read<T>() where T : struct
         {
-            Open();
-
             return new ReadAPI<T> { Outer = this };
         }
 
@@ -227,7 +274,7 @@ namespace MAVLinkKit.Scripts.API
 
         public class ReadAPI<T> : Dependent<MAVConnection>
         {
-            public readonly IndexedByType<CaseProcessor<T>> Cases = new();
+            public readonly TypeIndexed<CaseProcessor<T>> Cases = TypeIndexed<CaseProcessor<T>>.Global();
 
             public void Clear()
             {
@@ -254,7 +301,7 @@ namespace MAVLinkKit.Scripts.API
                 {
                     var msgID = Outer.Cases.Get<TMav>().ID;
 
-                    var existingFn = Outer.Cases.Get(msgID).Value;
+                    var existingFn = Outer.Cases.Get(msgID).ValueOrDefault;
 
                     if (existingFn == null)
                     {
@@ -371,11 +418,11 @@ namespace MAVLinkKit.Scripts.API
             // }
         }
 
-        public StatsAPI Stats = new() { Counter = new() };
+        public StatsAPI Stats = new() { Counter = TypeIndexed<ulong>.Global() };
 
         public struct StatsAPI
         {
-            public IndexedByType<ulong> Counter;
+            public TypeIndexed<ulong> Counter;
         }
     }
 }

@@ -1,4 +1,4 @@
-namespace MAVLinkKit.Scripts.Util
+namespace MAVLinkPack.Scripts.Util
 {
     using System.Text.RegularExpressions;
 
