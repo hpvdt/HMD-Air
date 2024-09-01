@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 
 public class HudLiteScript : MonoBehaviour
@@ -43,6 +44,8 @@ public class HudLiteScript : MonoBehaviour
     public bool useSpeed = true;
     public float speedAmplitude = 1, speedOffSet = 0, speedFilterFactor = 0.25f;
     public Text speedTxt;
+
+    public TMP_Text energyTxt;
     //
 
 
@@ -180,6 +183,8 @@ public class HudLiteScript : MonoBehaviour
             if (speedTxt != null) speedTxt.text = speed.ToString("0").PadLeft(5);//.ToString("##0");
         }
         //////////////////////////////////////////// Speed
+
+        
 
     }
     /////////////////////////////////////////////////////// Updates and Calculations
