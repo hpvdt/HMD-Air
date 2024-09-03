@@ -1,6 +1,4 @@
 ﻿#nullable enable
-using HMD.Scripts.Util;
-
 namespace MAVLinkPack.Scripts.API
 {
     using System;
@@ -11,7 +9,7 @@ namespace MAVLinkPack.Scripts.API
         public readonly Dictionary<uint, MAVLink.message_info> ByID = new();
         public readonly Dictionary<Type, MAVLink.message_info> ByType = new();
 
-        public static readonly TypeLookup Global = new TypeLookup();
+        public static readonly TypeLookup Global = new();
 
         // constructor
         private TypeLookup()
@@ -33,11 +31,40 @@ namespace MAVLinkPack.Scripts.API
         }
     }
 
+
+    public struct Component
+    {
+        // our target sysid
+        public byte SystemID;
+
+        // our target compid
+        public byte ComponentID;
+
+        public static Component Gcs(byte compid = 0)
+        {
+            return new Component
+            {
+                SystemID = 255,
+                ComponentID = compid
+            };
+        }
+
+        public Message<T> Send<T>(T data) where T : struct
+        {
+            return new Message<T>
+            {
+                Data = data,
+                Sender = this
+            };
+        }
+    }
+
+
     // mavlink msg id is automatically inferred by reflection
-    public struct TypedMsg<T> where T : struct
+    public struct Message<T> where T : struct
     {
         public T Data;
-        public MAVComponent Sender;
+        public Component Sender;
 
         public MAVLink.message_info Info
         {
@@ -50,29 +77,30 @@ namespace MAVLinkPack.Scripts.API
             }
         }
 
+        public MAVLink.MAVLINK_MSG_ID TypeID => (MAVLink.MAVLINK_MSG_ID)Info.msgid;
 
-        public MAVLink.MAVLINK_MSG_ID TypeID
+        public static Message<T> FromRaw(MAVLink.MAVLinkMessage msg)
         {
-            get { return (MAVLink.MAVLINK_MSG_ID)Info.msgid; }
-        }
-    }
-
-
-    public static class FromPacket
-    {
-        public static TypedMsg<T> As<T>(this MAVLink.MAVLinkMessage msg) where T : struct
-        {
-            var sender = new MAVComponent
+            var sender = new Component
             {
                 SystemID = msg.sysid,
                 ComponentID = msg.compid
             };
 
-            return new TypedMsg<T>
+            return new Message<T>
             {
                 Data = (T)msg.data,
                 Sender = sender
             };
+        }
+    }
+
+
+    public static class RawMessageExtension
+    {
+        public static Message<T> OfType<T>(this MAVLink.MAVLinkMessage msg) where T : struct
+        {
+            return Message<T>.FromRaw(msg);
         }
     }
 }

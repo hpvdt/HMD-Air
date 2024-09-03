@@ -4,15 +4,16 @@ using HMD.Scripts.Util;
 
 namespace MAVLinkPack.Scripts.API
 {
-    public struct TypeIndexed<T>
+    public struct Indexed<T>
     {
+        // TODO: do I need to index by systemID and componentID?
         public TypeLookup Lookup;
 
         public Dictionary<uint, T> Index;
 
         // default constructor
 
-        public class Accessor : Dependent<TypeIndexed<T>>
+        public class Accessor : Dependent<Indexed<T>>
         {
             public uint ID;
 
@@ -23,6 +24,11 @@ namespace MAVLinkPack.Scripts.API
             }
 
             public T? ValueOrDefault => Outer.Index.GetValueOrDefault(ID);
+
+            public T ValueOr(T fallback)
+            {
+                return Outer.Index.GetValueOrDefault(ID, fallback);
+            }
 
             public void Remove()
             {
@@ -45,9 +51,10 @@ namespace MAVLinkPack.Scripts.API
 
         // do we need by systemID and componentID?
 
-        public static TypeIndexed<T> Global()
+        public static Indexed<T> Global(Dictionary<uint, T>? index = null)
         {
-            return new TypeIndexed<T> { Lookup = TypeLookup.Global, Index = new Dictionary<uint, T>() };
+            var ii = index ?? new Dictionary<uint, T>();
+            return new Indexed<T> { Lookup = TypeLookup.Global, Index = ii };
         }
     }
 }

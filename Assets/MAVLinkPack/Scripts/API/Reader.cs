@@ -1,37 +1,53 @@
 #nullable enable
 using System.Linq;
+using UnityEngine;
 
 namespace MAVLinkPack.Scripts.API
 {
     using System.Collections.Generic;
-    using HMD.Scripts.Util;
 
-    public class Reader<T> : Dependent<MAVConnection>
+    /**
+     * A.k.a subscription
+     */
+    public struct Reader<T>
     {
-        // public void Dispose()
-        // {
-        //     // throw new NotImplementedException(); // TODO: once stream forking is implemented, close the fork
-        // }
+        public MAVConnection Active;
 
+        public Subscriber<T> Subscriber;
 
-        public IEnumerable<T> Basic = null!;
-
-        public IEnumerable<T> Draining()
+        private IEnumerable<T> Create()
         {
-            if (Outer.Port.BytesToRead <= 0)
+            foreach (var message in Active.RawReadSource())
             {
-                // return empty
-                return Enumerable.Empty<T>();
+                var values = Subscriber.Process(message);
+
+                if (values != null)
+                    foreach (var v in values)
+                        yield return v;
             }
-
-            var truncated = Basic.TakeWhile(_ => Outer.Port.BytesToRead > 0);
-
-            return truncated;
         }
 
-        public List<T> Drain()
+        private IEnumerable<T> _basic;
+
+        public IEnumerable<T> Basic()
         {
-            return new List<T>(Draining());
+            _basic = _basic ?? Create();
+            return _basic;
+        }
+
+        public List<T> Drain(int leftover = 0)
+        {
+            var list = new List<T>();
+
+            var basic = Basic();
+
+            if (Active.Port.BytesToRead > leftover)
+            {
+                Debug.Log("Draining, " + Active.Port.BytesToRead + " bytes left");
+                list.Add(basic.First());
+            }
+
+            return list;
         }
     }
 }

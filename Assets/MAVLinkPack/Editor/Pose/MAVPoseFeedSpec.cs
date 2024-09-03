@@ -20,7 +20,7 @@ namespace MAVLinkPack.Editor.Pose
 
             for (var i = 0; i < 10; i++)
             {
-                var qs = feed.Reader.Drain();
+                var qs = feed.GetReader().Drain();
 
                 Debug.Log($"Quaternion:\n" +
                           $"{qs.Aggregate("", (acc, q) => acc + q + "\n")}");

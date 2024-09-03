@@ -1,4 +1,7 @@
 #nullable enable
+using System;
+using System.Threading.Tasks;
+
 namespace MAVLinkPack.Scripts.Pose
 {
     using System.Linq;
@@ -18,6 +21,20 @@ namespace MAVLinkPack.Scripts.Pose
             if (_feed == null)
             {
                 _feed = MAVPoseFeed.Of(args);
+
+                Task.Run(
+                    () =>
+                    {
+                        try
+                        {
+                            _feed.GetReader();
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogException(e);
+                        }
+                    }
+                );
             }
         }
 
@@ -37,12 +54,12 @@ namespace MAVLinkPack.Scripts.Pose
             TryConnect();
         }
 
-        Reader<Quaternion>? Reader
+        private Reader<Quaternion>? Reader
         {
             get
             {
                 if (_feed == null) return null;
-                return _feed.Reader;
+                return _feed.GetReader();
             }
         }
 
@@ -55,7 +72,7 @@ namespace MAVLinkPack.Scripts.Pose
             var reader = Reader;
 
             // TODO: this will cause pose to jump back to origin in case of connection loss or long latency
-            q = reader != null ? reader.Drain().LastOrDefault() : Quaternion.identity;
+            q = reader != null ? reader.Value.Drain().LastOrDefault() : Quaternion.identity;
 
             output = new Pose(new Vector3(0, 0, 0), q);
             return PoseDataFlags.Rotation;

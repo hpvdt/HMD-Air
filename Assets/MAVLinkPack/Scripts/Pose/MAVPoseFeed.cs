@@ -1,9 +1,9 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
 using MAVLinkPack.Scripts.API.Minimal;
 using MAVLinkPack.Scripts.API;
 using UnityEngine;
@@ -27,32 +27,57 @@ namespace MAVLinkPack.Scripts.Pose
 
         public ArgsAPI Args;
 
-        private Reader<Quaternion> _reader;
-
-        public Reader<Quaternion> Reader
+        private struct Candidates
         {
-            get
+            public Dictionary<MAVConnection, bool> All;
+
+            public void Set(List<MAVConnection> vs)
             {
-                if (_reader == null) DiscoverReader();
-                return _reader;
+                DropAll();
+                foreach (var v in vs) All.Add(v, false);
+            }
+
+            public void Drop(MAVConnection v)
+            {
+                v.Dispose();
+                All.Remove(v);
+            }
+
+            public void DropAll()
+            {
+                var size = All.Count;
+                if (size > 0)
+                {
+                    foreach (var cc in All.Keys) cc.Dispose();
+                    Debug.Log($"Dropped all {size} connection(s)");
+                }
             }
         }
 
-        private void DiscoverReader()
+        private Candidates _candidates = new() { All = new Dictionary<MAVConnection, bool>() };
+
+        private Reader<Quaternion>? _reader;
+
+        public Reader<Quaternion> GetReader()
         {
-            var candidates = MAVConnection.Discover(new Regex(Args.regexPattern));
+            return _reader ??= DiscoverReader();
+        }
+
+        private Reader<Quaternion> DiscoverReader()
+        {
+            _candidates.Set(MAVConnection.Discover(new Regex(Args.regexPattern)).ToList());
             // var candidates = MAVConnection.Discover(GlobPatternConverter.GlobToRegex(pattern));
 
             var errors = new Dictionary<string, Exception>();
 
-            var readers = candidates.AsParallel()
-                .WithDegreeOfParallelism(16)
+            var readers = _candidates.All.Keys
+                .AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism)
                 .SelectMany(
                     connection =>
                     {
-                        Debug.Log("parallel filtering started for " + connection.Port.PortName);
+                        // Debug.Log("parallel filtering started for " + connection.Port.PortName);
 
-                        Thread.Sleep(1000);
+                        // Thread.Sleep(1000);
 
                         // for each connection, setup a monitor stream
                         // immediately start reading it and ensure that >= 1 heartbeat is received in the first 2 seconds
@@ -60,40 +85,37 @@ namespace MAVLinkPack.Scripts.Pose
 
                         try
                         {
-                            var cc = connection;
-
                             var reader = connection.Initialise(
-                                () =>
+                                cc =>
                                 {
-                                    var api = cc.ReadAndMonitor<Quaternion>();
+                                    var monitor = cc.Monitor<Quaternion>();
 
-                                    api
-                                        .On<MAVLink.mavlink_attitude_quaternion_t>()
-                                        .Select(ctx =>
+                                    var getQuaternion = Subscriber.On<MAVLink.mavlink_attitude_quaternion_t>()
+                                        .Select((raw, msg) =>
                                         {
-                                            var data = ctx.Msg.Data;
+                                            var data = msg.Data;
                                             var q = new Quaternion(data.q1, data.q2, data.q3, data.q4);
                                             return q;
                                         });
 
-                                    return api.Build();
+                                    return monitor.Subscriber.Union(getQuaternion).LatchOn(cc);
                                 },
                                 Args.preferredBaudRate
                             );
 
-                            return new List<Reader<Quaternion>> { reader }.AsParallel();
+                            return new List<Reader<Quaternion>> { reader };
                         }
                         catch (Exception e)
                         {
                             errors.Add(connection.Port.PortName, e);
-                            connection.Dispose();
+                            _candidates.Drop(connection);
 
-                            return new List<Reader<Quaternion>>().AsParallel();
+                            return new List<Reader<Quaternion>>();
                         }
-                        finally
-                        {
-                            Debug.Log("ended for " + connection.Port.PortName);
-                        }
+                        // finally
+                        // {
+                        //     Debug.Log("ended for " + connection.Port.PortName);
+                        // }
                     }
                 )
                 .ToList();
@@ -111,15 +133,33 @@ namespace MAVLinkPack.Scripts.Pose
                 );
             }
 
-            _ = readers.Select(
+            var only = readers.Where(
                 (v, i) =>
                 {
-                    if (i != 0) v.Outer.Dispose();
-                    else _reader = v;
-                    return i;
+                    if (i != 0)
+                    {
+                        _candidates.Drop(v.Active);
+                        return false;
+                    }
+
+                    return true;
                 }
             );
+
+            return only.First();
         }
+
+        ~MAVPoseFeed()
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (_reader != null) _candidates.Drop(_reader.Value.Active);
+            _candidates.DropAll();
+        }
+
 
         public static MAVPoseFeed Of(ArgsAPI args)
         {
@@ -127,11 +167,6 @@ namespace MAVLinkPack.Scripts.Pose
             {
                 Args = args
             };
-        }
-
-        public void Dispose()
-        {
-            if (_reader != null) _reader.Outer.Dispose();
         }
     }
 }

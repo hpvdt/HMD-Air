@@ -1,6 +1,6 @@
 ﻿#nullable enable
 using MAVLinkPack.Scripts.Util;
-using UnityEngine.XR;
+using Microsoft.Win32.SafeHandles;
 
 namespace MAVLinkPack.Scripts.API
 {
@@ -10,28 +10,28 @@ namespace MAVLinkPack.Scripts.API
     using System.IO.Ports;
     using System.Linq;
     using System.Text.RegularExpressions;
-    using HMD.Scripts.Util;
     using UnityEngine;
 
-    public class MAVConnection : IDisposable
+    public class MAVConnection : SafeHandleMinusOneIsInvalid
     {
         // TODO: generalised this to read from any () => Stream
-        public SerialPort Port = null!;
+        public readonly SerialPort Port;
 
-        private readonly MAVLink.MavlinkParse _mavlink = new MAVLink.MavlinkParse();
+        private readonly MAVLink.MavlinkParse _mavlink = new();
 
-        ~MAVConnection()
+        public MAVConnection(SerialPort port) : base(true)
         {
-            Dispose();
+            Port = port;
         }
 
-        public void Dispose()
+        protected override bool ReleaseHandle()
         {
             // from Unity_SerialPort
             try
             {
                 // Close the serial port
                 IsOpen = false;
+                return true;
             }
             catch (Exception ex)
             {
@@ -40,23 +40,25 @@ namespace MAVLinkPack.Scripts.API
                     // Failed to close the serial port. Uncomment if
                     // you wish but this is triggered as the port is
                     // already closed and or null.
-
                     Debug.Log($"Error on closing but port already closed! {ex.Message}");
+                    return true;
                 }
                 else
                 {
-                    throw;
+                    return false;
                 }
             }
-
-            Port.Dispose();
+            finally
+            {
+                Port.Dispose();
+            }
         }
 
 
         // bool armed = false;
         // locking to prevent multiple reads on serial port
-        readonly object _readLock = new object();
-        readonly object _writeLock = new object();
+        private readonly object _readLock = new();
+        private readonly object _writeLock = new();
 
         public static readonly int[] DefaultPreferredBaudRates = { 57600, 115200 };
 
@@ -71,37 +73,30 @@ namespace MAVLinkPack.Scripts.API
             var portNames = SerialPort.GetPortNames();
             var matchedPortNames = portNames.Where(name => pattern.IsMatch(name)).ToList();
 
-            if (!matchedPortNames.Any())
-            {
-                throw new IOException("No serial ports found");
-            }
+            if (!matchedPortNames.Any()) throw new IOException("No serial ports found");
 
             Debug.Log($"Found {matchedPortNames.Count} serial ports: " + string.Join(", ", matchedPortNames));
 
             foreach (var name in matchedPortNames)
             {
-                SerialPort port = new SerialPort(); // this will be reused to try all baud rates
+                var port = new SerialPort(); // this will be reused to try all baud rates
                 port.PortName = name;
                 port.ReadTimeout = 2000;
                 port.WriteTimeout = 2000;
 
-                yield return new MAVConnection { Port = port };
+                yield return new MAVConnection(port);
             }
         }
 
-        public T Initialise<T>(Func<T> handshake, int[]? preferredBaudRates = null)
+        public T Initialise<T>(Func<MAVConnection, T> handshake, int[]? preferredBaudRates = null)
         {
             var bauds = preferredBaudRates ?? DefaultPreferredBaudRates;
 
-            if (bauds.Length == 0)
-            {
-                return _initialise(handshake);
-            }
+            if (bauds.Length == 0) return _initialise(handshake);
 
             var errors = new Dictionary<int, Exception>();
 
             foreach (var baud in bauds)
-            {
                 try
                 {
                     return _initialise(handshake);
@@ -110,7 +105,6 @@ namespace MAVLinkPack.Scripts.API
                 {
                     errors[baud] = new Exception("Failed to connect");
                 }
-            }
 
             throw new IOException(
                 "All attempt(s) failed, tried with baud rate(s) " +
@@ -120,12 +114,12 @@ namespace MAVLinkPack.Scripts.API
         }
 
 
-        private T _initialise<T>(Func<T> handshake)
+        private T _initialise<T>(Func<MAVConnection, T> handshake)
         {
             try
             {
                 Connect();
-                return handshake();
+                return handshake(this);
             }
             catch (Exception)
             {
@@ -175,9 +169,9 @@ namespace MAVLinkPack.Scripts.API
                     if (value)
                     {
                         Port.Open();
-                        var fakeData = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+                        var sanityCheckData = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };
 
-                        WriteRaw(fakeData);
+                        WriteRaw(sanityCheckData);
                     }
                     else
                     {
@@ -186,10 +180,8 @@ namespace MAVLinkPack.Scripts.API
 
                     // assert
                     if (value != Port.IsOpen)
-                    {
                         throw new IOException(
                             $"Failed to set port {Port.PortName} to {(value ? "open" : "closed")}, baud rate {Port.BaudRate}");
-                    }
 
                     Debug.Log($"Port {Port.PortName} is now {(value ? "open" : "closed")}, baud rate {Port.BaudRate}");
                 }
@@ -204,7 +196,7 @@ namespace MAVLinkPack.Scripts.API
             }
         }
 
-        public void Write<T>(TypedMsg<T> msg) where T : struct
+        public void Write<T>(Message<T> msg) where T : struct
         {
             // TODO: why not GenerateMAVLinkPacket20?
             var bytes = _mavlink.GenerateMAVLinkPacket20(
@@ -217,7 +209,7 @@ namespace MAVLinkPack.Scripts.API
             WriteRaw(bytes);
         }
 
-        public MAVComponent Gcs = MAVComponent.Gcs();
+        private static Component Gcs = Component.Gcs();
 
         public void WriteData<T>(T data) where T : struct
         {
@@ -243,186 +235,38 @@ namespace MAVLinkPack.Scripts.API
                     MAVLink.MAVLinkMessage result;
                     lock (_readLock)
                     {
+                        Stats.Pressure = Port.BytesToRead;
                         result = _mavlink.ReadPacket(Port.BaseStream);
                     }
 
                     if (result == null)
                     {
-                        var pending = Port.BytesToRead;
-                        Debug.Log($"unknown packet, {pending} byte(s) left");
+                        // var pending = Port.BytesToRead;
+                        // Debug.Log($"unknown packet, {pending} byte(s) left");
                     }
                     else
                     {
                         Stats.Counter.Get(result.msgid).Value = Stats.Counter.Get(result.msgid).ValueOrDefault + 1;
-                        var info = TypeLookup.Global.ByID.GetValueOrDefault(result.msgid);
-                        Debug.Log($"received packet, info={info}");
+
+                        // Debug.Log($"received packet, info={TypeLookup.Global.ByID.GetValueOrDefault(result.msgid)}");
                         yield return result;
                     }
                 }
             }
         }
 
-        public ReadAPI<T> Read<T>() where T : struct
+        public Reader<T> Read<T>(Subscriber<T> subscriber)
         {
-            return new ReadAPI<T> { Outer = this };
+            return new Reader<T> { Active = this, Subscriber = subscriber };
         }
 
-        // public StreamReader EmptyStream<T>() where T : struct
-        // {
-        //     return new StreamReader<T> { Outer = this };
-        // }
-
-        public class ReadAPI<T> : Dependent<MAVConnection>
-        {
-            public readonly TypeIndexed<CaseProcessor<T>> Cases = TypeIndexed<CaseProcessor<T>>.Global();
-
-            public void Clear()
-            {
-                Cases.Index.Clear();
-            }
-
-            public SubReader<TMav> On<TMav>() where TMav : struct
-            {
-                return new SubReader<TMav> { Outer = this };
-            }
-
-            public class SubReader<TMav> : Dependent<ReadAPI<T>> where TMav : struct
-            {
-                public struct Context
-                {
-                    public MAVLink.MAVLinkMessage Raw;
-                    public TypedMsg<TMav> Msg;
-
-                    public List<T>?
-                        Prev; // null means Processor is missing, empty list means has processor but no result
-                }
-
-                public ReadAPI<T> SelectMany(Func<Context, List<T>?> fn)
-                {
-                    var msgID = Outer.Cases.Get<TMav>().ID;
-
-                    var existingFn = Outer.Cases.Get(msgID).ValueOrDefault;
-
-                    if (existingFn == null)
-                    {
-                        Outer.Cases.Get(msgID).Value = CaseProcessor<T>.OfDirect(
-                            raw =>
-                            {
-                                var ctx = new Context
-                                {
-                                    Raw = raw,
-                                    Msg = raw.As<TMav>(),
-                                    Prev = null
-                                };
-                                return fn(ctx);
-                            });
-                    }
-                    else
-                    {
-                        Outer.Cases.Get(msgID).Value =
-                            CaseProcessor<T>.OfDirect( // TODO: This should be CutElimination
-                                raw =>
-                                {
-                                    var ctx = new Context
-                                    {
-                                        Raw = raw,
-                                        Msg = raw.As<TMav>(),
-                                        Prev = existingFn.Process(raw)
-                                    };
-                                    return fn(ctx);
-                                });
-                    }
-
-                    return Outer;
-                }
-
-
-                public ReadAPI<T> Select(Func<Context, T?> fn)
-                {
-                    return SelectMany(
-                        ctx =>
-                        {
-                            var result = fn(ctx);
-                            return result == null ? null : new List<T> { result };
-                        }
-                    );
-                }
-            }
-
-            public Reader<T> Build()
-            {
-                List<T> Process(MAVLink.MAVLinkMessage message)
-                {
-                    var id = message.msgid;
-
-                    if (Cases.Index.TryGetValue(id, out var callback))
-                    {
-                        return callback.Process(message) ?? new List<T>();
-                    }
-
-                    return new List<T>();
-                }
-
-                IEnumerable<T> Basic()
-                {
-                    foreach (var message in Outer.RawReadSource())
-                    {
-                        var ee = Process(message);
-
-                        foreach (var e in ee)
-                        {
-                            yield return e;
-                        }
-                    }
-                }
-
-                return new Reader<T>
-                {
-                    Outer = Outer,
-                    Basic = Basic()
-                };
-            }
-
-            // public StreamBuilder<T> Bind<TI>(Func<TypedMsg<TI>, List<T>?> fn) where TI : struct
-            // {
-            //     return Update<TI>(
-            //         old => Processor<T>.OfMany(fn)
-            //     );
-            // }
-
-            // public StreamBuilder<T> And<TI>(Func<TypedMsg<TI>, List<T>?> fn) where TI : struct
-            // {
-            //     return Update<TI>(
-            //         old =>
-            //             old.Add(Processor<T>.OfMany(fn))!
-            //     );
-            // }
-            //
-            // public StreamBuilder<T> Or<TI>(Func<TypedMsg<TI>, List<T>?> fn) where TI : struct
-            // {
-            //     return Update<TI>(
-            //         old =>
-            //             old.OrElse(Processor<T>.OfMany(fn))!
-            //     );
-            // }
-
-
-            // public ITypedStream<T> Build()
-            // {
-            //     return new ITypedStream<T>()
-            //     {
-            //         Connection = Outer,
-            //         Basic = GetEnum()
-            //     };
-            //
-            // }
-        }
-
-        public StatsAPI Stats = new() { Counter = TypeIndexed<ulong>.Global() };
+        public StatsAPI Stats = new() { Counter = Indexed<ulong>.Global() };
 
         public struct StatsAPI
         {
-            public TypeIndexed<ulong> Counter;
+            public Indexed<ulong> Counter;
+
+            public int Pressure; // pending data in the buffer
         }
     }
 }

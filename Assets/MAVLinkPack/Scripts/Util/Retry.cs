@@ -1,5 +1,6 @@
 #nullable enable
 using System.Diagnostics;
+using Debug = UnityEngine.Debug;
 
 namespace MAVLinkPack.Scripts.Util
 {
@@ -8,7 +9,10 @@ namespace MAVLinkPack.Scripts.Util
 
     public static class Retry
     {
-        private static bool DefaultShouldRetry(Exception ex, int attempt) => true;
+        private static bool DefaultShouldRetry(Exception ex, int attempt)
+        {
+            return true;
+        }
 
         public static Args Of(
             int maxAttempts = 3,
@@ -43,7 +47,7 @@ namespace MAVLinkPack.Scripts.Util
             //     ShouldRetry = ((ex, attempt) => true)
             // };
 
-            public FixedInterval FixedInterval => new FixedInterval { Args = this };
+            public FixedInterval FixedInterval => new() { Args = this };
         }
 
         public class FixedInterval
@@ -55,28 +59,28 @@ namespace MAVLinkPack.Scripts.Util
                 if (operation == null)
                     throw new ArgumentNullException(nameof(operation));
 
-                var attempts = 0;
+                // var attempts = 0;
                 var stopwatch = Stopwatch.StartNew();
 
-                while (true)
-                {
+                for (var attempt = 0; attempt <= Args.MaxAttempts; attempt++)
                     try
                     {
-                        attempts++;
-                        return operation(attempts, stopwatch.Elapsed);
+                        return operation(attempt, stopwatch.Elapsed);
                     }
                     catch (Exception ex)
                     {
-                        if (attempts >= Args.MaxAttempts ||
-                            !Args.ShouldRetry(ex, attempts))
-                        {
+                        if (attempt >= Args.MaxAttempts ||
+                            !Args.ShouldRetry(ex, attempt))
                             throw;
-                        }
 
                         Thread.Sleep(Args.Interval);
+
+                        Debug.Log(
+                            $"Attempt {attempt} after {stopwatch.Elapsed} seconds, previous error: {ex.Message}");
                         // TODO: Claude 3.5 should add offset for execution time already spent, not cool
                     }
-                }
+
+                throw new Exception("IMPOSSIBLE!");
             }
 
             public void Run(Action<int, TimeSpan> operation)
