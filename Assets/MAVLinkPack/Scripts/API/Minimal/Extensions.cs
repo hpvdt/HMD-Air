@@ -51,7 +51,7 @@ namespace MAVLinkPack.Scripts.API.Minimal
 
             var sub = connection.Read(subscriber);
 
-            var retry = Retry.Of(24, TimeSpan.FromSeconds(0.2)).FixedInterval;
+            var retry = Retry.UpTo(24).With(TimeSpan.FromSeconds(0.2)).FixedInterval;
 
             retry.Run(
                 (_, tt) =>

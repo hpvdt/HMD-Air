@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Threading.Tasks;
 using MAVLinkPack.Scripts.Util;
 using Microsoft.Win32.SafeHandles;
 
@@ -88,44 +89,56 @@ namespace MAVLinkPack.Scripts.API
             }
         }
 
-        public T Initialise<T>(Func<MAVConnection, T> handshake, int[]? preferredBaudRates = null)
+        public T Initialise<T>(
+            Func<MAVConnection, T> handshake,
+            int[]? preferredBaudRates = null,
+            TimeSpan? timeout = null
+        )
         {
+            timeout ??= TimeSpan.FromSeconds(10);
+
             var bauds = preferredBaudRates ?? DefaultPreferredBaudRates;
 
-            if (bauds.Length == 0) return _initialise(handshake);
+            if (bauds.Length == 0) return Get();
 
-            var errors = new Dictionary<int, Exception>();
+            var result = bauds.Retry().With(TimeSpan.FromSeconds(0.2))
+                .FixedInterval.Run(
+                    (baud, i) =>
+                    {
+                        Port.BaudRate = baud;
+                        return Get();
+                    }
+                );
 
-            foreach (var baud in bauds)
+            return result;
+
+            T Get()
+            {
                 try
                 {
-                    return _initialise(handshake);
+                    var task = _initialiseTask(handshake);
+
+                    if (task.Wait(timeout.Value)) return task.Result;
+                    throw new TimeoutException($"Timeout after {timeout.Value.TotalSeconds} seconds");
                 }
                 catch
                 {
-                    errors[baud] = new Exception("Failed to connect");
+                    IsOpen = false;
+                    throw;
+                    // errors[baud] = new Exception("Failed to connect");
                 }
-
-            throw new IOException(
-                "All attempt(s) failed, tried with baud rate(s) " +
-                string.Join("\n", errors.Select(kv => $"Baud rate {kv.Key}: {kv.Value.Message}")
-                )
-            );
+            }
         }
 
-
-        private T _initialise<T>(Func<MAVConnection, T> handshake)
+        private Task<T> _initialiseTask<T>(
+            Func<MAVConnection, T> handshake
+        )
         {
-            try
+            return Task.Run(() =>
             {
                 Connect();
                 return handshake(this);
-            }
-            catch (Exception)
-            {
-                IsOpen = false;
-                throw;
-            }
+            });
         }
 
         public void Connect(bool validate = false)
@@ -135,7 +148,7 @@ namespace MAVLinkPack.Scripts.API
 
             if (validate)
             {
-                var retry = Retry.Of(12, TimeSpan.FromSeconds(0.2)).FixedInterval;
+                var retry = Retry.UpTo(12).With(TimeSpan.FromSeconds(0.2)).FixedInterval;
 
                 var minBytes = 8;
                 //sanity check, port is deemed unusable if it doesn't receive any data

@@ -11,6 +11,9 @@
             Dictionary<TKey, TValue> second,
             Func<TValue, TValue, TValue> reduceFunc)
         {
+            if (second == null) throw new ArgumentNullException(nameof(second));
+            if (reduceFunc == null) throw new ArgumentNullException(nameof(reduceFunc));
+
             return first
                 .Concat(second)
                 .GroupBy(kvp => kvp.Key)

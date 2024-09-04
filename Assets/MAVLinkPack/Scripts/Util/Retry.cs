@@ -1,5 +1,8 @@
 #nullable enable
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using HMD.Scripts.Util;
 using Debug = UnityEngine.Debug;
 
 namespace MAVLinkPack.Scripts.Util
@@ -7,83 +10,94 @@ namespace MAVLinkPack.Scripts.Util
     using System;
     using System.Threading;
 
-    public static class Retry
+    public class Retry<TI>
     {
-        private static bool DefaultShouldRetry(Exception ex, int attempt)
+        public IEnumerable<TI> Attempts = null!;
+
+        private ArgsT? _args;
+
+        public ArgsT Args => _args ?? DefaultArgs;
+
+        private static bool DefaultShouldRetry(Exception ex, TI attempt)
         {
             return true;
         }
 
-        public static Args Of(
-            int maxAttempts = 3,
+        private static readonly ArgsT DefaultArgs = new()
+        {
+            Interval = TimeSpan.FromSeconds(1),
+            ShouldContinue = DefaultShouldRetry
+        };
+
+        public Retry<TI> With(
             TimeSpan? interval = null,
-            Func<Exception, int, bool>? shouldRetry = null
+            Func<Exception, TI, bool>? shouldRetry = null
         )
         {
-            if (maxAttempts <= 0)
-                throw new ArgumentOutOfRangeException(nameof(maxAttempts),
-                    "Max attempts must be greater than zero.");
-
-
-            return new Args
+            _args = new ArgsT
             {
-                MaxAttempts = maxAttempts,
-                Interval = interval ?? TimeSpan.FromSeconds(1),
-                ShouldRetry = shouldRetry ?? DefaultShouldRetry
+                Interval = interval ?? DefaultArgs.Interval,
+                ShouldContinue = shouldRetry ?? DefaultArgs.ShouldContinue
             };
+            return this;
         }
 
-        public struct Args
+        public struct ArgsT
         {
-            public int MaxAttempts;
             public TimeSpan Interval;
-            public Func<Exception, int, bool> ShouldRetry;
-
-
-            // public static Args Default => new Args
-            // {
-            //     MaxAttempts = 3,
-            //     Interval = TimeSpan.FromSeconds(1),
-            //     ShouldRetry = ((ex, attempt) => true)
-            // };
-
-            public FixedInterval FixedInterval => new() { Args = this };
+            public Func<Exception, TI, bool> ShouldContinue;
         }
 
-        public class FixedInterval
+        public class FixedIntervalT : Dependent<Retry<TI>>
         {
-            public Args Args;
-
-            public T Run<T>(Func<int, TimeSpan, T> operation)
+            public T Run<T>(Func<TI, TimeSpan, T> operation)
             {
                 if (operation == null)
                     throw new ArgumentNullException(nameof(operation));
 
-                // var attempts = 0;
+                var errors = new Dictionary<TI, Exception>();
+
                 var stopwatch = Stopwatch.StartNew();
 
-                for (var attempt = 0; attempt <= Args.MaxAttempts; attempt++)
+                var counter = 0;
+
+                var zipped = Outer.Attempts.ZipWithNext(default);
+
+                foreach (var (attempt, next) in zipped)
                     try
                     {
+                        counter += 1;
                         return operation(attempt, stopwatch.Elapsed);
                     }
                     catch (Exception ex)
                     {
-                        if (attempt >= Args.MaxAttempts ||
-                            !Args.ShouldRetry(ex, attempt))
-                            throw;
+                        if (!Outer.Args.ShouldContinue(ex, attempt))
+                        {
+                            // augmenting error message
+                            var addendum =
+                                $"All {counter} attempt(s) failed\n" +
+                                string.Join("\n", errors.Select(kv => $"    {kv.Key}: {kv.Value.Message}"));
 
-                        Thread.Sleep(Args.Interval);
+                            ex.Data["Retry"] += addendum;
+
+                            throw;
+                        }
 
                         Debug.Log(
-                            $"Attempt {attempt} after {stopwatch.Elapsed} seconds, previous error: {ex.Message}");
+                            $"Error at `{attempt}` after {stopwatch.Elapsed} second(s): {ex.Message}\n" +
+                            $"will try again at `{next}`"
+                        );
+
+                        Thread.Sleep(Outer.Args.Interval);
+
+                        errors[attempt] = ex;
                         // TODO: Claude 3.5 should add offset for execution time already spent, not cool
                     }
 
                 throw new Exception("IMPOSSIBLE!");
             }
 
-            public void Run(Action<int, TimeSpan> operation)
+            public void Run(Action<TI, TimeSpan> operation)
             {
                 if (operation == null)
                     throw new ArgumentNullException(nameof(operation));
@@ -94,6 +108,35 @@ namespace MAVLinkPack.Scripts.Util
                     return null!;
                 });
             }
+        }
+
+        public FixedIntervalT FixedInterval => new()
+        {
+            Outer = this
+        };
+    }
+
+    public static class Retry
+    {
+        public static Retry<int> UpTo(int maxAttempts)
+        {
+            return new Retry<int>
+            {
+                Attempts = Enumerable.Range(0, maxAttempts)
+            };
+        }
+    }
+
+    public static class RetryExtensions
+    {
+        public static Retry<TI> Retry<TI>(
+            this IEnumerable<TI> attempts
+        )
+        {
+            return new Retry<TI>
+            {
+                Attempts = attempts
+            };
         }
     }
 }

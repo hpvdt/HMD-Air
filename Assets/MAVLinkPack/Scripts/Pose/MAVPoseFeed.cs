@@ -65,12 +65,13 @@ namespace MAVLinkPack.Scripts.Pose
 
         private Reader<Quaternion> DiscoverReader()
         {
-            _candidates.Set(MAVConnection.Discover(new Regex(Args.regexPattern)).ToList());
-            // var candidates = MAVConnection.Discover(GlobPatternConverter.GlobToRegex(pattern));
+            var discovered = MAVConnection.Discover(new Regex(Args.regexPattern)).ToList();
+
+            _candidates.Set(discovered);
 
             var errors = new Dictionary<string, Exception>();
 
-            var readers = _candidates.All.Keys
+            var readers = discovered
                 .AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism)
                 .SelectMany(
                     connection =>
@@ -107,8 +108,8 @@ namespace MAVLinkPack.Scripts.Pose
                         }
                         catch (Exception e)
                         {
-                            errors.Add(connection.Port.PortName, e);
                             _candidates.Drop(connection);
+                            errors.Add(connection.Port.PortName, e);
 
                             return new List<Reader<Quaternion>>();
                         }
@@ -119,7 +120,6 @@ namespace MAVLinkPack.Scripts.Pose
                     }
                 )
                 .ToList();
-
 
             if (!readers.Any())
             {

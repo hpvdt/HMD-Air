@@ -79,7 +79,9 @@ namespace MAVLinkPack.Editor.Util
         public void MergeWith_NullReducerFunction_ThrowsArgumentNullException()
         {
             var dict1 = new Dictionary<string, int> { { "a", 1 } };
-            var dict2 = new Dictionary<string, int> { { "b", 2 } };
+            var dict2 = new Dictionary<string, int> { { "b", 2 }, { "a", 1 } };
+
+            // var dd = dict1.Merge(dict2, null);
 
             Assert.Throws<ArgumentNullException>(() => dict1.Merge(dict2, null));
         }

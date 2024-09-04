@@ -13,11 +13,12 @@ namespace MAVLinkPack.Scripts.API
         {
             protected override Indexed<Topic> MkTopics()
             {
-                Topics.Get<T>().Value = message => new List<Message<T>>
+                var result = Indexed<Topic>.Global();
+                result.Get<T>().Value = message => new List<Message<T>>
                 {
                     Message<T>.FromRaw(message)
                 };
-                return Topics;
+                return result;
             }
         }
 
@@ -27,24 +28,25 @@ namespace MAVLinkPack.Scripts.API
         }
     }
 
+
     public abstract class Subscriber<T>
     {
         public delegate List<T>? Topic(MAVLink.MAVLinkMessage message);
 
-        public static readonly Topic NoOp = _ => null;
+        public static readonly Topic TopicMissing = _ => null;
 
         private Indexed<Topic>? _topics;
 
         protected abstract Indexed<Topic> MkTopics();
 
-        public Indexed<Topic> Topics
+        private Indexed<Topic> Topics
         {
             get { return _topics ??= MkTopics(); }
         }
 
         public List<T>? Process(MAVLink.MAVLinkMessage message)
         {
-            return Topics.Get(message.msgid).ValueOr(NoOp)(message);
+            return Topics.Get(message.msgid).ValueOr(TopicMissing)(message);
         }
 
         public abstract class BinaryT : Subscriber<T>
