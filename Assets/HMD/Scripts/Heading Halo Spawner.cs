@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class HeadingHaloSpawner : MonoBehaviour
@@ -11,6 +12,8 @@ public class HeadingHaloSpawner : MonoBehaviour
     public float angleBetweenPins = 30f;
 
     public GameObject pin;
+
+    TMP_Text newText;
 
     
     // Start is called before the first frame update
@@ -27,11 +30,17 @@ public class HeadingHaloSpawner : MonoBehaviour
             if (i % numberBetweenMajors == 0)
             {
                 newPin.transform.localScale += new Vector3(0,0.1f,0);
+                GameObject textObject = new GameObject("WorldTextObject");
+                textObject.transform.position = newPin.transform.position; //The text needs to be parented to the heading halo to fix the positioning. 
+                TextMeshPro textMeshPro = textObject.AddComponent<TextMeshPro>();
+                textMeshPro.text = degree.ToString();
+                
             }
             degree += angleBetweenPins;
-            Debug.Log(degree);
         }
     }
+
+    
 
 
     public Vector3 GetPinLocation(float degree)
@@ -39,6 +48,6 @@ public class HeadingHaloSpawner : MonoBehaviour
         float rad = degree * Mathf.Deg2Rad;
         float x = Mathf.Sin(rad) * radius;
         float z = Mathf.Cos(rad) * radius;
-        return new Vector3(x, 0 ,z);
+        return new Vector3(x,this.transform.position.y ,z);
     }
 }
