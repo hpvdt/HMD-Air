@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using MAVLinkPack.Scripts.API.Minimal;
 using MAVLinkPack.Scripts.API;
+using MAVLinkPack.Scripts.Util;
 using UnityEngine;
 
 namespace MAVLinkPack.Scripts.Pose
@@ -60,10 +61,10 @@ namespace MAVLinkPack.Scripts.Pose
 
         public Reader<Quaternion> GetReader()
         {
-            return _reader ??= DiscoverReader();
+            return _reader ??= Discover();
         }
 
-        private Reader<Quaternion> DiscoverReader()
+        private Reader<Quaternion> Discover()
         {
             var discovered = MAVConnection.Discover(new Regex(Args.regexPattern)).ToList();
 
@@ -99,7 +100,8 @@ namespace MAVLinkPack.Scripts.Pose
                                             return q;
                                         });
 
-                                    return monitor.Subscriber.Union(getQuaternion).LatchOn(cc);
+                                    var union = monitor.Subscriber.Union(getQuaternion).LatchOn(cc);
+                                    return union;
                                 },
                                 Args.preferredBaudRate
                             );
@@ -109,7 +111,7 @@ namespace MAVLinkPack.Scripts.Pose
                         catch (Exception e)
                         {
                             _candidates.Drop(connection);
-                            errors.Add(connection.Port.PortName, e);
+                            errors.Add(connection.IO.Name, e);
 
                             return new List<Reader<Quaternion>>();
                         }
@@ -125,7 +127,7 @@ namespace MAVLinkPack.Scripts.Pose
             {
                 var aggregatedErrors = errors.Aggregate(
                     "",
-                    (acc, kv) => acc + kv.Key + ": " + kv.Value.Message + "\n"
+                    (acc, kv) => acc + kv.Key + ": " + kv.Value.GetMessageForDisplay() + "\n"
                 );
 
                 throw new IOException(

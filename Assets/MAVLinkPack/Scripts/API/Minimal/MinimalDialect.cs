@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using MAVLinkPack.Scripts.Util;
 using Unity.VisualScripting;
 
 namespace MAVLinkPack.Scripts.API.Minimal
 {
-    public static class Extensions
+    public static class MinimalDialect
     {
         public static MAVLink.mavlink_heartbeat_t HeartbeatFromHere =>
             new() // this should be sent regardless of received heartbeat
@@ -51,19 +52,21 @@ namespace MAVLinkPack.Scripts.API.Minimal
 
             var sub = connection.Read(subscriber);
 
-            var retry = Retry.UpTo(24).With(TimeSpan.FromSeconds(0.2)).FixedInterval;
+            Retry.UpTo(12).With(TimeSpan.Zero).FixedInterval
+                .Run(
+                    (_, tt) =>
+                    {
+                        connection.WriteData(HeartbeatFromHere);
 
-            retry.Run(
-                (_, tt) =>
-                {
-                    connection.WriteData(HeartbeatFromHere);
+                        Thread.Sleep(200); // wait for a while before collecting
 
-                    sub.Drain();
+                        sub.Drain();
 
-                    if (sub.Active.Stats.Counter.Get<MAVLink.mavlink_heartbeat_t>().ValueOrDefault <= 0)
-                        throw new InvalidConnectionException($"No heartbeat received after {tt.TotalSeconds} seconds");
-                }
-            );
+                        if (sub.Active.Stats.Counters.Get<MAVLink.mavlink_heartbeat_t>().ValueOrDefault.Value <= 0)
+                            throw new InvalidConnectionException(
+                                $"No heartbeat received");
+                    }
+                );
 
             return sub;
         }

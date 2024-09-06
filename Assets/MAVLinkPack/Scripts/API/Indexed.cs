@@ -1,6 +1,7 @@
 ﻿#nullable enable
+using System;
 using System.Collections.Generic;
-using HMD.Scripts.Util;
+using MAVLinkPack.Editor.Util;
 
 namespace MAVLinkPack.Scripts.API
 {
@@ -9,7 +10,7 @@ namespace MAVLinkPack.Scripts.API
         // TODO: do I need to index by systemID and componentID?
         public TypeLookup Lookup;
 
-        public Dictionary<uint, T> Index;
+        public Dictionary<uint, T?> Index;
 
         // default constructor
 
@@ -17,7 +18,7 @@ namespace MAVLinkPack.Scripts.API
         {
             public uint ID;
 
-            public T Value
+            public T? Value
             {
                 get => Outer.Index[ID];
                 set => Outer.Index[ID] = value;
@@ -28,6 +29,20 @@ namespace MAVLinkPack.Scripts.API
             public T ValueOr(T fallback)
             {
                 return Outer.Index.GetValueOrDefault(ID, fallback);
+            }
+
+            public T ValueOrInsert(Func<T> fallback)
+            {
+                var index = Outer.Index;
+                if (index.TryGetValue(ID, out var existing)) return existing;
+
+                index[ID] = fallback();
+                return index[ID];
+            }
+
+            public T? ValueOrInsertDefault()
+            {
+                return ValueOrInsert(() => default);
             }
 
             public void Remove()

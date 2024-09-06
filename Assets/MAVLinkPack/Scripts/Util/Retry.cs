@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using HMD.Scripts.Util;
+using System.Text;
+using MAVLinkPack.Editor.Util;
 using Debug = UnityEngine.Debug;
 
 namespace MAVLinkPack.Scripts.Util
@@ -12,11 +13,13 @@ namespace MAVLinkPack.Scripts.Util
 
     public class Retry<TI>
     {
-        public IEnumerable<TI> Attempts = null!;
+        public List<TI> Attempts = null!;
 
         private ArgsT? _args;
 
         public ArgsT Args => _args ?? DefaultArgs;
+
+        public string Name = "Retry-" + Retry.NameCounter.Next();
 
         private static bool DefaultShouldRetry(Exception ex, TI attempt)
         {
@@ -31,14 +34,20 @@ namespace MAVLinkPack.Scripts.Util
 
         public Retry<TI> With(
             TimeSpan? interval = null,
-            Func<Exception, TI, bool>? shouldRetry = null
+            Func<Exception, TI, bool>? shouldRetry = null,
+            bool logException = false,
+            string? name = null
         )
+
         {
             _args = new ArgsT
             {
                 Interval = interval ?? DefaultArgs.Interval,
-                ShouldContinue = shouldRetry ?? DefaultArgs.ShouldContinue
+                ShouldContinue = shouldRetry ?? DefaultArgs.ShouldContinue,
+                LogException = logException
             };
+
+            if (name != null) Name = name;
             return this;
         }
 
@@ -46,6 +55,7 @@ namespace MAVLinkPack.Scripts.Util
         {
             public TimeSpan Interval;
             public Func<Exception, TI, bool> ShouldContinue;
+            public bool LogException;
         }
 
         public class FixedIntervalT : Dependent<Retry<TI>>
@@ -55,46 +65,60 @@ namespace MAVLinkPack.Scripts.Util
                 if (operation == null)
                     throw new ArgumentNullException(nameof(operation));
 
-                var errors = new Dictionary<TI, Exception>();
+                var errors = new List<(TI, Exception)>();
 
                 var stopwatch = Stopwatch.StartNew();
 
                 var counter = 0;
 
-                var zipped = Outer.Attempts.ZipWithNext(default);
+                var zipped = Outer.Attempts.ZipWithNext().ToList();
 
                 foreach (var (attempt, next) in zipped)
+                {
                     try
                     {
-                        counter += 1;
                         return operation(attempt, stopwatch.Elapsed);
                     }
                     catch (Exception ex)
                     {
-                        if (!Outer.Args.ShouldContinue(ex, attempt))
+                        if (Outer.Args.LogException) Debug.LogException(ex);
+                        errors.Add((attempt, ex));
+
+                        var baseInfo =
+                            $"{Outer.Name}/[{counter}/{zipped.Count}] {attempt}: Retry failed @ {stopwatch.Elapsed}s:" +
+                            $"\n{ex.GetMessageForDisplay()}";
+
+                        if (!Outer.Args.ShouldContinue(ex, attempt) || !next.HasValue)
                         {
+                            Debug.Log(
+                                baseInfo + $"\nthis is the last"
+                            );
+
                             // augmenting error message
-                            var addendum =
-                                $"All {counter} attempt(s) failed\n" +
-                                string.Join("\n", errors.Select(kv => $"    {kv.Key}: {kv.Value.Message}"));
+                            var info =
+                                $"All {counter + 1} attempt(s) failed on [" +
+                                $"{string.Join(", ", errors.Select(kv => kv.Item1))}" +
+                                "]";
 
-                            ex.Data["Retry"] += addendum;
+                            var ee = new RetryException(
+                                info,
+                                errors.Select(kv => kv.Item2)
+                            );
 
-                            throw;
+                            throw ee;
                         }
 
                         Debug.Log(
-                            $"Error at `{attempt}` after {stopwatch.Elapsed} second(s): {ex.Message}\n" +
-                            $"will try again at `{next}`"
+                            baseInfo + $"\nwill try again at [{next.Value}]"
                         );
 
                         Thread.Sleep(Outer.Args.Interval);
-
-                        errors[attempt] = ex;
-                        // TODO: Claude 3.5 should add offset for execution time already spent, not cool
                     }
 
-                throw new Exception("IMPOSSIBLE!");
+                    counter += 1;
+                }
+
+                throw new SystemException("IMPOSSIBLE!");
             }
 
             public void Run(Action<TI, TimeSpan> operation)
@@ -118,25 +142,46 @@ namespace MAVLinkPack.Scripts.Util
 
     public static class Retry
     {
+        public static AtomicLong NameCounter = new();
+
         public static Retry<int> UpTo(int maxAttempts)
         {
             return new Retry<int>
             {
-                Attempts = Enumerable.Range(0, maxAttempts)
+                Attempts = Enumerable.Range(0, maxAttempts).ToList()
             };
+        }
+    }
+
+
+    public class RetryException : AggregateException
+    {
+        // constructors
+        public RetryException(string message) : base(message)
+        {
+        }
+
+        public RetryException(string message, IEnumerable<Exception> innerExceptions) : base(message,
+            innerExceptions)
+        {
         }
     }
 
     public static class RetryExtensions
     {
         public static Retry<TI> Retry<TI>(
-            this IEnumerable<TI> attempts
+            this IEnumerable<TI> attempts,
+            string? name = null
         )
         {
-            return new Retry<TI>
+            var result = new Retry<TI>
             {
-                Attempts = attempts
+                Attempts = attempts.ToList()
             };
+
+            if (name != null) result.Name = name;
+
+            return result;
         }
     }
 }

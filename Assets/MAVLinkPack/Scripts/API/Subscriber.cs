@@ -11,9 +11,9 @@ namespace MAVLinkPack.Scripts.API
     {
         public class OnT<T> : Subscriber<Message<T>> where T : struct
         {
-            protected override Indexed<Topic> MkTopics()
+            protected override Indexed<Topic?> MkTopics()
             {
-                var result = Indexed<Topic>.Global();
+                Indexed<Topic?> result = Indexed<Topic>.Global();
                 result.Get<T>().Value = message => new List<Message<T>>
                 {
                     Message<T>.FromRaw(message)
@@ -33,13 +33,13 @@ namespace MAVLinkPack.Scripts.API
     {
         public delegate List<T>? Topic(MAVLink.MAVLinkMessage message);
 
-        public static readonly Topic TopicMissing = _ => null;
+        public static readonly Topic? TopicMissing = _ => null;
 
         private Indexed<Topic>? _topics;
 
         protected abstract Indexed<Topic> MkTopics();
 
-        private Indexed<Topic> Topics
+        private Indexed<Topic?> Topics
         {
             get { return _topics ??= MkTopics(); }
         }

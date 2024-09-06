@@ -1,4 +1,4 @@
-﻿namespace HMD.Scripts.Util
+﻿namespace MAVLinkPack.Editor.Util
 {
     public abstract class Dependent<T>
     {

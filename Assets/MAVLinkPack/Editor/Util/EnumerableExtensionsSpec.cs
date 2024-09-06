@@ -14,33 +14,33 @@ namespace MAVLinkPack.Editor.Util
         [Test]
         public void ZipWithNext_EmptySequence_ReturnsEmptySequence()
         {
-            var result = Enumerable.Empty<int>().ZipWithNext(default).ToList();
+            var result = Enumerable.Empty<int>().ZipWithNext().ToList();
             Assert.That(result, Is.Empty);
         }
 
         [Test]
         public void ZipWithNext_SingleElement_ReturnsOneElementWithNullNext()
         {
-            var result = new[] { 1 }.ZipWithNext(-1).ToList();
+            var result = new[] { 1 }.ZipWithNext().ToList();
             Assert.That(result, Has.Count.EqualTo(1));
-            Assert.That(result[0], Is.EqualTo((1, -1)));
+            Assert.That(result[0], Is.EqualTo((1, Maybe<int>.None())));
         }
 
         [Test]
         public void ZipWithNext_MultipleElements_ReturnsCorrectPairs()
         {
-            var result = new[] { 1, 2, 3 }.ZipWithNext(-1).ToList();
+            var result = new[] { 1, 2, 3 }.ZipWithNext().ToList();
             Assert.That(result, Has.Count.EqualTo(3));
-            Assert.That(result[0], Is.EqualTo((1, 2)));
-            Assert.That(result[1], Is.EqualTo((2, 3)));
-            Assert.That(result[2], Is.EqualTo((3, -1)));
+            Assert.That(result[0], Is.EqualTo((1, Maybe<int>.Some(2))));
+            Assert.That(result[1], Is.EqualTo((2, Maybe<int>.Some(3))));
+            Assert.That(result[2], Is.EqualTo((3, Maybe<int>.None())));
         }
 
         [Test]
         public void ZipWithNext_ConsumesSequenceOnlyOnce()
         {
             var sequence = new SequenceCounter<int>(new[] { 1, 2, 3 });
-            var result = sequence.ZipWithNext(-1).ToList();
+            var result = sequence.ZipWithNext().ToList();
 
             Assert.That(result, Has.Count.EqualTo(3));
             Assert.That(sequence.EnumerationCount, Is.EqualTo(1));

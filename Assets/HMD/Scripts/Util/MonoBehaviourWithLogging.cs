@@ -1,8 +1,10 @@
+using MAVLinkPack.Editor.Util;
 using UnityEngine;
 
 namespace HMD.Scripts.Util
 {
     using System;
+
     public class MonoBehaviourWithLogging : MonoBehaviour
     {
         public bool loggerVerbosity = true; // TODO: should be a number
@@ -17,10 +19,7 @@ namespace HMD.Scripts.Util
         {
             public LogType? Type;
 
-            private LogType ActualType
-            {
-                get => Type.GetValueOrDefault(LogType.Log);
-            }
+            private LogType ActualType => Type.GetValueOrDefault(LogType.Log);
 
             public void Write(string message)
             {
@@ -42,10 +41,7 @@ namespace HMD.Scripts.Util
 
             public void V(string message)
             {
-                if (Outer.loggerVerbosity)
-                {
-                    Write(message);
-                }
+                if (Outer.loggerVerbosity) Write(message);
             }
         }
 
@@ -58,21 +54,11 @@ namespace HMD.Scripts.Util
             };
         }
 
-        protected Logger Log
-        {
-            get => _log();
-        }
+        protected Logger Log => _log();
 
-        protected Logger Warning
-        {
-            get => _log(LogType.Warning);
-        }
+        protected Logger Warning => _log(LogType.Warning);
 
 
-        protected Logger Error
-        {
-            get => _log(LogType.Error);
-        }
+        protected Logger Error => _log(LogType.Error);
     }
-
 }

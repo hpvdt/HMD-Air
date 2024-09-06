@@ -5,6 +5,8 @@ using System.Linq;
 using HMD.Scripts.Streaming;
 using HMD.Scripts.Streaming.VLC;
 using HMD.Scripts.Util;
+using MAVLinkPack.Editor.Util;
+using MAVLinkPack.Scripts.Util;
 using NullableExtension;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -20,22 +22,16 @@ public class DashPanels : MonoBehaviourWithLogging
 
     public Dropdown playerMenu = null!;
 
-    private Dictionary<string, Player> _activePlayers = new Dictionary<string, Player> { };
+    private Dictionary<string, Player> _activePlayers = new() { };
 
     private string FocusedPlayerID
     {
-        get
-        {
-            return playerMenu.options[playerMenu.value].text;
-        }
+        get => playerMenu.options[playerMenu.value].text;
         set
         {
             var newIndex = playerMenu.options.FindIndex(option => option.text == value);
 
-            if (newIndex == -1)
-            {
-                throw new IndexOutOfRangeException($"cannot find player {value}");
-            }
+            if (newIndex == -1) throw new IndexOutOfRangeException($"cannot find player {value}");
 
             playerMenu.value = newIndex;
             playerMenu.RefreshShownValue();
@@ -71,15 +67,12 @@ public class DashPanels : MonoBehaviourWithLogging
 
         public ControllerLike Controller
         {
-            get
-            {
-                return _controller ??= Prefab.GetComponent<ControllerLike>();
-            }
+            get { return _controller ??= Prefab.GetComponent<ControllerLike>(); }
         }
 
         public class DraggingMode
         {
-            public static readonly DraggingMode Disabled = new DraggingMode();
+            public static readonly DraggingMode Disabled = new();
 
             public class Enabled : DraggingMode
             {
@@ -107,20 +100,17 @@ public class DashPanels : MonoBehaviourWithLogging
 
         public bool IconIsVisible
         {
-            set
-            {
-                Controller.icon.SetActive(value);
-            }
+            set => Controller.icon.SetActive(value);
         }
 
         public void Dispose()
         {
             Destroy(Prefab);
-            Outer._activePlayers.Remove(this.ID);
+            Outer._activePlayers.Remove(ID);
         }
     }
 
-    private AtomicInt _incCounter = new AtomicInt();
+    private AtomicLong _incCounter = new();
 
 
     // private Player? _focusedPlayer;
@@ -128,7 +118,6 @@ public class DashPanels : MonoBehaviourWithLogging
     private void Update()
     {
         foreach (var player in FocusedPlayers)
-        {
             if (player?.Dragging is Player.DraggingMode._3D v)
             {
                 var rotation = v.Offset * fovController.mainCamera.transform.rotation;
@@ -139,8 +128,7 @@ public class DashPanels : MonoBehaviourWithLogging
                 var rotation = v2.Offset * fovController.mainCamera.transform.rotation.DropRoll();
                 player.Prefab.transform.rotation = rotation;
             }
-            // TODO: add 2D
-        }
+        // TODO: add 2D
     }
 
     private Player _setupPlayerFromPrefab(GameObject prefab, string playerName)
@@ -164,10 +152,7 @@ public class DashPanels : MonoBehaviourWithLogging
 
         var player = _setupPlayerFromPrefab(prefab, prefix);
 
-        if (focus)
-        {
-            player.Focus();
-        }
+        if (focus) player.Focus();
 
         return player;
     }
@@ -180,13 +165,13 @@ public class DashPanels : MonoBehaviourWithLogging
 
     public Player SetupVCap()
     {
-
         return _setupPlayerFromTemplate(vCapPlayerTemplate, "Video Capture");
     }
 
     // SetupCaptureDevice()
 
     public GameObject playerTab;
+
     public void TogglePlayerTab()
     {
         ExtendDisplayOnce();
@@ -197,27 +182,19 @@ public class DashPanels : MonoBehaviourWithLogging
 
     private void _syncIcons()
     {
-
-        foreach (var player in _activePlayers.Values)
-        {
-            player.IconIsVisible = false;
-        }
+        foreach (var player in _activePlayers.Values) player.IconIsVisible = false;
 
         if (playerTab.activeInHierarchy)
-        {
             foreach (var player in FocusedPlayers)
-            {
                 player.IconIsVisible = true;
-            }
-        }
     }
 
     public void HideIcons()
     {
-
     }
 
     private List<Display>? _extendDisplay;
+
     // TODO: this shouldn't be cached, display may be connected or disconnected during execution
     private List<Display> ExtendDisplayOnce() // In Unity, display cannot be scrapped
     {
@@ -229,10 +206,10 @@ public class DashPanels : MonoBehaviourWithLogging
 
             var result = Display.displays.Skip(1).ToList();
 
-            foreach (Display d in result)
+            foreach (var d in result)
             {
                 Debug.Log("display" + d.systemWidth + "x" + d.systemHeight + " : " + d.renderingWidth + "x"
-                    + d.renderingHeight);
+                          + d.renderingHeight);
                 d.Activate();
             }
 
@@ -246,24 +223,28 @@ public class DashPanels : MonoBehaviourWithLogging
     public FOVController fovController;
 
     public GameObject consoleTab;
+
     public void ToggleConsoleTab()
     {
         ToggleElement(consoleTab);
     }
 
     public GameObject trackTab;
+
     public void ToggleTrackTab()
     {
         ToggleElement(trackTab);
     }
 
     public GameObject volumeTab;
+
     public void ToggleVolumeTab()
     {
         ToggleElement(volumeTab);
     }
 
     private List<Button>? _allTabs;
+
     private List<Button> AllTabs
     {
         get
@@ -293,6 +274,7 @@ public class DashPanels : MonoBehaviourWithLogging
     private GameObject _appMenu;
 
     private List<GameObject>? _allMenus;
+
     private List<GameObject> AllMenus
     {
         get
@@ -316,6 +298,7 @@ public class DashPanels : MonoBehaviourWithLogging
     private GameObject _pictureSettingsPopup;
 
     private List<GameObject>? _allPopups;
+
     private List<GameObject> AllPopups
     {
         get
@@ -430,6 +413,7 @@ public class DashPanels : MonoBehaviourWithLogging
 
     public Button? playerMove2DButton;
     public Button? playerMove3DButton;
+
     private void BindUI()
     {
         UpdateReferences();
@@ -474,13 +458,11 @@ public class DashPanels : MonoBehaviourWithLogging
                     {
                         Log.V("dragging in 3D ...");
                         foreach (var player in FocusedPlayers)
-                        {
                             player.Dragging = new Player.DraggingMode._3D
                             {
                                 Offset = player.Prefab.transform.rotation
-                                    * Quaternion.Inverse(fovController.mainCamera.transform.rotation)
+                                         * Quaternion.Inverse(fovController.mainCamera.transform.rotation)
                             };
-                        }
                     }
                 );
 
@@ -489,10 +471,7 @@ public class DashPanels : MonoBehaviourWithLogging
                     _ =>
                     {
                         Log.V("... done");
-                        foreach (var player in FocusedPlayers)
-                        {
-                            player.Dragging = Player.DraggingMode.Disabled;
-                        }
+                        foreach (var player in FocusedPlayers) player.Dragging = Player.DraggingMode.Disabled;
                     }
                 );
         }
@@ -521,10 +500,7 @@ public class DashPanels : MonoBehaviourWithLogging
                     _ =>
                     {
                         Log.V("... done");
-                        foreach (var player in FocusedPlayers)
-                        {
-                            player.Dragging = Player.DraggingMode.Disabled;
-                        }
+                        foreach (var player in FocusedPlayers) player.Dragging = Player.DraggingMode.Disabled;
                     }
                 );
         }
@@ -578,18 +554,12 @@ public class DashPanels : MonoBehaviourWithLogging
 
     private void HideAllMenus()
     {
-        foreach (var p in AllMenus)
-        {
-            p.SetActive(false);
-        }
+        foreach (var p in AllMenus) p.SetActive(false);
     }
 
     public void HideAllPopups()
     {
-        foreach (var p in AllPopups)
-        {
-            p.SetActive(false);
-        }
+        foreach (var p in AllPopups) p.SetActive(false);
     }
 
 // TODO: aggregate into a view
@@ -626,7 +596,9 @@ public class DashPanels : MonoBehaviourWithLogging
         protected GameObject HideWhenLocked;
 
         protected GameObject LockScreenNotice;
+
         protected GameObject MenuToggleButton;
+
         //
         protected GameObject Logo;
 
@@ -666,5 +638,4 @@ public class DashPanels : MonoBehaviourWithLogging
             }
         }
     }
-
 }

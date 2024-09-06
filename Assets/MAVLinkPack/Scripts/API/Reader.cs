@@ -15,36 +15,56 @@ namespace MAVLinkPack.Scripts.API
 
         public Subscriber<T> Subscriber;
 
-        private IEnumerable<T> Create()
+        private IEnumerable<List<T>> _byMessage;
+
+        public IEnumerable<List<T>> ByMessage
+        {
+            get
+            {
+                _byMessage = _byMessage ?? _getByMessage();
+                return _byMessage;
+            }
+        }
+
+        private IEnumerable<List<T>> _getByMessage()
         {
             foreach (var message in Active.RawReadSource())
             {
                 var values = Subscriber.Process(message);
 
-                if (values != null)
-                    foreach (var v in values)
-                        yield return v;
+                if (values != null) yield return values;
             }
         }
 
-        private IEnumerable<T> _basic;
+        private IEnumerable<T> _byOutput;
 
-        public IEnumerable<T> Basic()
+        public IEnumerable<T> ByOutput
         {
-            _basic = _basic ?? Create();
-            return _basic;
+            get
+            {
+                _byOutput = _byOutput ?? _getByOutput();
+                return _byOutput;
+            }
         }
 
-        public List<T> Drain(int leftover = 0)
+        private IEnumerable<T> _getByOutput()
+        {
+            return ByMessage.SelectMany(vs => vs);
+        }
+
+        public List<T> Drain(int leftover = 8)
         {
             var list = new List<T>();
 
-            var basic = Basic();
-
-            if (Active.Port.BytesToRead > leftover)
+            using (var rator = ByMessage.GetEnumerator())
             {
-                Debug.Log("Draining, " + Active.Port.BytesToRead + " bytes left");
-                list.Add(basic.First());
+                while (Active.IO.BytesToRead > leftover && rator.MoveNext())
+                {
+                    var current = rator.Current;
+                    if (current != null)
+                        // Debug.Log("Draining, " + Active.Port.BytesToRead + " bytes left");
+                        list.AddRange(current);
+                }
             }
 
             return list;
