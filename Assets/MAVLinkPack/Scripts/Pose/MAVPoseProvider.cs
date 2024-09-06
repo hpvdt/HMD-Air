@@ -67,15 +67,22 @@ namespace MAVLinkPack.Scripts.Pose
         // Update Pose
         public override PoseDataFlags GetPoseFromProvider(out Pose output)
         {
-            Quaternion q;
-
             var reader = Reader;
 
             // TODO: this will cause pose to jump back to origin in case of connection loss or long latency
-            q = reader != null ? reader.Value.Drain().LastOrDefault() : Quaternion.identity;
+            if (reader != null)
+            {
+                var updates = reader.Value.Drain();
+                if (updates.Count > 0)
+                {
+                    var q = updates.LastOrDefault();
+                    output = new Pose(new Vector3(0, 0, 0), q);
+                    return PoseDataFlags.Rotation;
+                }
+            }
 
-            output = new Pose(new Vector3(0, 0, 0), q);
-            return PoseDataFlags.Rotation;
+            output = Pose.identity;
+            return PoseDataFlags.NoData;
         }
     }
 }

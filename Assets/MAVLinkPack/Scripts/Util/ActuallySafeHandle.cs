@@ -27,6 +27,11 @@ namespace MAVLinkPack.Scripts.Util
             return false;
         }
 
+        protected new void Dispose()
+        {
+            ActualReleaseHandle();
+        }
+
         protected sealed override void Dispose(bool disposing)
         {
             ActualReleaseHandle();

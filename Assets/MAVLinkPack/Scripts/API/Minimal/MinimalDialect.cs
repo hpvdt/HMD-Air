@@ -18,7 +18,11 @@ namespace MAVLinkPack.Scripts.API.Minimal
                 base_mode = 0
             };
 
-        public static Reader<T> Monitor<T>(this MAVConnection connection)
+        public static Reader<T> Monitor<T>(
+            this MAVConnection connection,
+            bool requireReceivedBytes = true,
+            bool requireHeartbeat = true
+        )
         {
             // this will return an empty builder that respond to heartbeat and request target to send all data
             // will fail if heartbeat is not received within 2 seconds
@@ -60,11 +64,37 @@ namespace MAVLinkPack.Scripts.API.Minimal
 
                         Thread.Sleep(200); // wait for a while before collecting
 
-                        sub.Drain();
+                        if (requireReceivedBytes)
+                        {
+                            var minReadBytes = 8;
 
-                        if (sub.Active.Stats.Counters.Get<MAVLink.mavlink_heartbeat_t>().ValueOrDefault.Value <= 0)
-                            throw new InvalidConnectionException(
-                                $"No heartbeat received");
+                            //sanity check, port is deemed unusable if it doesn't receive any data
+                            Retry.UpTo(24).With(TimeSpan.FromSeconds(0.2)).FixedInterval
+                                .Run((_, tt) =>
+                                    {
+                                        if (connection.IO.BytesToRead >= minReadBytes)
+                                        {
+                                            // Debug.Log(
+                                            //     $"Start reading serial port {Port.PortName} (with baud rate {Port.BaudRate}), received {Port.BytesToRead} byte(s)");
+                                        }
+                                        else
+                                        {
+                                            throw new TimeoutException(
+                                                $"{connection.IO.Name} only received {connection.IO.BytesToRead} byte(s) after {tt.TotalSeconds} seconds\n"
+                                                + $" Expecting at least {minReadBytes} bytes");
+                                        }
+                                    }
+                                );
+                        }
+
+                        if (requireHeartbeat)
+                        {
+                            sub.Drain();
+
+                            if (sub.Active.Stats.Counters.Get<MAVLink.mavlink_heartbeat_t>().ValueOrDefault.Value <= 0)
+                                throw new InvalidConnectionException(
+                                    $"No heartbeat received");
+                        }
                     }
                 );
 

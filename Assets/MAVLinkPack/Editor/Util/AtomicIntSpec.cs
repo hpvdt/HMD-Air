@@ -29,7 +29,7 @@ namespace MAVLinkPack.Editor.Util
             public void Increment_ShouldIncrementValue()
             {
                 var counter = new AtomicInt();
-                Assert.AreEqual(1, counter.Next());
+                Assert.AreEqual(1, counter.Increment());
                 Assert.AreEqual(1, counter.Value);
             }
 
@@ -38,7 +38,7 @@ namespace MAVLinkPack.Editor.Util
             {
                 var counter = new AtomicInt();
                 counter.Value = 1;
-                Assert.AreEqual(0, counter.Prev());
+                Assert.AreEqual(0, counter.Decrement());
                 Assert.AreEqual(0, counter.Value);
             }
 
@@ -63,7 +63,7 @@ namespace MAVLinkPack.Editor.Util
                 var tasks = new Task[1000];
 
                 for (var i = 0; i < 1000; i++)
-                    tasks[i] = Task.Run(() => { counter.Next(); });
+                    tasks[i] = Task.Run(() => { counter.Increment(); });
 
                 var all = Task.WhenAll(tasks);
                 all.Wait();

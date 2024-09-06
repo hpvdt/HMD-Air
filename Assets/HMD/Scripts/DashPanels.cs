@@ -134,7 +134,7 @@ public class DashPanels : MonoBehaviourWithLogging
     private Player _setupPlayerFromPrefab(GameObject prefab, string playerName)
     {
         prefab.SetActive(true);
-        var id = playerName + "(" + _incCounter.Next() + ")";
+        var id = playerName + "(" + _incCounter.Increment() + ")";
 
         var player = new Player { Outer = this, Prefab = prefab, ID = id };
         _activePlayers.Add(id, player);

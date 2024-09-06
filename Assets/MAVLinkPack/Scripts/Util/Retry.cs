@@ -19,7 +19,7 @@ namespace MAVLinkPack.Scripts.Util
 
         public ArgsT Args => _args ?? DefaultArgs;
 
-        public string Name = "Retry-" + Retry.NameCounter.Next();
+        public string Name = "Retry-" + Retry.NameCounter.Increment();
 
         private static bool DefaultShouldRetry(Exception ex, TI attempt)
         {

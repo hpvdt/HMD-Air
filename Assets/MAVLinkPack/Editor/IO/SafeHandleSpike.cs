@@ -24,7 +24,7 @@ namespace MAVLinkPack.Editor.IO
         [Test]
         public void Real()
         {
-            var i1 = IO.Fake.Counter;
+            var i1 = IO.Real.Counter;
             using (var obj = new Real(true))
             {
                 Assert.AreEqual(i1, IO.Real.Counter);

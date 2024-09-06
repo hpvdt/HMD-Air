@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Ports;
+using System.Linq;
 using System.Threading;
 using MAVLinkPack.Scripts.Util;
 using Microsoft.Win32.SafeHandles;
@@ -48,7 +49,9 @@ namespace MAVLinkPack.Scripts.IO
                 var peerClosed = 0;
 
                 // close others with same name
-                foreach (var peer in SerialManager.Pool)
+                var peers = SerialManager.Pool.ToArray();
+
+                foreach (var peer in peers)
                     if (peer.Name == Name)
                     {
                         peer.Dispose();
@@ -57,7 +60,7 @@ namespace MAVLinkPack.Scripts.IO
 
                 if (peerClosed > 0)
                 {
-                    Debug.LogWarning($"Closed {peerClosed} peer(s) with name {Name}");
+                    Debug.LogWarning($"{peerClosed} peer(s) with name {Name} are disposed");
                     Thread.Sleep(1000);
                 }
 
@@ -172,27 +175,6 @@ namespace MAVLinkPack.Scripts.IO
                 var validateWriteData = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 };
 
                 WriteBytes(validateWriteData);
-
-                // var minReadBytes = 8;
-                //
-                // var retry = Retry.UpTo(24).With(TimeSpan.FromSeconds(0.2)).FixedInterval;
-                //
-                // //sanity check, port is deemed unusable if it doesn't receive any data
-                // retry.Run((_, tt) =>
-                //     {
-                //         if (Port.BytesToRead >= minReadBytes)
-                //         {
-                //             // Debug.Log(
-                //             //     $"Start reading serial port {Port.PortName} (with baud rate {Port.BaudRate}), received {Port.BytesToRead} byte(s)");
-                //         }
-                //         else
-                //         {
-                //             throw new TimeoutException(
-                //                 $" only received {Port.BytesToRead} byte(s) on port {Port.PortName} after {tt.TotalSeconds} seconds\n"
-                //                 + $" Expecting at least {minReadBytes} bytes");
-                //         }
-                //     }
-                // );
             }
         }
 

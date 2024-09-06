@@ -60,10 +60,12 @@ namespace MAVLinkPack.Scripts.API
             }
         }
 
+
         public T Initialise<T>(
             Func<MAVConnection, T> handshake,
             int[]? preferredBaudRates = null,
-            TimeSpan? timeout = null
+            TimeSpan? timeout = null,
+            bool reconnect = true
         )
         {
             timeout ??= TimeSpan.FromSeconds(10);
@@ -88,7 +90,7 @@ namespace MAVLinkPack.Scripts.API
                 try
                 {
                     var taskCompletedSuccessfully = false;
-                    IO.Connect(reconnect: true);
+                    IO.Connect(reconnect);
                     Debug.Log("Connected, waiting for handshake");
 
                     var task = Task.Run(() =>
@@ -167,9 +169,9 @@ namespace MAVLinkPack.Scripts.API
                     else
                     {
                         var counter = Stats.Counters.Get(result.msgid).ValueOrInsert(() => new AtomicLong());
-                        counter.Next();
+                        counter.Increment();
 
-                        Debug.Log($"received packet, info={TypeLookup.Global.ByID.GetValueOrDefault(result.msgid)}");
+                        // Debug.Log($"received packet, info={TypeLookup.Global.ByID.GetValueOrDefault(result.msgid)}");
                         yield return result;
                     }
                 }

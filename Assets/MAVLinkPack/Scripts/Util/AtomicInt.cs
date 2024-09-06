@@ -1,5 +1,4 @@
 ﻿using System.Threading;
-using Unity.VisualScripting;
 
 namespace MAVLinkPack.Scripts.Util
 {
@@ -11,6 +10,17 @@ namespace MAVLinkPack.Scripts.Util
         {
             ValueInternal = initialValue;
         }
+
+        public T Value
+        {
+            get => ValueInternal;
+            set => ValueInternal = value;
+        }
+
+        public T Get()
+        {
+            return Value;
+        }
     }
 
     public class AtomicInt : Atomic<int>
@@ -20,12 +30,12 @@ namespace MAVLinkPack.Scripts.Util
         // }
 
 
-        public int Next()
+        public int Increment()
         {
             return Interlocked.Increment(ref ValueInternal);
         }
 
-        public int Prev()
+        public int Decrement()
         {
             return Interlocked.Decrement(ref ValueInternal);
         }
@@ -34,22 +44,16 @@ namespace MAVLinkPack.Scripts.Util
         {
             return Interlocked.Add(ref ValueInternal, value);
         }
-
-        public int Value
-        {
-            get => ValueInternal;
-            set => ValueInternal = value;
-        }
     }
 
     public class AtomicLong : Atomic<long>
     {
-        public long Next()
+        public long Increment()
         {
             return Interlocked.Increment(ref ValueInternal);
         }
 
-        public long Prev()
+        public long Decrement()
         {
             return Interlocked.Decrement(ref ValueInternal);
         }
@@ -57,12 +61,6 @@ namespace MAVLinkPack.Scripts.Util
         public long Add(long value)
         {
             return Interlocked.Add(ref ValueInternal, value);
-        }
-
-        public long Value
-        {
-            get => Interlocked.CompareExchange(ref ValueInternal, 0, 0);
-            set => Interlocked.Exchange(ref ValueInternal, 0);
         }
     }
 }
