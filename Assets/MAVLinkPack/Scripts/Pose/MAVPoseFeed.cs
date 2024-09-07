@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+using MAVLinkPack.Editor.Util;
 using MAVLinkPack.Scripts.API.Minimal;
 using MAVLinkPack.Scripts.API;
 using MAVLinkPack.Scripts.Util;
@@ -14,19 +17,19 @@ namespace MAVLinkPack.Scripts.Pose
     public class MAVPoseFeed : IDisposable
     {
         [Serializable]
-        public struct ArgsAPI
+        public struct ArgsT
         {
             public string regexPattern;
             public int[] preferredBaudRate;
 
-            public static ArgsAPI MatchAll = new()
+            public static ArgsT MatchAll = new()
             {
                 regexPattern = ".*",
                 preferredBaudRate = MAVConnection.DefaultPreferredBaudRates
             };
         }
 
-        public ArgsAPI Args;
+        public ArgsT Args;
 
         private struct Candidates
         {
@@ -57,9 +60,9 @@ namespace MAVLinkPack.Scripts.Pose
 
         private Candidates _candidates = new() { All = new Dictionary<MAVConnection, bool>() };
 
-        private Box<Reader<Quaternion>>? _reader;
+        private Box<Reader<Quaternion>>? _existingReader;
 
-        public Reader<Quaternion> Reader => LazyHelper.EnsureInitialized(ref _reader, Reader_Mk);
+        public Reader<Quaternion> Reader => LazyHelper.EnsureInitialized(ref _existingReader, Reader_Mk);
 
         private Reader<Quaternion> Reader_Mk()
         {
@@ -148,6 +151,31 @@ namespace MAVLinkPack.Scripts.Pose
             return only.First();
         }
 
+        public class Updater : RecurrentJob
+        {
+            private readonly MAVPoseFeed _feed;
+
+            public Quaternion Attitude;
+
+            public Updater(MAVPoseFeed feed)
+            {
+                _feed = feed;
+            }
+
+            protected override void Iterate()
+            {
+                var reader = _feed.Reader;
+                Attitude = reader.ByOutput.First();
+            }
+        }
+
+        private Updater? _pose;
+
+        public Updater Pose => LazyHelper.EnsureInitialized(
+            ref _pose,
+            () => new Updater(this)
+        );
+
         ~MAVPoseFeed()
         {
             Dispose();
@@ -155,12 +183,12 @@ namespace MAVLinkPack.Scripts.Pose
 
         public void Dispose()
         {
-            if (_reader != null) _candidates.Drop(_reader.Value.Active);
+            if (_pose != null) _pose.Dispose();
+            if (_existingReader != null) _candidates.Drop(_existingReader.Value.Active);
             _candidates.DropAll();
         }
 
-
-        public static MAVPoseFeed Of(ArgsAPI args)
+        public static MAVPoseFeed Of(ArgsT args)
         {
             return new MAVPoseFeed
             {

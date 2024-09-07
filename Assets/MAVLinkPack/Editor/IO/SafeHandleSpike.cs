@@ -7,7 +7,7 @@ namespace MAVLinkPack.Editor.IO
 {
     public class SafeHandleSpike
     {
-        [Test]
+        // [Test]
         // will fail
         public void Fake()
         {

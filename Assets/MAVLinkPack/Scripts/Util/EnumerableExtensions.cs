@@ -5,7 +5,7 @@ namespace MAVLinkPack.Scripts.Util
 
     public static class EnumerableExtensions
     {
-        public static IEnumerable<(T Current, Maybe<T> Next)> ZipWithNext<T>(
+        public static IEnumerable<(T Current, Box<T>? Next)> ZipWithNext<T>(
             this IEnumerable<T> source
         )
         {
@@ -20,7 +20,7 @@ namespace MAVLinkPack.Scripts.Util
                 current = enumerator.Current;
             }
 
-            yield return (current, Maybe<T>.None());
+            yield return (current, null);
         }
     }
 }

@@ -23,7 +23,7 @@ namespace MAVLinkPack.Editor.Util
         {
             var result = new[] { 1 }.ZipWithNext().ToList();
             Assert.That(result, Has.Count.EqualTo(1));
-            Assert.That(result[0], Is.EqualTo((1, Maybe<int>.None())));
+            Assert.That(result[0], Is.EqualTo((1, (Box<int>)null)));
         }
 
         [Test]
@@ -31,9 +31,9 @@ namespace MAVLinkPack.Editor.Util
         {
             var result = new[] { 1, 2, 3 }.ZipWithNext().ToList();
             Assert.That(result, Has.Count.EqualTo(3));
-            Assert.That(result[0], Is.EqualTo((1, Maybe<int>.Some(2))));
-            Assert.That(result[1], Is.EqualTo((2, Maybe<int>.Some(3))));
-            Assert.That(result[2], Is.EqualTo((3, Maybe<int>.None())));
+            Assert.That(result[0], Is.EqualTo((1, Box.Of(2))));
+            Assert.That(result[1], Is.EqualTo((2, Box.Of(3))));
+            Assert.That(result[2], Is.EqualTo((3, (Box<int>)null)));
         }
 
         [Test]

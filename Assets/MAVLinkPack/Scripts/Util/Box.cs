@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 
 namespace MAVLinkPack.Scripts.Util
 {
@@ -14,6 +15,46 @@ namespace MAVLinkPack.Scripts.Util
         {
             if (value == null) throw new ArgumentNullException();
             Value = value;
+        }
+
+        public static implicit operator Box<T>(T value)
+        {
+            return new Box<T>(value);
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return Equals(obj as Box<T>);
+        }
+
+        public bool Equals(Box<T>? other)
+        {
+            return other != null &&
+                   EqualityComparer<T>.Default.Equals(Value, other.Value);
+        }
+
+        public override int GetHashCode()
+        {
+            return Value?.GetHashCode() ?? 0;
+        }
+
+        public static bool operator ==(Box<T> left, Box<T> right)
+        {
+            return EqualityComparer<Box<T>>.Default.Equals(left, right);
+        }
+
+        public static bool operator !=(Box<T> left, Box<T> right)
+        {
+            return !(left == right);
+        }
+    }
+
+    public static class Box
+    {
+        public static Box<T> Of<T>(T value)
+        {
+            return new Box<T>(value);
         }
     }
 }

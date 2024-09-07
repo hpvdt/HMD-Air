@@ -11,7 +11,7 @@ namespace MAVLinkPack.Editor.Pose
         [Test]
         public void ConnectAndRead10()
         {
-            var feed = MAVPoseFeed.Of(MAVPoseFeed.ArgsAPI.MatchAll);
+            var feed = MAVPoseFeed.Of(MAVPoseFeed.ArgsT.MatchAll);
 
             var counter = new AtomicInt();
 
@@ -26,6 +26,11 @@ namespace MAVLinkPack.Editor.Pose
 
                 if (counter.Get() > 10) break;
             }
+        }
+
+        [Test]
+        public void ConnectAndUpdate()
+        {
         }
     }
 }

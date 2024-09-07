@@ -88,7 +88,7 @@ namespace MAVLinkPack.Scripts.Util
                             $"{Outer.Name}/[{counter}/{zipped.Count}] {attempt}: Retry failed @ {stopwatch.Elapsed}s:" +
                             $"\n{ex.GetMessageForDisplay()}";
 
-                        if (!Outer.Args.ShouldContinue(ex, attempt) || !next.HasValue)
+                        if (!Outer.Args.ShouldContinue(ex, attempt) || next == null)
                         {
                             Debug.Log(
                                 baseInfo + $"\nthis is the last"

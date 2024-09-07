@@ -2,6 +2,8 @@
 
 namespace MAVLinkPack.Scripts.Util
 {
+    // TODO: theoretically it is faster than Box<T>?, but difficult to use
+
     public readonly struct Maybe<T>
     {
         private readonly T _value;
