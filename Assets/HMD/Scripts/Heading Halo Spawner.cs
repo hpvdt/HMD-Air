@@ -8,6 +8,9 @@ public class HeadingHaloSpawner : MonoBehaviour
     
     [Header("Parameters")]
     public float radius = 10f;
+
+    public float fontSize = 10f;
+
     public float angleBetweenMajor = 30f;
     public float angleBetweenPins = 30f;
 
@@ -31,18 +34,22 @@ public class HeadingHaloSpawner : MonoBehaviour
             {
                 newPin.transform.localScale += new Vector3(0,0.1f,0);
                 GameObject textObject = new GameObject("WorldTextObject");
-                textObject.transform.position = newPin.transform.position; //The text needs to be parented to the heading halo to fix the positioning. 
                 TextMeshPro textMeshPro = textObject.AddComponent<TextMeshPro>();
-                textMeshPro.text = degree.ToString();
                 
+                textMeshPro.transform.parent = this.transform;
+                textMeshPro.transform.position = newPin.transform.position + (Vector3.up);
+                
+                textMeshPro.alignment = TextAlignmentOptions.Center;
+                textMeshPro.text = degree.ToString();
+                textMeshPro.fontSize = this.fontSize;
+                textMeshPro.color = new Color32(0, 255, 30, 255);
+                textMeshPro.transform.LookAt(new Vector3(textMeshPro.transform.position.x * 2,textMeshPro.transform.position.y,textMeshPro.transform.position.z * 2));
+            
             }
             degree += angleBetweenPins;
         }
     }
-
     
-
-
     public Vector3 GetPinLocation(float degree)
     {
         float rad = degree * Mathf.Deg2Rad;
