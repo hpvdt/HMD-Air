@@ -27,7 +27,7 @@ namespace MAVLinkPack.Scripts.Pose
                     {
                         try
                         {
-                            _feed.GetReader();
+                            _ = _feed.Reader;
                         }
                         catch (Exception e)
                         {
@@ -59,7 +59,7 @@ namespace MAVLinkPack.Scripts.Pose
             get
             {
                 if (_feed == null) return null;
-                return _feed.GetReader();
+                return _feed.Reader;
             }
         }
 

@@ -57,14 +57,11 @@ namespace MAVLinkPack.Scripts.Pose
 
         private Candidates _candidates = new() { All = new Dictionary<MAVConnection, bool>() };
 
-        private Reader<Quaternion>? _reader;
+        private Box<Reader<Quaternion>>? _reader;
 
-        public Reader<Quaternion> GetReader()
-        {
-            return _reader ??= Discover();
-        }
+        public Reader<Quaternion> Reader => LazyHelper.EnsureInitialized(ref _reader, Reader_Mk);
 
-        private Reader<Quaternion> Discover()
+        private Reader<Quaternion> Reader_Mk()
         {
             var discovered = MAVConnection.Discover(new Regex(Args.regexPattern)).ToList();
 

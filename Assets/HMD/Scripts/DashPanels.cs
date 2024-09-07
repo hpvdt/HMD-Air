@@ -65,10 +65,8 @@ public class DashPanels : MonoBehaviourWithLogging
 
         private ControllerLike? _controller;
 
-        public ControllerLike Controller
-        {
-            get { return _controller ??= Prefab.GetComponent<ControllerLike>(); }
-        }
+        public ControllerLike Controller =>
+            LazyHelper.EnsureInitialized(ref _controller, () => Prefab.GetComponent<ControllerLike>());
 
         public class DraggingMode
         {
@@ -245,19 +243,13 @@ public class DashPanels : MonoBehaviourWithLogging
 
     private List<Button>? _allTabs;
 
-    private List<Button> AllTabs
+    private List<Button> AllTabs => LazyHelper.EnsureInitialized(ref _allTabs, () => new List<Button>
     {
-        get
-        {
-            return _allTabs ??= new List<Button>
-            {
-                playerTab.GetComponent<Button>(),
-                consoleTab.GetComponent<Button>(),
-                trackTab.GetComponent<Button>(),
-                volumeTab.GetComponent<Button>()
-            };
-        }
-    }
+        playerTab.GetComponent<Button>(),
+        consoleTab.GetComponent<Button>(),
+        trackTab.GetComponent<Button>(),
+        volumeTab.GetComponent<Button>()
+    });
 
     //Enable a GameObject if it is disabled, or disable it if it is enabled
     private static bool ToggleElement(GameObject element)
@@ -275,17 +267,11 @@ public class DashPanels : MonoBehaviourWithLogging
 
     private List<GameObject>? _allMenus;
 
-    private List<GameObject> AllMenus
+    private List<GameObject> AllMenus => LazyHelper.EnsureInitialized(ref _allMenus, () => new List<GameObject>
     {
-        get
-        {
-            return _allMenus ??= new List<GameObject>
-            {
-                _rootMenu,
-                _appMenu
-            };
-        }
-    }
+        _rootMenu,
+        _appMenu
+    });
 
     private GameObject _optionsButton;
 
@@ -299,20 +285,14 @@ public class DashPanels : MonoBehaviourWithLogging
 
     private List<GameObject>? _allPopups;
 
-    private List<GameObject> AllPopups
+    private List<GameObject> AllPopups => LazyHelper.EnsureInitialized(ref _allPopups, () => new List<GameObject>
     {
-        get
-        {
-            return _allPopups ??= new List<GameObject>
-            {
-                _aspectRatioPopup,
-                _screenPopup,
-                _formatPopup,
-                _releaseInfoPopup,
-                _pictureSettingsPopup
-            };
-        }
-    }
+        _aspectRatioPopup,
+        _screenPopup,
+        _formatPopup,
+        _releaseInfoPopup,
+        _pictureSettingsPopup
+    });
 
     // private MenuID _visibleMenuID;
 

@@ -11,7 +11,7 @@ namespace MAVLinkPack.Scripts.API
     {
         public class OnT<T> : Subscriber<Message<T>> where T : struct
         {
-            protected override Indexed<Topic?> MkTopics()
+            protected override Indexed<Topic> Topics_Mk()
             {
                 Indexed<Topic?> result = Indexed<Topic>.Global();
                 result.Get<T>().Value = message => new List<Message<T>>
@@ -35,14 +35,14 @@ namespace MAVLinkPack.Scripts.API
 
         public static readonly Topic? TopicMissing = _ => null;
 
-        private Indexed<Topic>? _topics;
+        private Box<Indexed<Topic>>? _topics;
 
-        protected abstract Indexed<Topic> MkTopics();
+        private Indexed<Topic> Topics =>
+            // Topics_Mk.BindToLazy(ref _topics); // TODO: oops, eta-expansion does't work.
+            LazyHelper.EnsureInitialized(ref _topics, Topics_Mk);
 
-        private Indexed<Topic?> Topics
-        {
-            get { return _topics ??= MkTopics(); }
-        }
+        protected abstract Indexed<Topic> Topics_Mk();
+
 
         public List<T>? Process(MAVLink.MAVLinkMessage message)
         {
@@ -57,7 +57,7 @@ namespace MAVLinkPack.Scripts.API
 
         public class UnionT : BinaryT
         {
-            protected override Indexed<Topic> MkTopics()
+            protected override Indexed<Topic> Topics_Mk()
             {
                 var merged = Left.Topics.Index.Merge(
                     Right.Topics.Index,
@@ -84,7 +84,7 @@ namespace MAVLinkPack.Scripts.API
 
         public class OrElseT : BinaryT
         {
-            protected override Indexed<Topic> MkTopics()
+            protected override Indexed<Topic> Topics_Mk()
             {
                 var merged = Left.Topics.Index.Merge(
                     Right.Topics.Index,
@@ -114,7 +114,7 @@ namespace MAVLinkPack.Scripts.API
             public Subscriber<T> Prev = null!;
             public Func<MAVLink.MAVLinkMessage, T, List<T2>> Fn = null!;
 
-            protected override Indexed<Topic> MkTopics()
+            protected override Indexed<Topic> Topics_Mk()
             {
                 var oldTopics = Prev.Topics.Index;
 

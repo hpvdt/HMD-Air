@@ -7,7 +7,7 @@ namespace MAVLinkPack.Editor.IO
 {
     public class SafeHandleSpike
     {
-        // [Test]
+        [Test]
         // will fail
         public void Fake()
         {
@@ -35,10 +35,14 @@ namespace MAVLinkPack.Editor.IO
         }
     }
 
-
     public class Fake : SafeHandleMinusOneIsInvalid
     {
         public static volatile int Counter;
+
+        public Fake(nint handle, bool ownsHandle) : base(ownsHandle)
+        {
+            SetHandle(handle);
+        }
 
         public Fake(bool ownsHandle) : base(ownsHandle)
         {
@@ -50,7 +54,6 @@ namespace MAVLinkPack.Editor.IO
             return true;
         }
     }
-
 
     public class Real : ActuallySafeHandle
     {

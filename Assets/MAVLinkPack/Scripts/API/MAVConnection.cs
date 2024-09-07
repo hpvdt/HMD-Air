@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Threading;
 using System.Threading.Tasks;
 using MAVLinkPack.Scripts.IO;
 using MAVLinkPack.Scripts.Util;
@@ -145,38 +146,39 @@ namespace MAVLinkPack.Scripts.API
 
         private IEnumerable<MAVLink.MAVLinkMessage>? _rawReadSource;
 
-        public IEnumerable<MAVLink.MAVLinkMessage> RawReadSource()
-        {
-            _rawReadSource ??= Get();
-            return _rawReadSource;
-
-            IEnumerable<MAVLink.MAVLinkMessage> Get()
-            {
-                while (IO.IsOpen)
+        public IEnumerable<MAVLink.MAVLinkMessage> RawReadSource =>
+            LazyInitializer.EnsureInitialized(ref _rawReadSource, () =>
                 {
-                    MAVLink.MAVLinkMessage result;
-                    lock (IO.ReadLock)
-                    {
-                        Stats.Pressure = IO.BytesToRead;
-                        result = Mavlink.ReadPacket(IO.BaseStream);
-                    }
+                    return Get();
 
-                    if (result == null)
+                    IEnumerable<MAVLink.MAVLinkMessage> Get()
                     {
-                        // var pending = Port.BytesToRead;
-                        // Debug.Log($"unknown packet, {pending} byte(s) left");
-                    }
-                    else
-                    {
-                        var counter = Stats.Counters.Get(result.msgid).ValueOrInsert(() => new AtomicLong());
-                        counter.Increment();
+                        while (IO.IsOpen)
+                        {
+                            MAVLink.MAVLinkMessage result;
+                            lock (IO.ReadLock)
+                            {
+                                Stats.Pressure = IO.BytesToRead;
+                                result = Mavlink.ReadPacket(IO.BaseStream);
+                            }
 
-                        // Debug.Log($"received packet, info={TypeLookup.Global.ByID.GetValueOrDefault(result.msgid)}");
-                        yield return result;
+                            if (result == null)
+                            {
+                                // var pending = Port.BytesToRead;
+                                // Debug.Log($"unknown packet, {pending} byte(s) left");
+                            }
+                            else
+                            {
+                                var counter = Stats.Counters.Get(result.msgid).ValueOrInsert(() => new AtomicLong());
+                                counter.Increment();
+
+                                // Debug.Log($"received packet, info={TypeLookup.Global.ByID.GetValueOrDefault(result.msgid)}");
+                                yield return result;
+                            }
+                        }
                     }
                 }
-            }
-        }
+            );
 
         public Reader<T> Read<T>(Subscriber<T> subscriber)
         {

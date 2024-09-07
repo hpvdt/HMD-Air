@@ -1,6 +1,7 @@
 #nullable enable
 using System.Linq;
-using UnityEngine;
+using System.Threading;
+using MAVLinkPack.Scripts.Util;
 
 namespace MAVLinkPack.Scripts.API
 {
@@ -15,20 +16,15 @@ namespace MAVLinkPack.Scripts.API
 
         public Subscriber<T> Subscriber;
 
-        private IEnumerable<List<T>> _byMessage;
+        private IEnumerable<List<T>>? _byMessage;
 
-        public IEnumerable<List<T>> ByMessage
-        {
-            get
-            {
-                _byMessage = _byMessage ?? _getByMessage();
-                return _byMessage;
-            }
-        }
+        public IEnumerable<List<T>> ByMessage =>
+            LazyHelper.EnsureInitialized(ref _byMessage,
+                _byMessage_Mk); // LazyInitializer.EnsureInitialized(ref _byMessage, _byMessage_Mk);
 
-        private IEnumerable<List<T>> _getByMessage()
+        private IEnumerable<List<T>> _byMessage_Mk()
         {
-            foreach (var message in Active.RawReadSource())
+            foreach (var message in Active.RawReadSource)
             {
                 var values = Subscriber.Process(message);
 
@@ -38,16 +34,9 @@ namespace MAVLinkPack.Scripts.API
 
         private IEnumerable<T> _byOutput;
 
-        public IEnumerable<T> ByOutput
-        {
-            get
-            {
-                _byOutput = _byOutput ?? _getByOutput();
-                return _byOutput;
-            }
-        }
+        public IEnumerable<T> ByOutput => LazyInitializer.EnsureInitialized(ref _byOutput, _byOutput_Mk);
 
-        private IEnumerable<T> _getByOutput()
+        private IEnumerable<T> _byOutput_Mk()
         {
             return ByMessage.SelectMany(vs => vs);
         }

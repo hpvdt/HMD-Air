@@ -17,7 +17,7 @@ namespace MAVLinkPack.Editor.Pose
 
             for (var i = 0; i < 1000; i++)
             {
-                var qs = feed.GetReader().Drain();
+                var qs = feed.Reader.Drain();
 
                 if (qs.Count > 0) counter.Increment();
 
