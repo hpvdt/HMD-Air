@@ -16,6 +16,7 @@ public class DashPanels : MonoBehaviourWithLogging
     // [HideInInspector]
     // public VlcController controller;
 
+    public GameObject playerRig = null!;
     public GameObject vlcPlayerTemplate = null!;
     public GameObject vCapPlayerTemplate = null!;
 
@@ -145,7 +146,10 @@ public class DashPanels : MonoBehaviourWithLogging
     private Player _setupPlayerFromTemplate(GameObject template, string prefix, bool focus = true)
     {
         var heading = fovController.mainCamera.transform.rotation;
-        var prefab = Instantiate(template, Vector3.zero, heading);
+
+
+        var prefab =
+            Instantiate(template, Vector3.zero, heading, playerRig.transform);
 
         var player = _setupPlayerFromPrefab(prefab, prefix);
 
