@@ -1,23 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Ports;
-using System.Linq;
 using System.Threading;
 using MAVLinkPack.Scripts.Util;
-using Microsoft.Win32.SafeHandles;
 using UnityEngine;
 
 namespace MAVLinkPack.Scripts.IO
 {
-    public static class SerialManager
-    {
-        public static readonly List<Serial> Pool = new();
-
-        public static readonly object GlobalLock = new();
-    }
-
-    public class Serial : ActuallySafeHandle
+    public class Serial : SafeClean
     {
         // TODO: generalised this to read from any () => Stream
         private readonly SerialPort _port;
@@ -42,14 +32,14 @@ namespace MAVLinkPack.Scripts.IO
 
         public Serial(SerialPort port) : base()
         {
-            lock (SerialManager.GlobalLock)
+            lock (SafeCleanManager<Serial>.ReadWrite)
             {
                 Name = port.PortName;
 
                 var peerClosed = 0;
 
                 // close others with same name
-                var peers = SerialManager.Pool.ToArray();
+                var peers = this.Peers().ToArray();
 
                 foreach (var peer in peers)
                     if (peer.Name == Name)
@@ -64,32 +54,18 @@ namespace MAVLinkPack.Scripts.IO
                     Thread.Sleep(1000);
                 }
 
-                SerialManager.Pool.Add(this);
                 _port = port;
             }
         }
         // TODO:
         // public static GetOrCreate()?
 
-
-        protected override bool ActualReleaseHandle()
+        protected override bool DoClean()
         {
-            // from Unity_SerialPort
-            try
-            {
-                // Close the serial port
-                IsOpen = false;
-                _port.Dispose();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-            finally
-            {
-                SerialManager.Pool.Remove(this);
-            }
+            // Close the serial port
+            IsOpen = false;
+            _port.Dispose();
+            return true;
         }
 
         // last time it was closed

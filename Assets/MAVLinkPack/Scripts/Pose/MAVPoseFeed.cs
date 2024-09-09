@@ -96,7 +96,22 @@ namespace MAVLinkPack.Scripts.Pose
                                         .Select((raw, msg) =>
                                         {
                                             var data = msg.Data;
-                                            var q = new Quaternion(data.q1, data.q2, data.q3, data.q4);
+
+                                            // receiving quaternion in WXYZ order, FRD frame when facing north (a.k.a NED frame) (right-hand)
+                                            // FRD = Fowward-Right-Down
+                                            // NED = North-East-Down
+                                            // see MAVLink common.xml
+
+                                            // converting to XYZW order
+
+                                            // var q = new Quaternion(data.q1, data.q2, data.q3, data.q4);
+                                            // var q = new Quaternion(
+                                            //     -data.q2, -data.q4, -data.q3, data.q1
+                                            // ); // chiral conversion
+                                            var q = UnityQuaternionExtensions.AeronauticFrame.From(
+                                                data.q1, data.q2, data.q3, data.q4
+                                            );
+
                                             return q;
                                         });
 
@@ -108,10 +123,12 @@ namespace MAVLinkPack.Scripts.Pose
 
                             return new List<Reader<Quaternion>> { reader };
                         }
-                        catch (Exception e)
+                        catch (Exception ex)
                         {
                             _candidates.Drop(connection);
-                            errors.Add(connection.IO.Name, e);
+                            Debug.LogException(ex);
+
+                            errors.Add(connection.IO.Name, ex);
 
                             return new List<Reader<Quaternion>>();
                         }
@@ -165,7 +182,8 @@ namespace MAVLinkPack.Scripts.Pose
             protected override void Iterate()
             {
                 var reader = _feed.Reader;
-                Attitude = reader.ByOutput.First();
+                if (reader.HasMore)
+                    Attitude = reader.ByOutput.First();
             }
         }
 

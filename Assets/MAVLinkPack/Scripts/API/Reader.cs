@@ -32,6 +32,8 @@ namespace MAVLinkPack.Scripts.API
             }
         }
 
+        public bool HasMore => ByMessage.Any();
+
         private IEnumerable<T> _byOutput;
 
         public IEnumerable<T> ByOutput => LazyInitializer.EnsureInitialized(ref _byOutput, _byOutput_Mk);

@@ -3,6 +3,7 @@
 namespace MAVLinkPack.Scripts.Util
 {
     // TODO: theoretically it is faster than Box<T>?, but difficult to use
+    // TODO: should extend IEnumerable<T>
 
     public readonly struct Maybe<T>
     {

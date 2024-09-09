@@ -7,11 +7,14 @@ namespace MAVLinkPack.Editor.IO
 {
     public class SafeHandleSpike
     {
-        // [Test]
-        // will fail
+        [Test]
         public void Fake()
         {
             var i1 = IO.Fake.Counter;
+
+            // using (var obj = new Fake(10, true))
+            // using (var obj = new Fake(0, true))
+            // using (var obj = new Fake(-1, true)) // won't work
             using (var obj = new Fake(true))
             {
                 Assert.AreEqual(i1, IO.Fake.Counter);
@@ -25,7 +28,7 @@ namespace MAVLinkPack.Editor.IO
         public void Real()
         {
             var i1 = IO.Real.Counter;
-            using (var obj = new Real(true))
+            using (var obj = new Real())
             {
                 Assert.AreEqual(i1, IO.Real.Counter);
                 // do things
@@ -46,6 +49,9 @@ namespace MAVLinkPack.Editor.IO
 
         public Fake(bool ownsHandle) : base(ownsHandle)
         {
+            var i = new IntPtr(0);
+
+            SetHandle(i);
         }
 
         protected override bool ReleaseHandle()
@@ -55,15 +61,12 @@ namespace MAVLinkPack.Editor.IO
         }
     }
 
-    public class Real : ActuallySafeHandle
+    public class Real : SafeClean
     {
         public static volatile int Counter;
 
-        public Real(bool ownsHandle) : base(ownsHandle)
-        {
-        }
 
-        protected override bool ActualReleaseHandle()
+        protected override bool DoClean()
         {
             Counter += 1;
             return true;

@@ -1,9 +1,9 @@
 ﻿#nullable enable
-namespace NullableExtension
-{
-    using System.Collections.Generic;
+using System.Collections.Generic;
 
-    public static class Basic
+namespace MAVLinkPack.Scripts.Util
+{
+    public static class NullableExtensions
     {
         public static IEnumerable<T> Wrap<T>(this T? nullable) where T : struct
         {
@@ -18,10 +18,7 @@ namespace NullableExtension
         public static IEnumerable<T> Wrap<T>(this T nullable) where T : class
         {
             // TODO: how to remove this?
-            if (nullable != null)
-            {
-                yield return nullable;
-            }
+            if (nullable != null) yield return nullable;
         }
     }
 

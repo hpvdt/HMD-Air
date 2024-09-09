@@ -112,7 +112,12 @@ namespace MAVLinkPack.Scripts.API
                         }
                     });
 
-                    if (task.Wait(timeout.Value)) return task.Result;
+                    if (task.Wait(timeout.Value))
+                    {
+                        Debug.Log("Handshake completed");
+                        return task.Result;
+                    }
+
                     throw new TimeoutException($"Timeout after {timeout.Value.TotalSeconds} seconds");
                 }
                 catch
@@ -158,8 +163,9 @@ namespace MAVLinkPack.Scripts.API
                             MAVLink.MAVLinkMessage result;
                             lock (IO.ReadLock)
                             {
-                                Stats.Pressure = IO.BytesToRead;
+                                if (!IO.IsOpen) break;
                                 result = Mavlink.ReadPacket(IO.BaseStream);
+                                Stats.Pressure = IO.BytesToRead;
                             }
 
                             if (result == null)
