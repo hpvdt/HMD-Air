@@ -31,9 +31,9 @@ namespace MAVLinkPack.Scripts.Util
             {
                 var mapped = new Quaternion(y, z, x, w);
 
-                var bias = Quaternion.Euler(0, 0, 180);
+                var bias = Quaternion.Euler(0, 180, 0);
 
-                return bias * mapped;
+                return mapped * bias;
                 // return new Quaternion(0, 0, 0, 1);
             }
         }

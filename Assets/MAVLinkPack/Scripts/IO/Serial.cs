@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.IO.Ports;
+using System.Linq;
 using System.Threading;
 using MAVLinkPack.Scripts.Util;
 using UnityEngine;
@@ -30,16 +31,18 @@ namespace MAVLinkPack.Scripts.IO
             set => _port.BaudRate = value;
         }
 
-        public Serial(SerialPort port) : base()
+        public Serial(SerialPort port)
         {
-            lock (SafeCleanManager<Serial>.ReadWrite)
+            lock (this.ReadWrite())
             {
                 Name = port.PortName;
 
                 var peerClosed = 0;
 
                 // close others with same name
-                var peers = this.Peers().ToArray();
+                var peers = this.Peers().ToList();
+                Debug.LogWarning(
+                    $"found {peers.Count()} Serial and {SafeCleanManager.GlobalCounter.Value} SafeClean objects");
 
                 foreach (var peer in peers)
                     if (peer.Name == Name)

@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Microsoft.Win32.SafeHandles;
+using UnityEngine;
 
 namespace MAVLinkPack.Scripts.Util
 {
-    public static class SafeCleanManager<T>
+    public static class SafeCleanManager
     {
-        public static readonly List<T> Pool = new();
+        public static readonly AtomicInt GlobalCounter = new();
+
+        public static readonly List<SafeClean> Pool = new();
 
         public static readonly object ReadWrite = new();
     }
@@ -25,8 +30,13 @@ namespace MAVLinkPack.Scripts.Util
 
             lock (this.ReadWrite())
             {
-                this.Peers().Add(this);
+                SafeCleanManager.Pool.Add(this);
+                SafeCleanManager.GlobalCounter.Increment();
             }
+
+            var peers = this.SelfAndPeers();
+            if (!peers.Contains(this))
+                Debug.LogException(new IOException("INTERNAL ERROR!"));
         }
 
         protected sealed override bool ReleaseHandle()
@@ -39,10 +49,18 @@ namespace MAVLinkPack.Scripts.Util
             finally
             {
                 if (success)
+                {
+                    Debug.Log($"Cleaning successful, removing {this} from peers");
                     lock (this.ReadWrite())
                     {
-                        this.Peers().Remove(this);
+                        SafeCleanManager.Pool.Remove(this);
+                        SafeCleanManager.GlobalCounter.Decrement();
                     }
+                }
+                else
+                {
+                    Debug.LogWarning("Cleaning failed");
+                }
             }
 
             return success;
@@ -55,15 +73,33 @@ namespace MAVLinkPack.Scripts.Util
     {
         public static object ReadWrite<T>(this T self) where T : SafeClean
         {
-            return SafeCleanManager<T>.ReadWrite;
+            return SafeCleanManager.ReadWrite; // should avoid a global lock and classify by types
         }
 
-        public static List<T> Peers<T>(this T tt) where T : SafeClean
+        public static IEnumerable<T> SelfAndPeers<T>(this T self)
+            where T : SafeClean // should be read only
         {
-            lock (tt.ReadWrite())
+            lock (self.ReadWrite())
             {
-                return SafeCleanManager<T>.Pool;
+                var selfType = self.GetType();
+
+                var filtered = SafeCleanManager.Pool
+                    .Where(x =>
+                    {
+                        var isSelfType = x.GetType() == selfType;
+                        return isSelfType;
+                    })
+                    .Cast<T>();
+
+                return filtered;
             }
+        }
+
+
+        public static IEnumerable<T> Peers<T>(this T self) where T : SafeClean
+        {
+            var peers = self.SelfAndPeers<T>();
+            return peers.Where(v => !ReferenceEquals(v, self));
         }
     }
 }
