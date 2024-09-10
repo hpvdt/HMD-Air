@@ -16,7 +16,6 @@ namespace MAVLinkPack.Scripts.IO
 
         public TimeSpan MinRestartLatency = TimeSpan.FromSeconds(1);
 
-
         public Stream BaseStream => _port.BaseStream;
         public int BytesToRead => _port.BytesToRead;
 
@@ -42,7 +41,7 @@ namespace MAVLinkPack.Scripts.IO
                 // close others with same name
                 var peers = this.Peers().ToList();
                 Debug.LogWarning(
-                    $"found {peers.Count()} Serial and {SafeCleanManager.GlobalCounter.Value} SafeClean objects");
+                    $"found {peers.Count()} Serial and {CleanupPool.GlobalCounter.Value} SafeClean objects");
 
                 foreach (var peer in peers)
                     if (peer.Name == Name)

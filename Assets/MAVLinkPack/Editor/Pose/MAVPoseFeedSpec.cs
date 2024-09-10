@@ -33,14 +33,14 @@ namespace MAVLinkPack.Editor.Pose
         public void ConnectAndUpdate()
         {
             var feed = MAVPoseFeed.Of(MAVPoseFeed.ArgsT.MatchAll);
-            _ = feed.Reader;
+            feed.StartUpdate();
 
             var counter = new AtomicInt();
 
             for (var i = 0; i < 1000; i++)
             {
                 Thread.Sleep(100);
-                var qs = feed.Pose.Attitude;
+                var qs = feed.UpdaterDaemon!.Attitude;
 
                 if (qs != Quaternion.identity) counter.Increment();
 

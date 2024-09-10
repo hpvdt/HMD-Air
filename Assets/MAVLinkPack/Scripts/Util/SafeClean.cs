@@ -7,11 +7,13 @@ using UnityEngine;
 
 namespace MAVLinkPack.Scripts.Util
 {
-    public static class SafeCleanManager
+    public static class CleanupPool
     {
         public static readonly AtomicInt GlobalCounter = new();
 
+        // TODO: should use ConcurrentMultiMap
         public static readonly List<SafeClean> Pool = new();
+        // TODO: not efficient, should optimise this
 
         public static readonly object ReadWrite = new();
     }
@@ -30,8 +32,8 @@ namespace MAVLinkPack.Scripts.Util
 
             lock (this.ReadWrite())
             {
-                SafeCleanManager.Pool.Add(this);
-                SafeCleanManager.GlobalCounter.Increment();
+                CleanupPool.Pool.Add(this);
+                CleanupPool.GlobalCounter.Increment();
             }
 
             var peers = this.SelfAndPeers();
@@ -53,8 +55,8 @@ namespace MAVLinkPack.Scripts.Util
                     Debug.Log($"Cleaning successful, removing {this} from peers");
                     lock (this.ReadWrite())
                     {
-                        SafeCleanManager.Pool.Remove(this);
-                        SafeCleanManager.GlobalCounter.Decrement();
+                        CleanupPool.Pool.Remove(this);
+                        CleanupPool.GlobalCounter.Decrement();
                     }
                 }
                 else
@@ -73,7 +75,7 @@ namespace MAVLinkPack.Scripts.Util
     {
         public static object ReadWrite<T>(this T self) where T : SafeClean
         {
-            return SafeCleanManager.ReadWrite; // should avoid a global lock and classify by types
+            return CleanupPool.ReadWrite; // should avoid a global lock and classify by types
         }
 
         public static IEnumerable<T> SelfAndPeers<T>(this T self)
@@ -83,7 +85,7 @@ namespace MAVLinkPack.Scripts.Util
             {
                 var selfType = self.GetType();
 
-                var filtered = SafeCleanManager.Pool
+                var filtered = CleanupPool.Pool
                     .Where(x =>
                     {
                         var isSelfType = x.GetType() == selfType;

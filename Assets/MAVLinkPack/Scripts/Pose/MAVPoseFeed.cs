@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
-using MAVLinkPack.Editor.Util;
 using MAVLinkPack.Scripts.API.Minimal;
 using MAVLinkPack.Scripts.API;
 using MAVLinkPack.Scripts.Util;
@@ -168,31 +166,51 @@ namespace MAVLinkPack.Scripts.Pose
             return only.First();
         }
 
-        public class Updater : RecurrentJob
+        public class UpdaterD : RecurrentDaemon
         {
-            private readonly MAVPoseFeed _feed;
+            public Reader<Quaternion> Reader;
 
             public Quaternion Attitude;
 
-            public Updater(MAVPoseFeed feed)
-            {
-                _feed = feed;
-            }
-
             protected override void Iterate()
             {
-                var reader = _feed.Reader;
-                if (reader.HasMore)
-                    Attitude = reader.ByOutput.First();
+                if (Reader.HasMore)
+                    Attitude = Reader.ByOutput.First();
             }
         }
 
-        private Updater? _pose;
+        // each feed can only has 1 daemon
+        public UpdaterD? UpdaterDaemon;
 
-        public Updater Pose => LazyHelper.EnsureInitialized(
-            ref _pose,
-            () => new Updater(this)
-        );
+        public void StartUpdate()
+        {
+            var reader = Reader;
+
+            lock (this)
+            {
+                if (UpdaterDaemon == null)
+                {
+                    var daemon = new UpdaterD
+                    {
+                        Reader = reader
+                    };
+                    daemon.Start();
+                    UpdaterDaemon = daemon;
+                }
+            }
+        }
+
+        public void StopUpdate()
+        {
+            lock (this)
+            {
+                if (UpdaterDaemon != null)
+                {
+                    UpdaterDaemon.Dispose();
+                    UpdaterDaemon = null;
+                }
+            }
+        }
 
         ~MAVPoseFeed()
         {
@@ -201,7 +219,7 @@ namespace MAVLinkPack.Scripts.Pose
 
         public void Dispose()
         {
-            if (_pose != null) _pose.Dispose();
+            StopUpdate();
             if (_existingReader != null) _candidates.Drop(_existingReader.Value.Active);
             _candidates.DropAll();
         }

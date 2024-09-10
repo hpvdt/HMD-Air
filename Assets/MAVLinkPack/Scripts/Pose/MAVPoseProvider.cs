@@ -1,4 +1,7 @@
 #nullable enable
+using System;
+using System.Threading.Tasks;
+
 namespace MAVLinkPack.Scripts.Pose
 {
     using UnityEngine;
@@ -15,12 +18,22 @@ namespace MAVLinkPack.Scripts.Pose
         {
             lock (this)
             {
-                if (_feed == null)
-                {
-                    _feed = MAVPoseFeed.Of(args);
-                    _feed.Pose.Start();
-                }
+                if (_feed == null) _feed = MAVPoseFeed.Of(args);
             }
+
+            Task.Run(
+                () =>
+                {
+                    try
+                    {
+                        _feed.StartUpdate();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogException(ex);
+                    }
+                }
+            );
         }
 
         public void TryDisconnect()
@@ -42,26 +55,23 @@ namespace MAVLinkPack.Scripts.Pose
             TryConnect();
         }
 
-        // private Reader<Quaternion>? Reader
-        // {
-        //     get
-        //     {
-        //         if (_feed == null) return null;
-        //
-        //         if (_feed.ExistingReader == null) return null;
-        //
-        //         return _feed.ExistingReader.Value;
-        //     }
-        // }
-
+        public MAVPoseFeed.UpdaterD? UpdaterDaemon
+        {
+            get
+            {
+                if (_feed != null) return null;
+                if (_feed!.UpdaterDaemon == null) return null;
+                return _feed.UpdaterDaemon;
+            }
+        }
 
         // Update Pose
         public override PoseDataFlags GetPoseFromProvider(out Pose output)
         {
-            // TODO: this will cause pose to jump back to origin in case of connection loss or long latency
-            if (_feed != null)
+            var d = UpdaterDaemon;
+            if (d != null)
             {
-                output = new Pose(new Vector3(0, 0, 0), _feed.Pose.Attitude);
+                output = new Pose(new Vector3(0, 0, 0), d.Attitude);
                 return PoseDataFlags.Rotation;
             }
 
