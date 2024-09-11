@@ -1,3 +1,5 @@
+using HMD_Commons.Scripts;
+
 namespace HMD.Scripts.Streaming.VLC
 {
     using System;
@@ -8,12 +10,15 @@ namespace HMD.Scripts.Streaming.VLC
     using LibVLCSharp;
     using UnityEngine;
     using UnityEngine.Assertions;
+    using UnityEngine.Serialization;
     using Application = UnityEngine.Device.Application;
+
     public class VlcFeed : FeedLike
     {
-        public bool DebugVLCPlayer;
+        [FormerlySerializedAs("DebugVLCPlayer")]
+        public bool debugVLCPlayer;
 
-        public VlcArgs Args;
+        [Required] public VlcArgs Args;
 
         private LibVLC _libVLC;
 
@@ -40,7 +45,7 @@ namespace HMD.Scripts.Streaming.VLC
                 //LibVLC can freeze Unity if an exception goes unhandled inside an event handler.
                 try
                 {
-                    if (DebugVLCPlayer) Log.V($"[VLC-{e.Level}] [{s}{e.Module}] " + e.Message);
+                    if (debugVLCPlayer) Log.V($"[VLC-{e.Level}] [{s}{e.Module}] " + e.Message);
                 }
                 catch (Exception ex)
                 {
@@ -70,6 +75,7 @@ namespace HMD.Scripts.Streaming.VLC
                     Log.V($"LibVLCSharp version {typeof(LibVLC).Assembly.GetName().Version}");
                     _player = new MediaPlayer(libVLC);
                 }
+
                 return _player;
             }
         }
@@ -139,10 +145,7 @@ namespace HMD.Scripts.Streaming.VLC
             if (px != 0 && py != 0 && updated && texPtr != IntPtr.Zero)
             {
                 //If the currently playing video uses the Bottom Right orientation, we have to do this to avoid stretching it.
-                if (GetVideoOrientation() == VideoOrientation.BottomRight)
-                {
-                    (px, py) = (py, px);
-                }
+                if (GetVideoOrientation() == VideoOrientation.BottomRight) (px, py) = (py, px);
 
                 var _source =
                     Texture2D.CreateExternalTexture((int)px, (int)py, TextureFormat.RGBA32, false, true, texPtr);
@@ -213,10 +216,7 @@ namespace HMD.Scripts.Streaming.VLC
             // mediaPlayer.Media = new Media(Args.Location, Args.FromType, parameters);
 
             var m = new Media(Args.Location, Args.FromType);
-            foreach (var parameter in parameters)
-            {
-                m.AddOption(parameter);
-            }
+            foreach (var parameter in parameters) m.AddOption(parameter);
 
             Player.Media = m;
 
@@ -382,5 +382,4 @@ namespace HMD.Scripts.Streaming.VLC
             Player?.Unselect(type);
         }
     }
-
 }

@@ -1,5 +1,6 @@
 ﻿namespace HMD.Scripts.Streaming
 {
+    using HMD_Commons.Scripts;
     using UnityEngine;
     using UnityEngine.UI;
     public abstract class ControllerLike : MonoBehaviour
@@ -8,11 +9,11 @@
         // public ScreenLike screen;
         // public DashPanels dashPanels;
 
-        public GameObject icon;
+        [Required] public GameObject icon;
 
-        public Button playButton;
-        public Button pauseButton;
-        public Button stopButton;
+        [Required] public Button playButton;
+        [Required] public Button pauseButton;
+        [Required] public Button stopButton;
 
         public abstract void BindUI();
     }

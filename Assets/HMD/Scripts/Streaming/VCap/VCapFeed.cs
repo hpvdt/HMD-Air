@@ -1,19 +1,19 @@
 #nullable enable
+using HMD_Commons.Scripts;
+
 namespace HMD.Scripts.Streaming.VCap
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using NullableExtension;
     using Pickle;
     using Unity.VisualScripting;
     using UnityEngine;
 
     public class VCapFeed : FeedLike
     {
-
-        private Yaml _pickler = new Yaml();
+        private Yaml _pickler = new();
 
         public struct DeviceSelector
         {
@@ -22,6 +22,7 @@ namespace HMD.Scripts.Streaming.VCap
         }
 
         private WebCamTexture? _webCamTex;
+
         private static WebCamDevice[] Devices
         {
             get
@@ -48,7 +49,6 @@ namespace HMD.Scripts.Streaming.VCap
         {
             foreach (var d in _activeDevice.Wrap())
             {
-
                 var resList = _activeDevice?.availableResolutions;
 
                 if (res == null)
@@ -62,12 +62,10 @@ namespace HMD.Scripts.Streaming.VCap
                 {
                     var resV = res.Value;
                     if (resList != null && !resList.Contains(resV))
-                    {
                         Warning.V(
                             $"resolution `{resV.ToString()}` may be unsupported:\n"
                             + $"supported resolutions are [{string.Join(", ", resList.Select(x => x.ToString()))}]"
                         );
-                    }
 
                     Open(
                         new DeviceSelector
@@ -99,7 +97,6 @@ namespace HMD.Scripts.Streaming.VCap
                 }
 
                 if (resList != null)
-                {
                     foreach (var res in resList)
                     {
                         var v = new DeviceSelector()
@@ -109,7 +106,6 @@ namespace HMD.Scripts.Streaming.VCap
                         };
                         selectors.Add(v);
                     }
-                }
             }
 
             var yamls = _pickler.Fwd(selectors);
@@ -124,7 +120,7 @@ namespace HMD.Scripts.Streaming.VCap
 
             if (lines.Count <= 0) throw new IOException($"No line defined in file `${path}`");
 
-            var selectorStr = String.Join("\n", lines);
+            var selectorStr = string.Join("\n", lines);
             var selector = _pickler.Rev<DeviceSelector>(selectorStr);
 
             Open(selector);
@@ -176,7 +172,6 @@ namespace HMD.Scripts.Streaming.VCap
                 + $"    Seleccted: `{selector.Name}` ({selector.Resolution.ToSafeString()})\n"
                 + $"    Actual: `{_webCamTex.deviceName}` ({_webCamTex.width}x{_webCamTex.height} @ {_webCamTex.requestedFPS}fps)"
             );
-
         }
 
         public override void Stop()
@@ -217,13 +212,9 @@ namespace HMD.Scripts.Streaming.VCap
         protected override (uint, uint) GetSize()
         {
             if (_webCamTex == null)
-            {
                 return (0, 0);
-            }
             else
-            {
                 return ((uint)_webCamTex.width, (uint)_webCamTex.height);
-            }
         }
 
         public override void Dispose()

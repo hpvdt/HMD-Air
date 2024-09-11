@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Linq;
+    using HMD_Commons.Scripts;
     using SFB;
     using UnityEngine;
     using Util;
@@ -10,9 +11,9 @@
     {
 
         [HideInInspector]
-        public VlcController controller;
+        [Required] public VlcController controller;
 
-        [SerializeField] public VlcFeed feed;
+        [Required] [SerializeField] public VlcFeed feed;
 
         protected override FeedLike Feed
         {
@@ -33,7 +34,7 @@
                 feed.Player.AspectRatio = value?.ToRatioText();
 
                 var actual = AspectRatio;
-                var actualF = (float)(actual.ToDouble());
+                var actualF = (float)actual.ToDouble();
                 if (m_lMaterial is not null)
                     m_lMaterial.SetFloat("AspectRatio", actualF);
 
@@ -59,12 +60,12 @@
             var audio = new List<string>
             {
                 // Audio formats
-                "mp3", "wav", "ogg", "flac", "aac", "wma", "m4a", "opus",
+                "mp3", "wav", "ogg", "flac", "aac", "wma", "m4a", "opus"
             };
 
             var locator = new List<string>
             {
-                "mrl", "url", "txt",
+                "mrl", "url", "txt"
             };
 
             var supported = video.Union(audio).Union(locator);
@@ -91,7 +92,7 @@
                 new ExtensionFilter("Video", video.ToArray()),
                 new ExtensionFilter("Audio", audio.ToArray()),
                 new ExtensionFilter("Media resource locator", locator.ToArray()),
-                new ExtensionFilter("Any", "*"),
+                new ExtensionFilter("Any", "*")
             };
             var paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", fileTypes, false);
             var path = paths.FirstOrDefault();

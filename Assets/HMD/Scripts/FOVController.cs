@@ -1,18 +1,19 @@
 ﻿#nullable enable
 using System.Collections.Generic;
+using HMD_Commons.Scripts;
 using HMD.Scripts.Util;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class FOVController : MonoBehaviourWithLogging
 {
-    public Camera mainCamera;
+    [Required] public Camera mainCamera = null!;
 
     // TODO : enable this after gimbal or professional AR camera support
     // [SerializeField] private Camera leftCamera;
     // [SerializeField] private Camera rightCamera;
 
-    [SerializeField] private Slider fovBar;
+    [Required] [SerializeField] private Slider fovBar = null!;
 
     // [SerializeField] public Slider brightnessBar; // TODO: enable
     //
@@ -33,10 +34,22 @@ public class FOVController : MonoBehaviourWithLogging
     private static float minFocal = -15.0f;
 
     private List<Camera>? _mainCameras;
-    private List<Camera> MainCameras => _mainCameras ??= new List<Camera> { mainCamera };
+    private List<Camera> MainCameras
+    {
+        get
+        {
+            return _mainCameras ??= new List<Camera> { mainCamera };
+        }
+    }
 
     private List<Camera>? _allCameras;
-    private List<Camera> AllCameras => _allCameras ??= MainCameras;
+    private List<Camera> AllCameras
+    {
+        get
+        {
+            return _allCameras ??= MainCameras;
+        }
+    }
 
     private float FOV // 20 for 2D 140 for spherical
     {

@@ -1,6 +1,7 @@
 namespace HMD.Scripts.Streaming.VLC
 {
     using System;
+    using HMD_Commons.Scripts;
     using Util;
     using UnityEngine;
     using UnityEngine.EventSystems;
@@ -17,24 +18,24 @@ namespace HMD.Scripts.Streaming.VLC
         //GUI Elements
         //public RawImage screen;
         //public AspectRatioFitter screenAspectRatioFitter;
-        public Button rewind10Button;
-        public Button ffw10Button;
+        [Required] public Button rewind10Button;
+        [Required] public Button ffw10Button;
 
-        public Slider seekBar;
+        [Required] public Slider seekBar;
 
-        public Button fileButton;
+        [Required] public Button fileButton;
 
-        public InputField pathInputField; // TODO: this won't be on the dashUI, will be moved to HUD
-        public Button pathEnterButton;
+        [Required] public InputField pathInputField; // TODO: this won't be on the dashUI, will be moved to HUD
+        [Required] public Button pathEnterButton;
 
-        public Slider volumeBar;
-        public int maxVolume = 100;
+        [Required] public Slider volumeBar;
+        [Required] public int maxVolume = 100;
         //The highest volume the slider can reach. 100 is usually good but you can go higher.
 
-        public Text currentTimeCode;
+        [Required] public Text currentTimeCode;
 
-        public Slider aspectRatioBar;
-        public GameObject aspectRatioText;
+        [Required] public Slider aspectRatioBar;
+        [Required] public GameObject aspectRatioText;
 
         private bool _isDraggingAspectRatioBar; // TODO: cleanup, onValueChange is totally good enough
 

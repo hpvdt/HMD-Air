@@ -1,15 +1,16 @@
 ﻿namespace HMD.Scripts.Streaming.VCap
 {
+    using HMD_Commons.Scripts;
     using UnityEngine;
     using UnityEngine.UI;
     using Util;
     public class VCapController : ControllerLike
     {
-        public VCapScreen screen;
+        [Required] public VCapScreen screen;
 
-        public Button fileButton;
+        [Required] public Button fileButton;
 
-        public Button devicesButton;
+        [Required] public Button devicesButton;
 
         // TODO: do we need buttons for next/previous track/vCapDevice?
 

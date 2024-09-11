@@ -1,10 +1,11 @@
+using System;
+using HMD.Scripts.Pickle;
+using HMD.Scripts.Streaming.VCap;
+using NUnit.Framework;
+
 namespace HMD.Editor.Pickle
 {
-    using HMD.Scripts.Pickle;
-    using HMD.Scripts.Streaming.VCap;
-    using NUnit.Framework;
-
-    public class PickleSuite
+    public class PickleSpike
     {
         // A Test behaves as an ordinary method
         [Test]
@@ -18,7 +19,7 @@ namespace HMD.Editor.Pickle
             var obj = yaml.Rev<VCapFeed.DeviceSelector>(str);
             var str2 = yaml.Fwd(obj);
 
-            Assert.AreEqual(str2, "name: /dev/video0\nresolution: \n");
+            Assert.AreEqual(str2, $"name: /dev/video0{Environment.NewLine}resolution: {Environment.NewLine}");
             // Use the Assert class to test conditions
         }
 

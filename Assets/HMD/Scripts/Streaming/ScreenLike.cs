@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 namespace HMD.Scripts.Streaming
 {
+    using HMD_Commons.Scripts;
     using UnityEngine.Serialization;
 
     public abstract class ScreenLike : MonoBehaviourWithLogging
@@ -21,13 +22,13 @@ namespace HMD.Scripts.Streaming
             // TODO: there is no Mono_OU?
         }
 
-        [SerializeField] public VideoMode videoMode = VideoMode.Mono; // 2d by default
+        [Required] [SerializeField] public VideoMode videoMode = VideoMode.Mono; // 2d by default
 
         protected abstract FeedLike Feed { get; }
 
 
-        [SerializeField] private GameObject leftEyeScreen;
-        [SerializeField] private GameObject rightEyeScreen;
+        [Required] [SerializeField] private GameObject leftEyeScreen;
+        [Required] [SerializeField] private GameObject rightEyeScreen;
 
         private List<GameObject> AllScreens()
         {
@@ -40,13 +41,13 @@ namespace HMD.Scripts.Streaming
 
         // [SerializeField] public Slider scaleBar;
 
-        [SerializeField] public Slider distanceBar;
+        [Required] [SerializeField] public Slider distanceBar;
 
-        [SerializeField] public Slider deformBar;
+        [Required] [SerializeField] public Slider deformBar;
 
-        [SerializeField] public Slider horizontalBar;
+        [Required] [SerializeField] public Slider horizontalBar;
 
-        [SerializeField] public Slider verticalBar;
+        [Required] [SerializeField] public Slider verticalBar;
 
         // TODO: enable
         // [SerializeField] public Slider depthBar; // affect distance between left/right eyes

@@ -3,13 +3,14 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using HMD_Commons.Scripts;
     using SFB;
     using Unity.VisualScripting;
     using UnityEngine;
 
     public class VCapScreen : ScreenLike
     {
-        public VCapFeed feed;
+        [Required] public VCapFeed feed;
 
         protected override FeedLike Feed
         {
@@ -73,14 +74,14 @@
 
             var yaml = new List<string>
             {
-                "yaml", "yml",
+                "yaml", "yml"
             };
 
             // Open file with filter
             var fileTypes = new[]
             {
                 new ExtensionFilter("Video Capture Device YAML descriptor", yaml.ToArray()),
-                new ExtensionFilter("Any", "*"),
+                new ExtensionFilter("Any", "*")
             };
             var paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", fileTypes, false);
             var path = paths.FirstOrDefault();
