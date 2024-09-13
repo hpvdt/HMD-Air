@@ -19,18 +19,18 @@ public class AirPoseProvider : BasePoseProvider
     [DllImport("AirAPI_Windows", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr GetEuler();
 
-#elif UNITY_EDITOR_LINUX
+#elif UNITY_EDITOR_OSX
 
-    [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("libar_drivers.dylib", CallingConvention = CallingConvention.Cdecl)]
     public static extern int StartConnection();
 
-    [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("libar_drivers.dylib", CallingConvention = CallingConvention.Cdecl)]
     public static extern int StopConnection();
 
-    [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("libar_drivers.dylib", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr GetEuler();
 
-    [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
+    [DllImport("libar_drivers.dylib", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr GetQuaternion();
 
 #endif
