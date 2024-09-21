@@ -1,4 +1,4 @@
-namespace AirAPI.Scripts
+namespace XRPoseAPI.Scripts
 {
     public class __LinuxDriver
     {

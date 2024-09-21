@@ -1,13 +1,10 @@
-using System;
-using System.Runtime.InteropServices;
-using UnityEngine;
-using UnityEngine.Experimental.XR.Interaction;
-using UnityEngine.SpatialTracking;
-using Quaternion = UnityEngine.Quaternion;
-using Vector3 = UnityEngine.Vector3;
-
-namespace AirAPI.Scripts
+namespace XRPoseAPI.Scripts
 {
+    using System;
+    using System.Runtime.InteropServices;
+    using UnityEngine;
+    using UnityEngine.Experimental.XR.Interaction;
+    using UnityEngine.SpatialTracking;
     public class AirPoseProvider : BasePoseProvider
     {
         public bool useQuaternion = false;
