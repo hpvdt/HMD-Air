@@ -17,16 +17,16 @@ namespace AirAPI.Scripts
         public float mouseSensitivity = 100.0f;
 
 #if (UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN)
-        [DllImport("AirAPI_Windows", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("AirAPI_Windows.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int StartConnection();
 
-        [DllImport("AirAPI_Windows", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("AirAPI_Windows.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int StopConnection();
 
-        [DllImport("AirAPI_Windows", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("AirAPI_Windows.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr GetQuaternion();
 
-        [DllImport("AirAPI_Windows", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("AirAPI_Windows.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr GetEuler();
 
 #elif (UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX)
