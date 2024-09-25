@@ -20,6 +20,5 @@ public class FollowRotation : MonoBehaviour
         {
             transform.rotation = Quaternion.Inverse(leader.rotation);
         }
-
     }
 }
