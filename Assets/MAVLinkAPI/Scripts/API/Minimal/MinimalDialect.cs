@@ -80,7 +80,7 @@ namespace MAVLinkAPI.Scripts.API.Minimal
                                         else
                                         {
                                             throw new TimeoutException(
-                                                $"{connection.IO.Name} only received {connection.IO.BytesToRead} byte(s) after {tt.TotalSeconds} seconds\n"
+                                                $"{connection.IO.Key} only received {connection.IO.BytesToRead} byte(s) after {tt.TotalSeconds} seconds\n"
                                                 + $" Expecting at least {minReadBytes} bytes");
                                         }
                                     }

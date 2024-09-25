@@ -1,4 +1,6 @@
 #nullable enable
+using UnityEngine.Serialization;
+
 namespace HMD.Scripts.Streaming.VCap
 {
     using System;
@@ -12,10 +14,11 @@ namespace HMD.Scripts.Streaming.VCap
 
     public class VCapFeed : FeedLike
     {
-        private Yaml _pickler = new Yaml();
+        private Yaml _pickler = new();
 
-        public struct DeviceSelector
+        public struct ArgsT
         {
+            [FormerlySerializedAs("index")] public int Index;
             public string Name;
             public Resolution? Resolution;
         }
@@ -53,9 +56,7 @@ namespace HMD.Scripts.Streaming.VCap
                 if (res == null)
                 {
                     Log.V($"Setting up camera `{d.name}`");
-                    Open(
-                        new DeviceSelector { Name = d.name }
-                    );
+                    Open(new ArgsT { Name = d.name });
                 }
                 else
                 {
@@ -67,7 +68,7 @@ namespace HMD.Scripts.Streaming.VCap
                         );
 
                     Open(
-                        new DeviceSelector
+                        new ArgsT
                         {
                             Name = d.name,
                             Resolution = res
@@ -81,16 +82,18 @@ namespace HMD.Scripts.Streaming.VCap
         {
             var devices = Devices;
 
-            var selectors = new List<DeviceSelector>();
+            var selectors = new List<ArgsT>();
 
-            foreach (var dd in devices)
+
+            foreach (var pair in devices.Select((v, i) => (v, i)))
             {
-                var resList = dd.availableResolutions;
+                var resList = pair.v.availableResolutions;
 
                 {
-                    var v = new DeviceSelector()
+                    var v = new ArgsT()
                     {
-                        Name = dd.name
+                        Index = pair.i,
+                        Name = pair.v.name
                     };
                     selectors.Add(v);
                 }
@@ -98,9 +101,10 @@ namespace HMD.Scripts.Streaming.VCap
                 if (resList != null)
                     foreach (var res in resList)
                     {
-                        var v = new DeviceSelector()
+                        var v = new ArgsT()
                         {
-                            Name = dd.name,
+                            Index = pair.i,
+                            Name = pair.v.name,
                             Resolution = res
                         };
                         selectors.Add(v);
@@ -120,12 +124,12 @@ namespace HMD.Scripts.Streaming.VCap
             if (lines.Count <= 0) throw new IOException($"No line defined in file `${path}`");
 
             var selectorStr = string.Join("\n", lines);
-            var selector = _pickler.Rev<DeviceSelector>(selectorStr);
+            var selector = _pickler.Rev<ArgsT>(selectorStr);
 
             Open(selector);
         }
 
-        public void Open(DeviceSelector selector)
+        public void Open(ArgsT selector)
         {
             Stop();
 

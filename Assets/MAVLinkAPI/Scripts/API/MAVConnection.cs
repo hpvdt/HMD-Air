@@ -1,7 +1,9 @@
 ﻿#nullable enable
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using MAVLinkAPI.Scripts.IO;
+using MAVLinkAPI.Scripts.Comms;
 using MAVLinkAPI.Scripts.Util;
 
 namespace MAVLinkAPI.Scripts.API
@@ -10,13 +12,11 @@ namespace MAVLinkAPI.Scripts.API
     using System.Collections.Generic;
     using System.IO;
     using System.IO.Ports;
-    using System.Linq;
-    using System.Text.RegularExpressions;
     using UnityEngine;
 
     public class MAVConnection : IDisposable
     {
-        public Serial IO = null!;
+        public CleanSerial IO = null!;
 
         // public SerialPort Port => IO.Port;
         // TODO: generalised this to read from any () => Stream
@@ -37,10 +37,11 @@ namespace MAVLinkAPI.Scripts.API
             // 115200
         };
 
-        public static IEnumerable<MAVConnection> Discover(Regex pattern)
+
+        public static IEnumerable<MAVConnection> DiscoverPort(Regex pattern)
         {
             // TODO: add a list of preferred baudRates
-            var portNames = SerialPort.GetPortNames();
+            var portNames = SerialPort.GetPortNames().ToList();
             var matchedPortNames = portNames.Where(name => pattern.IsMatch(name)).ToList();
 
             if (!matchedPortNames.Any()) throw new IOException("No serial ports found");
@@ -48,18 +49,83 @@ namespace MAVLinkAPI.Scripts.API
             Debug.Log($"Found {matchedPortNames.Count} serial ports: " + string.Join(", ", matchedPortNames));
 
             foreach (var name in matchedPortNames)
+            foreach (var conn in Discover("SerialPort", name))
+                yield return conn;
+        }
+
+        public static IEnumerable<MAVConnection> Discover(
+            string className,
+            string pattern
+        )
+        {
+            var ns = typeof(SerialPort).Namespace;
+            var fullClassName = ns + "." + className;
+
+            var cls = Type.GetType(className) ?? Type.GetType(fullClassName) ?? throw new IOException(
+                $"Class '{className}` or `{fullClassName}' not found"
+            );
+
+            var result = Discover(cls, pattern);
+            return result;
+        }
+
+        private static IEnumerable<MAVConnection> Discover(Type cls, string pattern)
+        {
+            var names = new List<string> { pattern };
+
+            if (cls == typeof(SerialPort))
             {
-                var port = new SerialPort(); // this will be reused to try all baud rates
-                port.PortName = name;
-                port.ReadTimeout = 2000;
-                port.WriteTimeout = 2000;
+                var regex = GlobPatternConverter.GlobToRegex(pattern);
+
+                // using serial port 
+                var portNames = SerialPort.GetPortNames().ToList();
+                names = portNames.Where(name => regex.IsMatch(name)).ToList();
+
+
+                if (!names.Any()) throw new IOException("No serial ports found");
+
+                Debug.Log($"Found {names.Count} serial ports: " + string.Join(", ", names));
+            }
+
+            var constructor = cls.GetConstructor(Type.EmptyTypes) ?? throw new IOException(
+                $"Class '{cls.Name}' has no default constructor"
+            );
+
+            foreach (var name in names)
+            {
+                var serial = constructor.Invoke(null) as ICommsSerial ?? throw new IOException(
+                    $"Class '{cls.Name}' does not implement ICommsSerial interface"
+                );
+
+                serial.PortName = name;
 
                 yield return new MAVConnection
                 {
-                    IO = new Serial(port)
+                    IO = new CleanSerial(serial)
                 };
             }
         }
+
+        // var portNames = SerialPort.GetPortNames();
+        // var matchedPortNames = portNames.Where(name => portName.IsMatch(name)).ToList();
+        //
+        // if (!matchedPortNames.Any()) throw new IOException("No serial ports found");
+        //
+        // Debug.Log($"Found {matchedPortNames.Count} serial ports: " + string.Join(", ", matchedPortNames));
+        //
+        // foreach (var name in matchedPortNames)
+        // {
+        //     var port = new SerialPort(); // this will be reused to try all baud rates
+        //     port.PortName = name;
+        //     port.ReadTimeout = 2000;
+        //     port.WriteTimeout = 2000;
+        //
+        //     yield return new MAVConnection
+        //     {
+        //         IO = new Serial(port)
+        //     };
+        // }
+        // }
 
 
         public T Initialise<T>(

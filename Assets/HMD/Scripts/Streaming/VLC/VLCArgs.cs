@@ -5,7 +5,7 @@ namespace HMD.Scripts.Streaming.VLC
     using LibVLCSharp;
     
     // TODO: use Record defined in C# 9.0, current Unity support is limited (https://docs.unity3d.com/2021.2/Documentation/Manual/CSharpCompiler.html)
-    public class VLCArgs
+    public struct VLCArgs
     {
         public List<string> Lines;
         public FromType FromType;

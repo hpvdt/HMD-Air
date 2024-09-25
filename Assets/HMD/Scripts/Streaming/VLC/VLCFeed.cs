@@ -17,7 +17,6 @@ namespace HMD.Scripts.Streaming.VLC
         [FormerlySerializedAs("DebugVLCPlayer")]
         public bool debugVLCPlayer;
 
-        [Required] public VLCArgs Args;
 
         private LibVLC _libVLC;
 
@@ -181,6 +180,7 @@ namespace HMD.Scripts.Streaming.VLC
         {
             var _path = path.ToLower();
 
+            VLCArgs args;
             if (_path.EndsWith(".url") || _path.EndsWith(".txt") || _path.EndsWith(".mrl"))
             {
                 // TODO: merge with file picker in VlcScreen
@@ -190,31 +190,31 @@ namespace HMD.Scripts.Streaming.VLC
 
                 if (lines.Count <= 0) throw new IOException($"No line defined in file `${path}`");
 
-                Args = new VLCArgs(lines.ToList(), FromType.FromLocation);
+                args = new VLCArgs(lines.ToList(), FromType.FromLocation);
             }
             else
             {
-                Args = new VLCArgs(new List<string> { path }, FromType.FromPath);
+                args = new VLCArgs(new List<string> { path }, FromType.FromPath);
             }
 
-            _openArgs();
+            OpenArgs(args);
         }
 
-        private void _openArgs()
+        public void OpenArgs(VLCArgs args)
         {
             if (Player?.Media != null)
                 Player.Media.Dispose();
 
-            var parameters = Args.Parameters;
+            var parameters = args.Parameters;
             Log.V(
-                $"Opening `{Args.Location}` with {parameters.Length} parameter(s)"
+                $"Opening `{args.Location}` with {parameters.Length} parameter(s)"
                 + $" {string.Join(" ", parameters.Select(s => $"`{s}`").ToArray())}"
             );
 
             // mediaPlayer.Media = new Media(new Uri(Args.Location), parameters);
             // mediaPlayer.Media = new Media(Args.Location, Args.FromType, parameters);
 
-            var m = new Media(Args.Location, Args.FromType);
+            var m = new Media(args.Location, args.FromType);
             foreach (var parameter in parameters) m.AddOption(parameter);
 
             Player.Media = m;

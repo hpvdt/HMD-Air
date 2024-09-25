@@ -3,8 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using MAVLinkAPI.Scripts.API;
 using MAVLinkAPI.Scripts.Util;
 using MAVLinkAPI.Scripts.API.Minimal;
@@ -14,20 +12,7 @@ namespace MAVLinkAPI.Scripts.Pose
 {
     public class MAVPoseFeed : IDisposable
     {
-        [Serializable]
-        public struct ArgsT
-        {
-            public string regexPattern;
-            public int[] preferredBaudRate;
-
-            public static ArgsT MatchAll = new()
-            {
-                regexPattern = ".*",
-                preferredBaudRate = MAVConnection.DefaultPreferredBaudRates
-            };
-        }
-
-        public ArgsT Args;
+        public CleanSerial.ArgsT Args;
 
         private struct Candidates
         {
@@ -64,7 +49,7 @@ namespace MAVLinkAPI.Scripts.Pose
 
         private Reader<Quaternion> Reader_Mk()
         {
-            var discovered = MAVConnection.Discover(new Regex(Args.regexPattern)).ToList();
+            var discovered = MAVConnection.Discover(Args.className, Args.portName).ToList();
 
             _candidates.Set(discovered);
 
@@ -126,7 +111,7 @@ namespace MAVLinkAPI.Scripts.Pose
                             _candidates.Drop(connection);
                             Debug.LogException(ex);
 
-                            errors.Add(connection.IO.Name, ex);
+                            errors.Add(connection.IO.Key.Item2, ex);
 
                             return new List<Reader<Quaternion>>();
                         }
@@ -224,7 +209,7 @@ namespace MAVLinkAPI.Scripts.Pose
             _candidates.DropAll();
         }
 
-        public static MAVPoseFeed Of(ArgsT args)
+        public static MAVPoseFeed Of(CleanSerial.ArgsT args)
         {
             return new MAVPoseFeed
             {

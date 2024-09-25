@@ -1,23 +1,42 @@
 ﻿using System;
 using System.IO;
-using System.IO.Ports;
 using System.Linq;
 using System.Threading;
+using MAVLinkAPI.Scripts.Comms;
 using MAVLinkAPI.Scripts.Util;
 using UnityEngine;
 
-namespace MAVLinkAPI.Scripts.IO
+namespace MAVLinkAPI.Scripts.API
 {
-    public class Serial : SafeClean
+    public class CleanSerial : SafeClean
     {
+        [Serializable]
+        public struct ArgsT
+        {
+            public string className;
+            public string portName;
+            public int[] preferredBaudRate;
+
+            //TODO: use these
+            public bool keepAlive;
+
+            public static ArgsT AnyPort = new()
+            {
+                className = nameof(SerialPort),
+                portName = ".*",
+                preferredBaudRate = MAVConnection.DefaultPreferredBaudRates
+            };
+        }
+
         // TODO: generalised this to read from any () => Stream
-        private readonly SerialPort _port;
-        public readonly string Name;
+        private readonly ICommsSerial _self;
 
-        public TimeSpan MinRestartLatency = TimeSpan.FromSeconds(1);
+        public TimeSpan MinReopenInterval = TimeSpan.FromSeconds(1);
 
-        public Stream BaseStream => _port.BaseStream;
-        public int BytesToRead => _port.BytesToRead;
+        public (Type, string) Key => (_self.GetType(), _self.PortName);
+
+        public Stream BaseStream => _self.BaseStream;
+        public int BytesToRead => _self.BytesToRead;
 
         // locking to prevent multiple reads on serial port
         public readonly object ReadLock = new();
@@ -26,16 +45,14 @@ namespace MAVLinkAPI.Scripts.IO
         // getter and setter for baud rate
         public int BaudRate
         {
-            get => _port.BaudRate;
-            set => _port.BaudRate = value;
+            get => _self.BaudRate;
+            set => _self.BaudRate = value;
         }
 
-        public Serial(SerialPort port)
+        public CleanSerial(ICommsSerial self)
         {
             lock (this.ReadWrite())
             {
-                Name = port.PortName;
-
                 var peerClosed = 0;
 
                 // close others with same name
@@ -44,7 +61,7 @@ namespace MAVLinkAPI.Scripts.IO
                     $"found {peers.Count()} Serial and {CleanupPool.GlobalCounter.Value} SafeClean objects");
 
                 foreach (var peer in peers)
-                    if (peer.Name == Name)
+                    if (peer.Key == Key)
                     {
                         peer.Dispose();
                         peerClosed += 1;
@@ -52,11 +69,11 @@ namespace MAVLinkAPI.Scripts.IO
 
                 if (peerClosed > 0)
                 {
-                    Debug.LogWarning($"{peerClosed} peer(s) with name {Name} are disposed");
+                    Debug.LogWarning($"{peerClosed} peer(s) with name {Key} are disposed");
                     Thread.Sleep(1000);
                 }
 
-                _port = port;
+                _self = self;
             }
         }
         // TODO:
@@ -66,7 +83,7 @@ namespace MAVLinkAPI.Scripts.IO
         {
             // Close the serial port
             IsOpen = false;
-            _port.Dispose();
+            _self.Dispose();
             return true;
         }
 
@@ -75,7 +92,7 @@ namespace MAVLinkAPI.Scripts.IO
 
         public bool IsOpen
         {
-            get => _port.IsOpen;
+            get => _self.IsOpen;
             set
             {
                 lock (WriteLock)
@@ -94,14 +111,15 @@ namespace MAVLinkAPI.Scripts.IO
                                     // TODO: should be simplified
                                     var millisSinceClosed = (DateTime.Now - _lastActiveTime).TotalMilliseconds;
 
-                                    if (millisSinceClosed < MinRestartLatency.TotalMilliseconds)
+                                    if (millisSinceClosed < MinReopenInterval.TotalMilliseconds)
                                     {
-                                        var waitMillis = (int)(MinRestartLatency.TotalMilliseconds - millisSinceClosed);
-                                        Debug.Log($"Waiting {waitMillis} ms before opening port {_port.PortName}");
+                                        var waitMillis =
+                                            (int)(MinReopenInterval.TotalMilliseconds - millisSinceClosed);
+                                        Debug.Log($"Waiting {waitMillis} ms before opening port {_self.PortName}");
                                         Thread.Sleep(waitMillis);
                                     }
 
-                                    _port.Open();
+                                    _self.Open();
                                 }
                                 else
                                 {
@@ -109,12 +127,12 @@ namespace MAVLinkAPI.Scripts.IO
                                     try
                                     {
                                         // Close the serial port
-                                        _port.Close();
+                                        _self.Close();
                                         _lastActiveTime = DateTime.Now;
                                     }
                                     catch (Exception ex)
                                     {
-                                        if (_port.IsOpen == false)
+                                        if (_self.IsOpen == false)
                                             // Failed to close the serial port. Uncomment if
                                             // you wish but this is triggered as the port is
                                             // already closed and or null.
@@ -126,13 +144,13 @@ namespace MAVLinkAPI.Scripts.IO
                                 }
 
                                 // assert
-                                if (value != _port.IsOpen)
+                                if (value != _self.IsOpen)
                                     throw new IOException(
-                                        $"Failed to set port {_port.PortName} to {(value ? "open" : "closed")}, baud rate {_port.BaudRate}");
+                                        $"Failed to set port {_self.PortName} to {(value ? "open" : "closed")}, baud rate {_self.BaudRate}");
                             });
 
                         Debug.Log(
-                            $"Port {_port.PortName} is now {(value ? "open" : "closed")}, baud rate {_port.BaudRate}");
+                            $"Port {_self.PortName} is now {(value ? "open" : "closed")}, baud rate {_self.BaudRate}");
                     }
                 }
             }
@@ -161,7 +179,7 @@ namespace MAVLinkAPI.Scripts.IO
         {
             lock (WriteLock)
             {
-                _port.Write(bytes, 0, bytes.Length);
+                _self.Write(bytes, 0, bytes.Length);
             }
         }
     }

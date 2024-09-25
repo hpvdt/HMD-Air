@@ -1,6 +1,13 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using HMD.Scripts.Pickle;
+using HMD.Scripts.Streaming.VLC;
+using LibVLCSharp;
+using MAVLinkAPI.Scripts.API;
 
 namespace MAVLinkAPI.Scripts.Pose
 {
@@ -10,11 +17,25 @@ namespace MAVLinkAPI.Scripts.Pose
 
     public class MAVPoseProvider : BasePoseProvider
     {
-        public MAVPoseFeed.ArgsT args = MAVPoseFeed.ArgsT.MatchAll;
-
         private MAVPoseFeed? _feed;
 
-        public void TryConnect()
+        private Yaml _pickler = new();
+
+        public void Open(string path)
+        {
+            var urlContent = File.ReadAllText(path);
+            var lines = urlContent.Split('\n').ToList();
+            lines.RemoveAll(string.IsNullOrEmpty);
+
+            if (lines.Count <= 0) throw new IOException($"No line defined in file `${path}`");
+
+            var selectorStr = string.Join("\n", lines);
+            var selector = _pickler.Rev<CleanSerial.ArgsT>(selectorStr);
+
+            Open(selector);
+        }
+
+        public void Open(CleanSerial.ArgsT args)
         {
             lock (this)
             {
@@ -50,10 +71,10 @@ namespace MAVLinkAPI.Scripts.Pose
             TryDisconnect();
         }
 
-        private void Start()
-        {
-            TryConnect();
-        }
+        // private void Start()
+        // {
+        //     TryConnect();
+        // }
 
         public MAVPoseFeed.UpdaterD? UpdaterDaemon
         {

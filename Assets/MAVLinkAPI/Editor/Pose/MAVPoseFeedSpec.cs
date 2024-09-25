@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading;
+using MAVLinkAPI.Scripts.API;
 using MAVLinkAPI.Scripts.Pose;
 using MAVLinkAPI.Scripts.Util;
 using NUnit.Framework;
@@ -12,7 +13,7 @@ namespace MAVLinkAPI.Editor.Pose
         [Test]
         public void ConnectAndRead10()
         {
-            var feed = MAVPoseFeed.Of(MAVPoseFeed.ArgsT.MatchAll);
+            var feed = MAVPoseFeed.Of(CleanSerial.ArgsT.AnyPort);
 
             var counter = new AtomicInt();
 
@@ -32,7 +33,7 @@ namespace MAVLinkAPI.Editor.Pose
         [Test]
         public void ConnectAndUpdate()
         {
-            var feed = MAVPoseFeed.Of(MAVPoseFeed.ArgsT.MatchAll);
+            var feed = MAVPoseFeed.Of(CleanSerial.ArgsT.AnyPort);
             feed.StartUpdate();
 
             var counter = new AtomicInt();
