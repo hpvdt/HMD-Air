@@ -1,6 +1,6 @@
 ﻿namespace HMD.Scripts.Streaming.VCap
 {
-    using HMD_Commons.Scripts;
+    using HMDCommons.Scripts;
     using UnityEngine;
     using UnityEngine.UI;
     using Util;

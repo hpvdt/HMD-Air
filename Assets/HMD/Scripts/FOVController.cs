@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.Collections.Generic;
-using HMD_Commons.Scripts;
 using HMD.Scripts.Util;
+using HMDCommons.Scripts;
 using UnityEngine;
 using UnityEngine.UI;
 

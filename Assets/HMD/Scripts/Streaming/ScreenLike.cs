@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace HMD.Scripts.Streaming
 {
-    using HMD_Commons.Scripts;
+    using HMDCommons.Scripts;
     using UnityEngine.Serialization;
 
     public abstract class ScreenLike : MonoBehaviourWithLogging

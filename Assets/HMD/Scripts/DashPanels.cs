@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HMD_Commons.Scripts;
 using HMD.Scripts.Streaming;
 using HMD.Scripts.Util;
+using HMDCommons.Scripts;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;

@@ -1,7 +1,7 @@
 namespace HMD.Scripts.Streaming.VLC
 {
     using System;
-    using HMD_Commons.Scripts;
+    using HMDCommons.Scripts;
     using Util;
     using UnityEngine;
     using UnityEngine.EventSystems;

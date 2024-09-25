@@ -1,10 +1,9 @@
-﻿using System;
-using System.Reflection;
-using Unity.VisualScripting;
-using UnityEngine;
-
-namespace HMD_Commons.Scripts
+﻿namespace HMDCommons.Scripts
 {
+    using System;
+    using System.Reflection;
+    using Unity.VisualScripting;
+    using UnityEngine;
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Class)]
     // [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Class)] TODO: enable this
     public class RequiredAttribute : PropertyAttribute

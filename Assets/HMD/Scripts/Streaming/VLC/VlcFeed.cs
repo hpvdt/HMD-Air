@@ -1,5 +1,3 @@
-using HMD_Commons.Scripts;
-
 namespace HMD.Scripts.Streaming.VLC
 {
     using System;
@@ -7,6 +5,7 @@ namespace HMD.Scripts.Streaming.VLC
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
+    using HMDCommons.Scripts;
     using LibVLCSharp;
     using UnityEngine;
     using UnityEngine.Assertions;

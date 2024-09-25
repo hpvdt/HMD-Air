@@ -1,7 +1,6 @@
-﻿using UnityEngine;
-
-namespace HMD_Commons.Scripts
+﻿namespace HMDCommons.Scripts
 {
+    using UnityEngine;
     [Required]
     public class NullExample1 : MonoBehaviour
     {

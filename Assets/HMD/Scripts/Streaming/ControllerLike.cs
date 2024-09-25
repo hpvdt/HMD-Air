@@ -1,6 +1,6 @@
 ﻿namespace HMD.Scripts.Streaming
 {
-    using HMD_Commons.Scripts;
+    using HMDCommons.Scripts;
     using UnityEngine;
     using UnityEngine.UI;
     public abstract class ControllerLike : MonoBehaviour

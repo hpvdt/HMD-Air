@@ -1,19 +1,18 @@
 #nullable enable
-using HMD_Commons.Scripts;
-
 namespace HMD.Scripts.Streaming.VCap
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using HMDCommons.Scripts;
     using Pickle;
     using Unity.VisualScripting;
     using UnityEngine;
 
     public class VCapFeed : FeedLike
     {
-        private Yaml _pickler = new();
+        private Yaml _pickler = new Yaml();
 
         public struct DeviceSelector
         {

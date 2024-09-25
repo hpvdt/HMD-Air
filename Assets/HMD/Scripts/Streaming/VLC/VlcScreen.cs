@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Linq;
-    using HMD_Commons.Scripts;
+    using HMDCommons.Scripts;
     using SFB;
     using UnityEngine;
     using Util;

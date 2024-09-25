@@ -1,8 +1,7 @@
 ﻿#nullable enable
-using System.Collections.Generic;
-
-namespace HMD_Commons.Scripts
+namespace HMDCommons.Scripts
 {
+    using System.Collections.Generic;
     public static class NullableExtensions
     {
         public static IEnumerable<T> Wrap<T>(this T? nullable) where T : struct
