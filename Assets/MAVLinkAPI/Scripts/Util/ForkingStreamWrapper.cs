@@ -1,17 +1,17 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Ports;
+
 namespace MAVLinkAPI.Scripts.Util
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.IO.Ports;
-
     public class ForkingStreamWrapper : Stream
     {
         private SerialPort _serialPort;
-        private List<MemoryStream> _forks = new List<MemoryStream>();
+        private List<MemoryStream> _forks = new();
         private byte[] _buffer = new byte[4096];
         private int _readPosition = 0;
-        private object _lock = new object();
+        private object _lock = new();
 
         public ForkingStreamWrapper(SerialPort serialPort)
         {
@@ -21,16 +21,13 @@ namespace MAVLinkAPI.Scripts.Util
 
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            int bytesToRead = _serialPort.BytesToRead;
-            byte[] receivedData = new byte[bytesToRead];
+            var bytesToRead = _serialPort.BytesToRead;
+            var receivedData = new byte[bytesToRead];
             _serialPort.Read(receivedData, 0, bytesToRead);
 
             lock (_lock)
             {
-                foreach (var fork in _forks)
-                {
-                    fork.Write(receivedData, 0, bytesToRead);
-                }
+                foreach (var fork in _forks) fork.Write(receivedData, 0, bytesToRead);
             }
         }
 
@@ -75,19 +72,27 @@ namespace MAVLinkAPI.Scripts.Util
             set => throw new NotSupportedException();
         }
 
-        public override void Flush() => _serialPort.BaseStream.Flush();
-        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
-        public override void SetLength(long value) => throw new NotSupportedException();
+        public override void Flush()
+        {
+            _serialPort.BaseStream.Flush();
+        }
+
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void SetLength(long value)
+        {
+            throw new NotSupportedException();
+        }
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
                 _serialPort.DataReceived -= SerialPort_DataReceived;
-                foreach (var fork in _forks)
-                {
-                    fork.Dispose();
-                }
+                foreach (var fork in _forks) fork.Dispose();
 
                 _forks.Clear();
             }

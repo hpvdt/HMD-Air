@@ -1,16 +1,30 @@
+using System;
 using System.Linq;
 using MAVLinkAPI.Scripts.UI;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 namespace MAVLinkAPI.Editor.UI
 {
+    [Serializable]
+    public struct PlayerData
+    {
+        public string name;
+        public int level;
+        public float health;
+    }
+
+    public class PlayerUIGen : AutoUIGeneratorUGUI<PlayerData>
+    {
+    }
+
     [TestFixture]
     public class AutoUIGeneratorUGUITests
     {
         private GameObject canvasGO;
-        private AutoUIGeneratorUGUI generator;
+        private PlayerUIGen _generatorUGUI;
 
         [SetUp]
         public void SetUp()
@@ -18,12 +32,12 @@ namespace MAVLinkAPI.Editor.UI
             canvasGO = new GameObject("Canvas");
             var canvas = canvasGO.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        
+
             var uiRoot = new GameObject("UIRoot").AddComponent<RectTransform>();
             uiRoot.SetParent(canvas.transform, false);
-        
-            generator = canvasGO.AddComponent<AutoUIGeneratorUGUI>();
-            generator.uiRoot = uiRoot;
+
+            _generatorUGUI = canvasGO.AddComponent<PlayerUIGen>();
+            _generatorUGUI.uiRoot = uiRoot;
         }
 
         [TearDown]
@@ -32,13 +46,33 @@ namespace MAVLinkAPI.Editor.UI
             Object.DestroyImmediate(canvasGO);
         }
 
+        // [Test] // this will not pass,
+        // see https://stackoverflow.com/questions/6280506/is-there-a-way-to-set-properties-on-struct-instances-using-reflection
+        public void SetValueSpike()
+        {
+            // Arrange
+            var playerData = new PlayerData
+            {
+                name = "Test Player",
+                level = 1,
+                health = 100f
+            };
+
+            // Act
+            var healthField = typeof(PlayerData).GetField("health");
+            healthField.SetValue(playerData, 75.5f);
+
+            // Assert
+            Assert.AreEqual(75.5f, playerData.health);
+        }
+
         [Test]
         public void GenerateUIForStruct_CreatesCorrectElements()
         {
-            generator.playerData = new PlayerData { name = "Test", level = 5, health = 100f };
-            generator.Start();
+            _generatorUGUI.Value = new PlayerData { name = "Test", level = 5, health = 100f };
+            _generatorUGUI.Start();
 
-            var uiElements = generator.uiRoot.GetComponentsInChildren<InputField>();
+            var uiElements = _generatorUGUI.uiRoot.GetComponentsInChildren<InputField>();
             Assert.AreEqual(3, uiElements.Length);
 
             var nameField = uiElements.First(f => f.gameObject.name == "name");
@@ -57,10 +91,14 @@ namespace MAVLinkAPI.Editor.UI
         [Test]
         public void UIElements_UpdateStructWhenChanged()
         {
-            generator.playerData = new PlayerData();
-            generator.Start();
+            var uiRoot = new GameObject("UIRoot").AddComponent<RectTransform>();
+            var autoUIGenerator = uiRoot.gameObject.AddComponent<PlayerUIGen>();
+            autoUIGenerator.Value = new PlayerData();
+            autoUIGenerator.uiRoot = uiRoot;
 
-            var uiElements = generator.uiRoot.GetComponentsInChildren<InputField>();
+            autoUIGenerator.GenerateUIForStruct(uiRoot);
+
+            var uiElements = uiRoot.GetComponentsInChildren<InputField>();
             var nameField = uiElements.First(f => f.gameObject.name == "name");
             var levelField = uiElements.First(f => f.gameObject.name == "level");
             var healthField = uiElements.First(f => f.gameObject.name == "health");
@@ -72,9 +110,11 @@ namespace MAVLinkAPI.Editor.UI
             healthField.text = "75.5";
             healthField.onValueChanged.Invoke("75.5");
 
-            Assert.AreEqual("NewPlayer", generator.playerData.name);
-            Assert.AreEqual(10, generator.playerData.level);
-            Assert.AreEqual(75.5f, generator.playerData.health);
+            Assert.AreEqual("NewPlayer", autoUIGenerator.Value.name);
+            Assert.AreEqual(10, autoUIGenerator.Value.level);
+            Assert.AreEqual(75.5f, autoUIGenerator.Value.health);
+
+            Object.DestroyImmediate(uiRoot.gameObject);
         }
     }
 }

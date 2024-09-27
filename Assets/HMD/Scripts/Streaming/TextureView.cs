@@ -1,10 +1,9 @@
+using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace HMD.Scripts.Streaming
 {
-    using System;
-    using Unity.VisualScripting;
-
     public class TextureView : IDisposable
     // immutable, can only be initialised once, all derivative textures can only be destroyed together
     {

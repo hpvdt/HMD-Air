@@ -1,10 +1,10 @@
-﻿namespace MAVLinkAPI.Scripts.Util
-{
-    using System;
-    using System.IO;
-    using System.Threading;
-    using System.Threading.Tasks;
+﻿using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
+namespace MAVLinkAPI.Scripts.Util
+{
     // TODO: use it to create multiple subscriber to a mavlink stream
     public class ForkedStream : Stream
     {
@@ -70,8 +70,19 @@
             base.Dispose(disposing);
         }
 
-        public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
-        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
-        public override void SetLength(long value) => throw new NotSupportedException();
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void SetLength(long value)
+        {
+            throw new NotSupportedException();
+        }
     }
 }

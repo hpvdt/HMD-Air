@@ -1,11 +1,11 @@
-﻿namespace HMD.Scripts.Streaming
+﻿using HMDCommons.Scripts;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace HMD.Scripts.Streaming
 {
-    using HMDCommons.Scripts;
-    using UnityEngine;
-    using UnityEngine.UI;
     public abstract class ControllerLike : MonoBehaviour
     {
-
         // public ScreenLike screen;
         // public DashPanels dashPanels;
 

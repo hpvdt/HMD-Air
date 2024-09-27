@@ -1,24 +1,22 @@
 #nullable enable
-using UnityEngine.Serialization;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using HMD.Scripts.Pickle;
+using HMDCommons.Scripts;
+using Unity.VisualScripting;
+using UnityEngine;
 
 namespace HMD.Scripts.Streaming.VCap
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using HMDCommons.Scripts;
-    using Pickle;
-    using Unity.VisualScripting;
-    using UnityEngine;
-
     public class VCapFeed : FeedLike
     {
         private Yaml _pickler = new();
 
         public struct ArgsT
         {
-            [FormerlySerializedAs("index")] public int Index;
+            public int? Index;
             public string Name;
             public Resolution? Resolution;
         }

@@ -1,8 +1,8 @@
 ﻿#nullable enable
+using System.Collections.Generic;
+
 namespace MAVLinkAPI.Scripts.Util
 {
-    using System.Collections.Generic;
-
     public static class EnumerableExtensions
     {
         public static IEnumerable<(T Current, Box<T>? Next)> ZipWithNext<T>(

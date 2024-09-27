@@ -1,8 +1,8 @@
-﻿namespace HMD.Scripts.Streaming.VLC
-{
-    using UnityEngine.UI;
-    using Util;
+﻿using HMD.Scripts.Util;
+using UnityEngine.UI;
 
+namespace HMD.Scripts.Streaming.VLC
+{
     public class AspectRatioUpdater
     {
         public readonly VLCScreen Screen;
@@ -10,7 +10,7 @@
 
         public AspectRatioUpdater(VLCScreen screen)
         {
-            this.Screen = screen;
+            Screen = screen;
             Value = screen.AspectRatio;
         }
 

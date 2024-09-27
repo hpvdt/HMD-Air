@@ -1,9 +1,9 @@
+using System.Collections.Generic;
+using System.Linq;
+using LibVLCSharp;
+
 namespace HMD.Scripts.Streaming.VLC
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using LibVLCSharp;
-    
     // TODO: use Record defined in C# 9.0, current Unity support is limited (https://docs.unity3d.com/2021.2/Documentation/Manual/CSharpCompiler.html)
     public struct VLCArgs
     {
@@ -30,10 +30,7 @@ namespace HMD.Scripts.Streaming.VLC
 
         public string[] Parameters
         {
-            get
-            {
-                return Lines.Skip(1).Select(v => v.Trim()).ToArray();
-            }
+            get { return Lines.Skip(1).Select(v => v.Trim()).ToArray(); }
         }
     }
 }

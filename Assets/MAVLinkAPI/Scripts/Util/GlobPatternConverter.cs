@@ -1,15 +1,14 @@
+using System.Text.RegularExpressions;
+
 namespace MAVLinkAPI.Scripts.Util
 {
-    using System.Text.RegularExpressions;
-
     public static class GlobPatternConverter
     {
         public static Regex GlobToRegex(string glob)
         {
-            string regexPattern = "^";
+            var regexPattern = "^";
 
-            foreach (char c in glob)
-            {
+            foreach (var c in glob)
                 switch (c)
                 {
                     case '*':
@@ -33,7 +32,6 @@ namespace MAVLinkAPI.Scripts.Util
                         regexPattern += c;
                         break;
                 }
-            }
 
             regexPattern += "$";
             return new Regex(regexPattern, RegexOptions.IgnoreCase);

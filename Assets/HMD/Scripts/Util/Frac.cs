@@ -1,6 +1,7 @@
-﻿namespace HMD.Scripts.Util
+﻿using System;
+
+namespace HMD.Scripts.Util
 {
-    using System;
     public class Frac
     {
         private int _nominator;
@@ -16,6 +17,7 @@
         {
             return (double)_nominator / _denominator;
         }
+
         public double ToLn()
         {
             return Math.Log(ToDouble());
@@ -35,7 +37,7 @@
 
             return new Frac(numerator, denominator);
         }
-        
+
         public static Frac FromLn(double d)
         {
             return FromDouble(Math.Exp(d));
@@ -59,6 +61,7 @@
         {
             return $"{_nominator}/{_denominator}";
         }
+
         public string ToRatioText()
         {
             return $"{_nominator}:{_denominator}";
@@ -99,7 +102,5 @@
         {
             return new Frac(-a._nominator, a._denominator);
         }
-
-
     }
 }

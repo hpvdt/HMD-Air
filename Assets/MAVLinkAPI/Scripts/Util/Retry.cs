@@ -1,16 +1,14 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using MAVLinkAPI.Editor.Util;
 using Debug = UnityEngine.Debug;
 
 namespace MAVLinkAPI.Scripts.Util
 {
-    using System;
-    using System.Threading;
-
     public class Retry<TI>
     {
         public List<TI> Attempts = null!;

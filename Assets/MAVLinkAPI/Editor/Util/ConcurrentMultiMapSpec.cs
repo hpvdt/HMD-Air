@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using MAVLinkAPI.Scripts.Util;
 using NUnit.Framework;
 
@@ -58,12 +59,12 @@ namespace MAVLinkAPI.Editor.Util
         [Test]
         public void ConcurrentOperations_ShouldBeThreadSafe()
         {
-            var tasks = new System.Collections.Generic.List<Task>();
+            var tasks = new List<Task>();
             for (var i = 0; i < 1000; i++)
             {
                 var i1 = i;
                 tasks.Add(Task.Run(() => _multiMap.Add("key", i1)));
-                tasks.Add(Task.Run(() => { _multiMap.TryGetValues("key", out var _); }));
+                tasks.Add(Task.Run(() => { _multiMap.TryGetValues("key", out _); }));
                 if (i % 2 == 0) tasks.Add(Task.Run(() => _multiMap.Remove("key", i1)));
             }
 

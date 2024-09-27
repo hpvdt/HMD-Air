@@ -4,15 +4,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MAVLinkAPI.Scripts.API;
-using MAVLinkAPI.Scripts.Util;
 using MAVLinkAPI.Scripts.API.Minimal;
+using MAVLinkAPI.Scripts.Util;
 using UnityEngine;
 
 namespace MAVLinkAPI.Scripts.Pose
 {
-    public class MAVPoseFeed : IDisposable
+    public record MAVPoseFeed(Routing.ArgsT Args) : IDisposable
     {
-        public CleanSerial.ArgsT Args;
+        // public ;
 
         private struct Candidates
         {
@@ -207,14 +207,6 @@ namespace MAVLinkAPI.Scripts.Pose
             StopUpdate();
             if (_existingReader != null) _candidates.Drop(_existingReader.Value.Active);
             _candidates.DropAll();
-        }
-
-        public static MAVPoseFeed Of(CleanSerial.ArgsT args)
-        {
-            return new MAVPoseFeed
-            {
-                Args = args
-            };
         }
     }
 }

@@ -1,9 +1,9 @@
-﻿namespace MAVLinkAPI.Scripts.Util
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
+namespace MAVLinkAPI.Scripts.Util
+{
     public static class DictionaryExtensions
     {
         public static Dictionary<TKey, TValue> Merge<TKey, TValue>(

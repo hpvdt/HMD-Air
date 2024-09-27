@@ -1,10 +1,9 @@
+using System;
 using MAVLinkAPI.Editor.Util;
 using UnityEngine;
 
 namespace HMD.Scripts.Util
 {
-    using System;
-
     public class MonoBehaviourWithLogging : MonoBehaviour
     {
         public bool loggerVerbosity = true; // TODO: should be a number

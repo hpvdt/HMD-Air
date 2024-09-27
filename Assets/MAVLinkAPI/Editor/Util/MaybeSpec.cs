@@ -1,10 +1,9 @@
-﻿using MAVLinkAPI.Scripts.Util;
+﻿using System;
+using MAVLinkAPI.Scripts.Util;
+using NUnit.Framework;
 
 namespace MAVLinkAPI.Editor.Util
 {
-    using NUnit.Framework;
-    using System;
-
     [TestFixture]
     public class MaybeTests
     {

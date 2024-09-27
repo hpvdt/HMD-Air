@@ -1,13 +1,12 @@
+using System;
+using HMD.Scripts.Util;
+using HMDCommons.Scripts;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
 namespace HMD.Scripts.Streaming.VLC
 {
-    using System;
-    using HMDCommons.Scripts;
-    using Util;
-    using UnityEngine;
-    using UnityEngine.EventSystems;
-    using UnityEngine.Serialization;
-    using UnityEngine.UI;
-
     ///This script controls all the GUI for the VLC Unity Canvas Example
     ///It sets up event handlers and updates the GUI every frame
     ///This example shows how to safely set up LibVLC events and a simple way to call Unity functions from them

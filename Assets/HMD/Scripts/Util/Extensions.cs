@@ -1,9 +1,9 @@
-﻿namespace HMD.Scripts.Util
-{
-    using UnityEngine;
-    using UnityEngine.Events;
-    using UnityEngine.EventSystems;
+﻿using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
+namespace HMD.Scripts.Util
+{
     public static class Extensions
     {
         // for UnityEvent

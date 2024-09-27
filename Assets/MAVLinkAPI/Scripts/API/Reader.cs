@@ -1,12 +1,11 @@
 #nullable enable
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using MAVLinkAPI.Scripts.Util;
 
 namespace MAVLinkAPI.Scripts.API
 {
-    using System.Collections.Generic;
-
     /**
      * A.k.a subscription
      */

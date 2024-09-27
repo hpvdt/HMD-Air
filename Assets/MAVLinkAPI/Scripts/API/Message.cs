@@ -1,9 +1,9 @@
 ﻿#nullable enable
+using System;
+using System.Collections.Generic;
+
 namespace MAVLinkAPI.Scripts.API
 {
-    using System;
-    using System.Collections.Generic;
-
     public class TypeLookup
     {
         public readonly Dictionary<uint, MAVLink.message_info> ByID = new();

@@ -1,12 +1,11 @@
-﻿using System.Threading;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using MAVLinkAPI.Scripts.Util;
+using NUnit.Framework;
 
 namespace MAVLinkAPI.Editor.Util
 {
-    using NUnit.Framework;
-    using System;
-    using System.Collections.Generic;
-
     [TestFixture]
     public class RetrySpec
     {

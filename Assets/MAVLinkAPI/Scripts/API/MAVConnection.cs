@@ -1,22 +1,21 @@
 ﻿#nullable enable
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using MAVLinkAPI.Scripts.Comms;
 using MAVLinkAPI.Scripts.Util;
+using UnityEngine;
+using SerialPort = System.IO.Ports.SerialPort;
 
 namespace MAVLinkAPI.Scripts.API
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.IO.Ports;
-    using UnityEngine;
-
     public class MAVConnection : IDisposable
     {
-        public CleanSerial IO = null!;
+        public Routing IO = null!;
 
         // public SerialPort Port => IO.Port;
         // TODO: generalised this to read from any () => Stream
@@ -58,7 +57,7 @@ namespace MAVLinkAPI.Scripts.API
             string pattern
         )
         {
-            var ns = typeof(SerialPort).Namespace;
+            var ns = typeof(ICommsSerial).Namespace;
             var fullClassName = ns + "." + className;
 
             var cls = Type.GetType(className) ?? Type.GetType(fullClassName) ?? throw new IOException(
@@ -101,7 +100,7 @@ namespace MAVLinkAPI.Scripts.API
 
                 yield return new MAVConnection
                 {
-                    IO = new CleanSerial(serial)
+                    IO = new Routing(serial)
                 };
             }
         }

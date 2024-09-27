@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace MAVLinkAPI.Scripts.Comms
 {
@@ -17,12 +18,12 @@ namespace MAVLinkAPI.Scripts.Comms
 
         public override bool CanWrite => true;
 
-        public override long Length => throw new System.NotImplementedException();
+        public override long Length => throw new NotImplementedException();
 
         public override long Position
         {
-            get => throw new System.NotImplementedException();
-            set => throw new System.NotImplementedException();
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
         }
 
         public override void Flush()
@@ -36,12 +37,12 @@ namespace MAVLinkAPI.Scripts.Comms
 
         public override long Seek(long offset, SeekOrigin origin)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override void SetLength(long value)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override void Write(byte[] buffer, int offset, int count)

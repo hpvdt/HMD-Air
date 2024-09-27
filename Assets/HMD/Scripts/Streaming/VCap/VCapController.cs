@@ -1,9 +1,10 @@
-﻿namespace HMD.Scripts.Streaming.VCap
+﻿using HMD.Scripts.Util;
+using HMDCommons.Scripts;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace HMD.Scripts.Streaming.VCap
 {
-    using HMDCommons.Scripts;
-    using UnityEngine;
-    using UnityEngine.UI;
-    using Util;
     public class VCapController : ControllerLike
     {
         [Required] public VCapScreen screen;
@@ -23,19 +24,12 @@
 
         public void Init()
         {
-            if (screen?.feed is null)
-            {
-                Debug.LogError("VCap feed not found");
-                return;
-            }
+            if (screen?.feed is null) Debug.LogError("VCap feed not found");
         }
 
         public override void BindUI()
         {
-            playButton.onClick.Rebind(() =>
-            {
-                screen.Play();
-            });
+            playButton.onClick.Rebind(() => { screen.Play(); });
             pauseButton.onClick.Rebind(() => { screen.Pause(); });
             stopButton.onClick.Rebind(() => { screen.Stop(); });
 

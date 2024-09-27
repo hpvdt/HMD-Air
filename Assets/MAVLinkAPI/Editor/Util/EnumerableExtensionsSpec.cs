@@ -1,11 +1,11 @@
-﻿using MAVLinkAPI.Scripts.Util;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using MAVLinkAPI.Scripts.Util;
+using NUnit.Framework;
 
 namespace MAVLinkAPI.Editor.Util
 {
-    using System.Linq;
-    using NUnit.Framework;
-    using System.Collections.Generic;
-
     [TestFixture]
     [TestOf(typeof(EnumerableExtensions))]
     [TestFixture]
@@ -64,7 +64,7 @@ namespace MAVLinkAPI.Editor.Util
             return _source.GetEnumerator();
         }
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }

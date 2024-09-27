@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace MAVLinkAPI.Scripts.API
 {
-    public class CleanSerial : SafeClean
+    public class Routing : SafeClean
     {
         [Serializable]
         public struct ArgsT
@@ -49,7 +49,7 @@ namespace MAVLinkAPI.Scripts.API
             set => _self.BaudRate = value;
         }
 
-        public CleanSerial(ICommsSerial self)
+        public Routing(ICommsSerial self)
         {
             lock (this.ReadWrite())
             {

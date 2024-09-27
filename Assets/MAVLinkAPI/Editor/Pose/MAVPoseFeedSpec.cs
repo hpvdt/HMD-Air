@@ -8,12 +8,13 @@ using UnityEngine;
 
 namespace MAVLinkAPI.Editor.Pose
 {
+    [Ignore("need SITL")]
     public class MAVPoseFeedSpec
     {
         [Test]
         public void ConnectAndRead10()
         {
-            var feed = MAVPoseFeed.Of(CleanSerial.ArgsT.AnyPort);
+            var feed = new MAVPoseFeed(Routing.ArgsT.AnyPort);
 
             var counter = new AtomicInt();
 
@@ -33,7 +34,7 @@ namespace MAVLinkAPI.Editor.Pose
         [Test]
         public void ConnectAndUpdate()
         {
-            var feed = MAVPoseFeed.Of(CleanSerial.ArgsT.AnyPort);
+            var feed = new MAVPoseFeed(Routing.ArgsT.AnyPort);
             feed.StartUpdate();
 
             var counter = new AtomicInt();

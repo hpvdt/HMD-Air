@@ -1,8 +1,8 @@
-﻿namespace MAVLinkAPI.Scripts.Util
-{
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 
+namespace MAVLinkAPI.Scripts.Util
+{
     public class ConcurrentMultiMap<TKey, TValue>
     {
         private readonly ConcurrentDictionary<TKey, HashSet<TValue>> _dictionary = new();

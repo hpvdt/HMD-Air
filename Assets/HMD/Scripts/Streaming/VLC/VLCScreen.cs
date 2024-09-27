@@ -1,12 +1,12 @@
-﻿namespace HMD.Scripts.Streaming.VLC
-{
-    using System.Collections.Generic;
-    using System.Linq;
-    using HMDCommons.Scripts;
-    using SFB;
-    using UnityEngine;
-    using Util;
+﻿using System.Collections.Generic;
+using System.Linq;
+using HMD.Scripts.Util;
+using HMDCommons.Scripts;
+using SFB;
+using UnityEngine;
 
+namespace HMD.Scripts.Streaming.VLC
+{
     public class VLCScreen : ScreenLike
     {
         [HideInInspector] public VLCController controller;
@@ -41,7 +41,6 @@
                 updater.SyncAll();
             }
         }
-
 
         public void PromptUserFilePicker()
         {

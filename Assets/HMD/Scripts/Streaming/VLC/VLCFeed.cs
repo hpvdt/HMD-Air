@@ -1,16 +1,17 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using LibVLCSharp;
+using UnityEngine;
+using UnityEngine.Assertions;
+using UnityEngine.Serialization;
+using Application = UnityEngine.Device.Application;
+
 namespace HMD.Scripts.Streaming.VLC
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using HMDCommons.Scripts;
-    using LibVLCSharp;
-    using UnityEngine;
-    using UnityEngine.Assertions;
-    using UnityEngine.Serialization;
-    using Application = UnityEngine.Device.Application;
+    using Application = Application;
 
     public class VLCFeed : FeedLike
     {

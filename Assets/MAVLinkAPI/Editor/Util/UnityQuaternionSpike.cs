@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using MAVLinkAPI.Scripts.Util;
+﻿using MAVLinkAPI.Scripts.Util;
 using NUnit.Framework;
 using UnityEngine;
 

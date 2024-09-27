@@ -1,15 +1,12 @@
 using System.Collections.Generic;
 using HMD.Scripts.Util;
+using HMDCommons.Scripts;
 using LibVLCSharp;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace HMD.Scripts.Streaming
 {
-    using HMDCommons.Scripts;
-    using UnityEngine.Serialization;
-
     public abstract class ScreenLike : MonoBehaviourWithLogging
     {
         public enum VideoMode
@@ -70,6 +67,7 @@ namespace HMD.Scripts.Streaming
         //Unity Awake, OnDestroy, and Update functions
 
         #region unity
+
         public void BindUI()
         {
             deformBar.onValueChanged.Rebind(OnDeformBarUpdated);
@@ -112,9 +110,10 @@ namespace HMD.Scripts.Streaming
             //Dispose of mediaPlayer, or it will stay in nemory and keep playing audio
             Feed.Dispose();
         }
+
         #endregion
 
-        private static Vector2 SCALE_RANGE = new Vector2(1f, 4.702173720867682f);
+        private static Vector2 SCALE_RANGE = new(1f, 4.702173720867682f);
 
         public void OnDeformBarUpdated(float value)
         {
@@ -168,15 +167,13 @@ namespace HMD.Scripts.Streaming
         private float _sphereScale;
 
         #region vlc
+
         public void Play()
         {
             if (Feed != null)
-            {
                 // icon.SetActive(false); // hide cone logo
                 // gameObject.SetActive(true);
-
                 Feed.Play();
-            }
         }
 
         private void _stopFeed()
@@ -205,11 +202,13 @@ namespace HMD.Scripts.Streaming
             Log.V("Pause");
             Feed.Pause();
         }
+
         #endregion
 
         //Private functions create and destroy VLC objects and textures
 
         #region internal
+
         public void ToggleFlipStereo()
         {
             _flipStereo = !_flipStereo;
@@ -219,7 +218,7 @@ namespace HMD.Scripts.Streaming
 
         public virtual Frac AspectRatio
         {
-            get { return Feed.NativeAspectRatio(); } // by default, has no setter
+            get => Feed.NativeAspectRatio(); // by default, has no setter
             set { }
             // may not have a setter for some feeds
         }
@@ -231,7 +230,9 @@ namespace HMD.Scripts.Streaming
 
         public void SetARDefault()
         {
-            if (Feed == null) { }
+            if (Feed == null)
+            {
+            }
             else
             {
                 AspectRatio = Feed.NativeAspectRatio();
@@ -361,6 +362,7 @@ namespace HMD.Scripts.Streaming
         //     rightEyeScreen.transform.localRotation = Quaternion.identity;
         //     rightEyeScreen.transform.localScale = new Vector3(1, 1, 1);
         // }
+
         #endregion
     }
 }
