@@ -86,6 +86,7 @@ namespace MAVLinkAPI.Scripts.Util
                             $"{Outer.Name}/[{counter}/{zipped.Count}] {attempt}: Retry failed @ {stopwatch.Elapsed}s:" +
                             $"\n{ex.GetMessageForDisplay()}";
 
+                        // TODO: should stop retry if the current thread is cancelled with a token
                         if (!Outer.Args.ShouldContinue(ex, attempt) || next == null)
                         {
                             Debug.Log(
