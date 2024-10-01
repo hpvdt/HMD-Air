@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HMD.Scripts.Pickle;
 using MAVLinkAPI.Scripts.API;
+using MAVLinkAPI.Scripts.Util;
 using SFB;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -18,12 +19,10 @@ namespace MAVLinkAPI.Scripts.Pose
     {
         private MAVPoseFeed? _feed;
 
-        private Yaml _pickler = new();
+        private static readonly Yaml Pickler = new();
 
         public void PromptUserFilePicker()
         {
-            // feed.PromptAllDevices();
-
             var yaml = new List<string>
             {
                 "yaml", "yml"
@@ -56,10 +55,10 @@ namespace MAVLinkAPI.Scripts.Pose
             var lines = urlContent.Split('\n').ToList();
             lines.RemoveAll(string.IsNullOrEmpty);
 
-            if (lines.Count <= 0) throw new IOException($"No line defined in file `${path}`");
+            // if (lines.Count <= 0) throw new IOException($"No line defined in file `${path}`");
 
             var selectorStr = string.Join("\n", lines);
-            var selector = _pickler.Rev<Routing.ArgsT>(selectorStr);
+            var selector = Pickler.Rev<Routing.ArgsT>(selectorStr);
 
             Open(selector);
         }
@@ -100,10 +99,17 @@ namespace MAVLinkAPI.Scripts.Pose
             TryDisconnect();
         }
 
-        // private void Start()
-        // {
-        //     TryConnect();
-        // }
+        private void Start()
+        {
+            // TODO: remove
+            var mgr = new ExternalProcessManager("cmd.exe", "/C timeout /t 5");
+
+            var task = mgr.StartAndMonitorAsync();
+
+            var result = task.Result;
+
+            Debug.Log($"Result is {result}");
+        }
 
         public MAVPoseFeed.UpdaterD? UpdaterDaemon
         {

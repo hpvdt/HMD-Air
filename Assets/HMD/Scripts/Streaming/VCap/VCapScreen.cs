@@ -67,8 +67,6 @@ namespace HMD.Scripts.Streaming.VCap
 
         public void PromptUserFilePicker()
         {
-            // feed.PromptAllDevices();
-
             var yaml = new List<string>
             {
                 "yaml", "yml"

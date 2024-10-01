@@ -5,24 +5,26 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class ExternalProcessManager : IDisposable
+    public class ExternalProcessManager : SafeClean
     {
-        public Process _process;
+        public readonly ProcessStartInfo StartInfo;
+        public readonly Process Process;
         private CancellationTokenSource _cts;
 
         public ExternalProcessManager(string fileName, string arguments = "")
         {
-            _process = new Process
+            StartInfo = new ProcessStartInfo
             {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = fileName,
-                    Arguments = arguments,
-                    UseShellExecute = true,
-                    CreateNoWindow = false
-                    // RedirectStandardOutput = true,
-                    // RedirectStandardError = true
-                },
+                FileName = fileName,
+                Arguments = arguments,
+                UseShellExecute = true,
+                CreateNoWindow = false
+                // RedirectStandardOutput = true,
+                // RedirectStandardError = true
+            };
+            Process = new Process
+            {
+                StartInfo = StartInfo,
                 EnableRaisingEvents = true
             };
             _cts = new CancellationTokenSource();
@@ -30,7 +32,7 @@
 
         public async Task<bool> StartAndMonitorAsync()
         {
-            if (!_process.Start())
+            if (!Process.Start())
                 return false;
 
             await MonitorProcessAsync(_cts.Token);
@@ -39,17 +41,17 @@
 
         private async Task MonitorProcessAsync(CancellationToken token)
         {
-            while (!_process.HasExited)
+            while (!Process.HasExited)
             {
                 if (token.IsCancellationRequested)
                     break;
 
-                if (await Task.Run(() => _process.WaitForExit(10000)))
+                if (await Task.Run(() => Process.WaitForExit(10000)))
                     break;
 
-                if (!_process.Responding)
+                if (!Process.Responding)
                 {
-                    _process.Kill();
+                    Process.Kill();
                     break;
                 }
 
@@ -61,37 +63,38 @@
         {
             _cts.Cancel();
 
-            if (!_process.HasExited)
+            if (!Process.HasExited)
             {
-                _process.CloseMainWindow();
-                if (!_process.WaitForExit(5000))
+                Process.CloseMainWindow();
+                if (!Process.WaitForExit(5000))
                 {
                     UnityEngine.Debug.LogWarning("process did not exit after 5 seconds, killing process");
-                    _process.Kill();
+                    Process.Kill();
                 }
             }
 
-            _process?.Dispose();
+            Process?.Dispose();
         }
 
         public void Stop()
         {
-            if (_process.HasExited) throw new Exception("Process has been exited");
+            if (Process.HasExited) throw new Exception("Process has been exited");
 
             EnsureExited();
-        }
-
-        public void Dispose()
-        {
-            EnsureExited();
-            _cts.Dispose();
         }
 
         public string Info =>
-            $"{_process.StartInfo.FileName} {_process.StartInfo.Arguments}\n" +
+            $"{Process.StartInfo.FileName} {Process.StartInfo.Arguments}\n" +
             $"===== Output =====\n" +
-            $"{_process.StandardOutput.ReadToEnd()}\n" +
+            $"{Process.StandardOutput.ReadToEnd()}\n" +
             $"===== Error! =====\n" +
-            $"{_process.StandardError.ReadToEnd()}";
+            $"{Process.StandardError.ReadToEnd()}";
+
+        protected override bool DoClean()
+        {
+            EnsureExited();
+            _cts.Dispose();
+            return true;
+        }
     }
 }
