@@ -101,15 +101,21 @@ namespace MAVLinkAPI.Scripts.Pose
 
         private void Start()
         {
-            // TODO: remove
-            var mgr = new ExternalProcessManager("cmd.exe", "/C timeout /t 5");
-
-            var task = mgr.StartAndMonitorAsync();
-
-            var result = task.Result;
-
-            Debug.Log($"Result is {result}");
+            // testProcess();
         }
+
+        // private async void testProcess()
+        // {
+        //     // TODO: remove, only used for a spike
+        //     var cmd = "ls";
+        //     var mgr = new ExternalProcessManager("bash", $"-c '{cmd}'");
+        //
+        //     var task = mgr.StartAndMonitorAsync();
+        //
+        //     var result = await task;
+        //
+        //     Debug.Log($"Result is {result}");
+        // }
 
         public MAVPoseFeed.UpdaterD? UpdaterDaemon
         {

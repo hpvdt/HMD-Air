@@ -41,7 +41,7 @@ namespace MAVLinkAPI.Scripts.Util
         {
             if (_dictionary.TryGetValue(key, out var set))
             {
-                values = new HashSet<TValue>(set);
+                values = set;
                 return true;
             }
 
