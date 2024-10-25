@@ -34,7 +34,6 @@ public class HudLiteScript : MonoBehaviour
     public float headingAmplitude = 1, headingOffSet = 0, headingFilterFactor = 0.1f;
     public RectTransform compassHSI;
     public Text headingTxt;
-    public CompassBar compassBar;
 
 
     public bool useAltitude = true;
@@ -62,7 +61,6 @@ public class HudLiteScript : MonoBehaviour
     
     public void toggleHud()
     {
-        SndPlayer.playClick();
         hudPanel.gameObject.SetActive(!hudPanel.gameObject.activeSelf);
 
         if (hudPanel.gameObject.activeSelf)
@@ -71,12 +69,10 @@ public class HudLiteScript : MonoBehaviour
             if (aircraft == null && aircraftRB != null) aircraft = aircraftRB.transform;
 
             isActive = true;
-            if (activeMsg != "") DisplayMsg.show(activeMsg, 5);
         }
         else
         {
             isActive = false; current = null;
-            DisplayMsg.show("Hud Disabled");
         }
     }
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Inicialization
@@ -119,8 +115,8 @@ public class HudLiteScript : MonoBehaviour
 
             //Send values to Gui and Instruments
             if (compassHSI != null) compassHSI.localRotation = Quaternion.Euler(0, 0, headingAmplitude * heading);
-            if (compassBar != null) compassBar.heading = heading;
-            if (headingTxt != null) { headingTxt.text = BinaryDecoder.heading.ToString("000"); }
+            //if (compassBar != null) compassBar.heading = heading;
+            if (headingTxt != null) { headingTxt.text = SerialReader.heading.ToString("000"); }
             //if (headingTxt != null) { if (heading < 0) headingTxt.text = (heading + 360f).ToString("000"); else headingTxt.text = heading.ToString("000"); }
 
         }
@@ -164,7 +160,7 @@ public class HudLiteScript : MonoBehaviour
             //Original Code
             //altitude = Mathf.Lerp(altitude, altitudeOffSet + altitudeAmplitude * currentPosition.y, speedFilterFactor);
             
-            altitude = BinaryDecoder.Altimeter;
+            altitude = SerialReader.Altimeter;
 
             //Send values to Gui and Instruments
             if (altitudeTxt != null) altitudeTxt.text = altitude.ToString("0").PadLeft(5);
@@ -177,7 +173,7 @@ public class HudLiteScript : MonoBehaviour
         {
             speed = Mathf.Lerp(speed, speedOffSet + speedAmplitude * relativeSpeed.z, speedFilterFactor);
 
-            speed = BinaryDecoder.Airspeed;
+            speed = SerialReader.Airspeed;
 
             //Send values to Gui and Instruments
             if (speedTxt != null) speedTxt.text = speed.ToString("0").PadLeft(5);//.ToString("##0");
