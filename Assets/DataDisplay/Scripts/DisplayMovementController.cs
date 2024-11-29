@@ -1,15 +1,16 @@
 namespace DataDisplay.Scripts
 {
+    using UnityEditor;
     using UnityEngine;
     public class DisplayMovementController : MonoBehaviour
     {
 
         [MenuItem("Assets/Create/My Custom Asset Type", false, 1)]
         private static void CreateNewAsset()
-        {       
-        ProjectWindowUtil.CreateAssetWithContent(
-        "Default Name.extension",
-        string.Empty);
+        {
+            ProjectWindowUtil.CreateAssetWithContent(
+                "Default Name.extension",
+                string.Empty);
         }
         public bool keyboardController = false;
         public float rotationSpeed = 10f;
