@@ -20,10 +20,18 @@ namespace MAVLinkAPI.Scripts.API
             //TODO: use these
             public bool keepAlive;
 
-            public static ArgsT AnyPort = new()
+            public static ArgsT AnySerial = new()
             {
                 className = nameof(SerialPort),
-                portName = ".*",
+                portName = "**",
+                preferredBaudRate = MAVConnection.DefaultPreferredBaudRates
+            };
+
+
+            public static ArgsT Com5 = new()
+            {
+                className = nameof(SerialPort),
+                portName = "COM5",
                 preferredBaudRate = MAVConnection.DefaultPreferredBaudRates
             };
         }

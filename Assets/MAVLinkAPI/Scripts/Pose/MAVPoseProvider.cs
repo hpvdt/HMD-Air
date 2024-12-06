@@ -101,7 +101,10 @@ namespace MAVLinkAPI.Scripts.Pose
 
         private void Start()
         {
-            // testProcess();
+            // open all LocalSerial
+
+            var arg = Routing.ArgsT.Com5;
+            Open(arg);
         }
 
         // private async void testProcess()

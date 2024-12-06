@@ -14,7 +14,7 @@ namespace MAVLinkAPI.Editor.Pose
         [Test]
         public void ConnectAndRead10()
         {
-            var feed = new MAVPoseFeed(Routing.ArgsT.AnyPort);
+            var feed = new MAVPoseFeed(Routing.ArgsT.AnySerial);
 
             var counter = new AtomicInt();
 
@@ -34,7 +34,7 @@ namespace MAVLinkAPI.Editor.Pose
         [Test]
         public void ConnectAndUpdate()
         {
-            var feed = new MAVPoseFeed(Routing.ArgsT.AnyPort);
+            var feed = new MAVPoseFeed(Routing.ArgsT.AnySerial);
             feed.StartUpdate();
 
             var counter = new AtomicInt();
