@@ -19,7 +19,7 @@ namespace MAVLinkAPI.Scripts.Util
 
         public string Name = "Retry-" + Retry.NameCounter.Increment();
 
-        private static bool DefaultShouldRetry(Exception ex, TI attempt)
+        private static bool DefaultShouldContinue(Exception ex, TI attempt)
         {
             return true;
         }
@@ -27,12 +27,12 @@ namespace MAVLinkAPI.Scripts.Util
         private static readonly ArgsT DefaultArgs = new()
         {
             Interval = TimeSpan.FromSeconds(1),
-            ShouldContinue = DefaultShouldRetry
+            ShouldContinue = DefaultShouldContinue
         };
 
         public Retry<TI> With(
             TimeSpan? interval = null,
-            Func<Exception, TI, bool>? shouldRetry = null,
+            Func<Exception, TI, bool>? shouldContinue = null,
             bool logException = false,
             string? name = null
         )
@@ -41,7 +41,7 @@ namespace MAVLinkAPI.Scripts.Util
             _args = new ArgsT
             {
                 Interval = interval ?? DefaultArgs.Interval,
-                ShouldContinue = shouldRetry ?? DefaultArgs.ShouldContinue,
+                ShouldContinue = shouldContinue ?? DefaultArgs.ShouldContinue,
                 LogException = logException
             };
 

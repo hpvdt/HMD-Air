@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using MAVLinkAPI.Scripts.Comms;
 using MAVLinkAPI.Scripts.Util;
 using UnityEngine;
-using SerialPort = System.IO.Ports.SerialPort;
 
 namespace MAVLinkAPI.Scripts.API
 {
@@ -22,6 +21,8 @@ namespace MAVLinkAPI.Scripts.API
 
         public readonly MAVLink.MavlinkParse Mavlink = new();
         public readonly Component ThisComponent = Component.Gcs0;
+
+        private CancellationTokenSource _cts = new();
 
         public void Dispose()
         {
@@ -138,20 +139,26 @@ namespace MAVLinkAPI.Scripts.API
 
             var bauds = preferredBaudRates ?? DefaultPreferredBaudRates;
 
-            if (bauds.Length == 0) return Get();
+            // new cancellation token
+            var token = _cts.Token;
 
-            var result = bauds.Retry().With(TimeSpan.FromSeconds(0.2))
+            if (bauds.Length == 0) return Get(token);
+
+            var result = bauds.Retry().With(
+                    TimeSpan.FromSeconds(0.2),
+                    (i, j) => token.IsCancellationRequested
+                )
                 .FixedInterval.Run(
                     (baud, i) =>
                     {
                         IO.BaudRate = baud;
-                        return Get();
+                        return Get(token);
                     }
                 );
 
             return result;
 
-            T Get()
+            T Get(CancellationToken token)
             {
                 try
                 {
