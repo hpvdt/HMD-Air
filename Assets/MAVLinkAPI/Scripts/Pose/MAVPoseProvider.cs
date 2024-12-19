@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using HMD.Scripts.Pickle;
 using MAVLinkAPI.Scripts.API;
-using MAVLinkAPI.Scripts.Util;
 using SFB;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -103,7 +102,7 @@ namespace MAVLinkAPI.Scripts.Pose
         {
             // open all LocalSerial
 
-            var arg = Routing.ArgsT.Com5;
+            var arg = Routing.ArgsT.AnySerial;
             Open(arg);
         }
 

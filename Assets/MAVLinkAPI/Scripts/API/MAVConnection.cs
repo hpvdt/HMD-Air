@@ -38,20 +38,20 @@ namespace MAVLinkAPI.Scripts.API
         };
 
 
-        public static IEnumerable<MAVConnection> DiscoverPort(Regex pattern)
-        {
-            // TODO: add a list of preferred baudRates
-            var portNames = SerialPort.GetPortNames().ToList();
-            var matchedPortNames = portNames.Where(name => pattern.IsMatch(name)).ToList();
-
-            if (!matchedPortNames.Any()) throw new IOException("No serial ports found");
-
-            Debug.Log($"Found {matchedPortNames.Count} serial ports: " + string.Join(", ", matchedPortNames));
-
-            foreach (var name in matchedPortNames)
-            foreach (var conn in Discover("SerialPort", name))
-                yield return conn;
-        }
+        // public static IEnumerable<MAVConnection> DiscoverPort(Regex pattern)
+        // {
+        //     // TODO: add a list of preferred baudRates
+        //     var portNames = SerialPort.GetPortNames().ToList();
+        //     var matchedPortNames = portNames.Where(name => pattern.IsMatch(name)).ToList();
+        //
+        //     if (!matchedPortNames.Any()) throw new IOException("No serial ports found");
+        //
+        //     Debug.Log($"Found {matchedPortNames.Count} serial ports: " + string.Join(", ", matchedPortNames));
+        //
+        //     foreach (var name in matchedPortNames)
+        //     foreach (var conn in Discover("SerialPort", name))
+        //         yield return conn;
+        // }
 
         public static IEnumerable<MAVConnection> Discover(
             string className,
