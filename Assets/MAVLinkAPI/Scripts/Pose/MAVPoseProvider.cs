@@ -102,7 +102,7 @@ namespace MAVLinkAPI.Scripts.Pose
         {
             // open all LocalSerial
 
-            var arg = Routing.ArgsT.AnySerial;
+            var arg = Routing.ArgsT.Com5;
             Open(arg);
         }
 

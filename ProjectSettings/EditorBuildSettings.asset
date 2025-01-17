@@ -5,10 +5,10 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
     path: Assets/HMD/Scenes/Main.unity
     guid: b086cec284c7832438aa6c6aa7656481
-  - enabled: 1
+  - enabled: 0
     path: Assets/MAVLinkAPI/Scenes/PoseDemo.unity
     guid: 5dfb2db3294bcc847846837cedf32328
   m_configObjects:
