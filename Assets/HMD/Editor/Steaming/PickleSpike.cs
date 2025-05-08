@@ -3,7 +3,7 @@ using HMD.Scripts.Pickle;
 using HMD.Scripts.Streaming.VCap;
 using NUnit.Framework;
 
-namespace HMD.Editor.Pickle
+namespace HMD.Editor.Steaming
 {
     public class PickleSpike
     {
