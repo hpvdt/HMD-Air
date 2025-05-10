@@ -5,7 +5,6 @@ using System.Linq;
 using HMD.Scripts.Streaming;
 using HMD.Scripts.Util;
 using HMDCommons.Scripts;
-using MAVLinkAPI.Editor.Util;
 using MAVLinkAPI.Scripts.Util;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -13,6 +12,19 @@ using UnityEngine.UI;
 
 public class DashPanels : MonoBehaviourWithLogging
 {
+    // private MenuID _visibleMenuID;
+
+    public enum MenuID
+    {
+        CONTROLLER_MENU,
+        APP_MENU
+    }
+
+    private const string WHATS_NEW = "OnboardingSeen_0_0_5_g";
+
+    private const string NEW_VLC_WINDOWS = "New VLC (Windows) ...";
+
+    private const string NEW_V_CAP = "New Video Capture ...";
     // [HideInInspector]
     // public VlcController controller;
 
@@ -22,7 +34,49 @@ public class DashPanels : MonoBehaviourWithLogging
 
     [Required] public Dropdown playerMenu = null!;
 
-    private Dictionary<string, Player> _activePlayers = new();
+    // SetupCaptureDevice()
+
+    public GameObject playerTab;
+
+    public FOVController fovController;
+
+    public GameObject consoleTab;
+
+    public GameObject trackTab;
+
+    public GameObject volumeTab;
+
+
+    public Button? playerMove2DButton;
+    public Button? playerMove3DButton;
+
+    private readonly Dictionary<string, Player> _activePlayers = new();
+
+    private List<GameObject>? _allMenus;
+
+    private List<GameObject>? _allPopups;
+
+    private List<Button>? _allTabs;
+    private GameObject _appMenu;
+
+    private GameObject _aspectRatioPopup;
+
+    private List<Display>? _extendDisplay;
+    private GameObject _formatPopup;
+
+    private readonly AtomicLong _incCounter = new();
+
+    private GameObject _lockScreenNotice;
+
+    private GameObject _optionsButton;
+    private GameObject _pictureSettingsPopup;
+    private GameObject _releaseInfoPopup;
+
+
+    // the following are set in `UpdateReferences`
+
+    private GameObject _rootMenu;
+    private GameObject _screenPopup;
 
     private string FocusedPlayerID
     {
@@ -40,11 +94,6 @@ public class DashPanels : MonoBehaviourWithLogging
         }
     }
 
-    private Player? GetFocusedPlayer()
-    {
-        return _activePlayers.GetValueOrDefault(FocusedPlayerID);
-    }
-
     public List<Player> FocusedPlayers
     {
         get
@@ -57,58 +106,67 @@ public class DashPanels : MonoBehaviourWithLogging
         }
     }
 
-    public class Player : Dependent<DashPanels>, IDisposable
+    private List<Button> AllTabs => LazyHelper.EnsureInitialized(ref _allTabs, () => new List<Button>
     {
-        public string ID;
+        playerTab.GetComponent<Button>(),
+        consoleTab.GetComponent<Button>(),
+        trackTab.GetComponent<Button>(),
+        volumeTab.GetComponent<Button>()
+    });
 
-        public GameObject Prefab;
+    private List<GameObject> AllMenus => LazyHelper.EnsureInitialized(ref _allMenus, () => new List<GameObject>
+    {
+        _rootMenu,
+        _appMenu
+    });
 
-        private ControllerLike? _controller;
+    private List<GameObject> AllPopups => LazyHelper.EnsureInitialized(ref _allPopups, () => new List<GameObject>
+    {
+        _aspectRatioPopup,
+        _screenPopup,
+        _formatPopup,
+        _releaseInfoPopup,
+        _pictureSettingsPopup
+    });
 
-        public ControllerLike Controller =>
-            LazyHelper.EnsureInitialized(ref _controller, () => Prefab.GetComponent<ControllerLike>());
+    // Start is called before the first frame update
+    private void Start()
+    {
+        BindUI();
 
-        public class DraggingMode
+        _lockScreenNotice = GlobalFinder.Find("LockScreenNotice").Only();
+
+        var versionName = Application.version;
+        var versionCode = Application.buildGUID;
+        GlobalFinder.Find("AppMenu/AppMenuInner/Subtitle").Only().GetComponent<Text>().text =
+            $"{versionName} ({versionCode})";
+
+        // center UI things that i had spread out in Editor
+        CenterPopupLocations();
+
+        // Center Menus/Objects
+        CenterXY(_lockScreenNotice);
+        CenterXY(_rootMenu);
+        CenterXY(_appMenu);
+
+        _lockScreenNotice.SetActive(false);
+
+        HideAllMenus();
+        HideAllPopups();
+
+        UIShowControllerMenu();
+
+        if (PlayerPrefs.GetInt(WHATS_NEW) == 1)
         {
-            public static readonly DraggingMode Disabled = new();
-
-            public class Enabled : DraggingMode
-            {
-                public Quaternion Offset;
-            }
-
-            public class _2D : Enabled
-            {
-            }
-
-            public class _3D : Enabled
-            {
-            }
+            // The user has already seen the onboarding tutorial text
         }
-
-        public DraggingMode Dragging = DraggingMode.Disabled;
-
-        public void Focus()
+        else
         {
-            Controller.BindUI();
-            Outer.FocusedPlayerID = ID;
-
-            Outer._syncIcons();
-        }
-
-        public bool IconIsVisible
-        {
-            set => Controller.icon.SetActive(value);
-        }
-
-        public void Dispose()
-        {
-            Destroy(Prefab);
-            Outer._activePlayers.Remove(ID);
+            // The user has not yet seen the onboarding tutorial text
+            PlayerPrefs.SetInt(WHATS_NEW, 1);
+            ShowWhatsNewPopup();
         }
     }
-
-    private AtomicLong _incCounter = new();
 
 
     // private Player? _focusedPlayer;
@@ -127,6 +185,11 @@ public class DashPanels : MonoBehaviourWithLogging
                 player.Prefab.transform.rotation = rotation;
             }
         // TODO: add 2D
+    }
+
+    private Player? GetFocusedPlayer()
+    {
+        return _activePlayers.GetValueOrDefault(FocusedPlayerID);
     }
 
     private Player _setupPlayerFromPrefab(GameObject prefab, string playerName)
@@ -169,10 +232,6 @@ public class DashPanels : MonoBehaviourWithLogging
         return _setupPlayerFromTemplate(vCapPlayerTemplate, "Video Capture");
     }
 
-    // SetupCaptureDevice()
-
-    public GameObject playerTab;
-
     public void TogglePlayerTab()
     {
         ExtendDisplayOnce();
@@ -193,8 +252,6 @@ public class DashPanels : MonoBehaviourWithLogging
     public void HideIcons()
     {
     }
-
-    private List<Display>? _extendDisplay;
 
     // TODO: this shouldn't be cached, display may be connected or disconnected during execution
     private List<Display> ExtendDisplayOnce() // In Unity, display cannot be scrapped
@@ -221,38 +278,20 @@ public class DashPanels : MonoBehaviourWithLogging
         return _extendDisplay;
     }
 
-    public FOVController fovController;
-
-    public GameObject consoleTab;
-
     public void ToggleConsoleTab()
     {
         ToggleElement(consoleTab);
     }
-
-    public GameObject trackTab;
 
     public void ToggleTrackTab()
     {
         ToggleElement(trackTab);
     }
 
-    public GameObject volumeTab;
-
     public void ToggleVolumeTab()
     {
         ToggleElement(volumeTab);
     }
-
-    private List<Button>? _allTabs;
-
-    private List<Button> AllTabs => LazyHelper.EnsureInitialized(ref _allTabs, () => new List<Button>
-    {
-        playerTab.GetComponent<Button>(),
-        consoleTab.GetComponent<Button>(),
-        trackTab.GetComponent<Button>(),
-        volumeTab.GetComponent<Button>()
-    });
 
     //Enable a GameObject if it is disabled, or disable it if it is enabled
     private static bool ToggleElement(GameObject element)
@@ -260,90 +299,6 @@ public class DashPanels : MonoBehaviourWithLogging
         var toggled = !element.activeInHierarchy;
         element.SetActive(toggled);
         return toggled;
-    }
-
-
-    // the following are set in `UpdateReferences`
-
-    private GameObject _rootMenu;
-    private GameObject _appMenu;
-
-    private List<GameObject>? _allMenus;
-
-    private List<GameObject> AllMenus => LazyHelper.EnsureInitialized(ref _allMenus, () => new List<GameObject>
-    {
-        _rootMenu,
-        _appMenu
-    });
-
-    private GameObject _optionsButton;
-
-    private GameObject _lockScreenNotice;
-
-    private GameObject _aspectRatioPopup;
-    private GameObject _screenPopup;
-    private GameObject _formatPopup;
-    private GameObject _releaseInfoPopup;
-    private GameObject _pictureSettingsPopup;
-
-    private List<GameObject>? _allPopups;
-
-    private List<GameObject> AllPopups => LazyHelper.EnsureInitialized(ref _allPopups, () => new List<GameObject>
-    {
-        _aspectRatioPopup,
-        _screenPopup,
-        _formatPopup,
-        _releaseInfoPopup,
-        _pictureSettingsPopup
-    });
-
-    // private MenuID _visibleMenuID;
-
-    public enum MenuID
-    {
-        CONTROLLER_MENU,
-        APP_MENU
-    };
-
-    private const string WHATS_NEW = "OnboardingSeen_0_0_5_g";
-
-    // Start is called before the first frame update
-    private void Start()
-    {
-        BindUI();
-
-        _lockScreenNotice = GlobalFinder.Find("LockScreenNotice").Only();
-
-        var versionName = Application.version;
-        var versionCode = Application.buildGUID;
-        GlobalFinder.Find("AppMenu/AppMenuInner/Subtitle").Only().GetComponent<Text>().text =
-            $"{versionName} ({versionCode})";
-
-        // center UI things that i had spread out in Editor
-        CenterPopupLocations();
-
-        // Center Menus/Objects
-        CenterXY(_lockScreenNotice);
-        CenterXY(_rootMenu);
-        CenterXY(_appMenu);
-
-        _lockScreenNotice.SetActive(false);
-
-        HideAllMenus();
-        HideAllPopups();
-
-        UIShowControllerMenu();
-
-        if (PlayerPrefs.GetInt(WHATS_NEW) == 1)
-        {
-            // The user has already seen the onboarding tutorial text
-        }
-        else
-        {
-            // The user has not yet seen the onboarding tutorial text
-            PlayerPrefs.SetInt(WHATS_NEW, 1);
-            ShowWhatsNewPopup();
-        }
     }
 
     private void CenterPopupLocations()
@@ -390,13 +345,6 @@ public class DashPanels : MonoBehaviourWithLogging
         _pictureSettingsPopup = gameObject.ByName("PictureSettingsPopup").Only();
     }
 
-    private const string NEW_VLC_WINDOWS = "New VLC (Windows) ...";
-    private const string NEW_V_CAP = "New Video Capture ...";
-
-
-    public Button? playerMove2DButton;
-    public Button? playerMove3DButton;
-
     private void BindUI()
     {
         UpdateReferences();
@@ -407,8 +355,7 @@ public class DashPanels : MonoBehaviourWithLogging
         playerMenu.options.Add(new Dropdown.OptionData(NEW_V_CAP));
         playerMenu.RefreshShownValue();
 
-        playerMenu.onValueChanged.AddListener(
-            value =>
+        playerMenu.onValueChanged.AddListener(value =>
             {
                 var option = playerMenu.options[value];
 
@@ -436,8 +383,7 @@ public class DashPanels : MonoBehaviourWithLogging
         {
             // 3D
             playerMove3DButton.OnEvent(EventTriggerType.PointerDown)
-                .AddListener(
-                    _ =>
+                .AddListener(_ =>
                     {
                         Log.V("dragging in 3D ...");
                         foreach (var player in FocusedPlayers)
@@ -450,8 +396,7 @@ public class DashPanels : MonoBehaviourWithLogging
                 );
 
             playerMove3DButton.OnEvent(EventTriggerType.PointerUp)
-                .AddListener(
-                    _ =>
+                .AddListener(_ =>
                     {
                         Log.V("... done");
                         foreach (var player in FocusedPlayers) player.Dragging = Player.DraggingMode.Disabled;
@@ -462,8 +407,7 @@ public class DashPanels : MonoBehaviourWithLogging
         {
             // 2D
             playerMove2DButton.OnEvent(EventTriggerType.PointerDown)
-                .AddListener(
-                    _ =>
+                .AddListener(_ =>
                     {
                         Log.V("dragging in 2D ...");
                         foreach (var player in FocusedPlayers)
@@ -479,8 +423,7 @@ public class DashPanels : MonoBehaviourWithLogging
                 );
 
             playerMove2DButton.OnEvent(EventTriggerType.PointerUp)
-                .AddListener(
-                    _ =>
+                .AddListener(_ =>
                     {
                         Log.V("... done");
                         foreach (var player in FocusedPlayers) player.Dragging = Player.DraggingMode.Disabled;
@@ -571,19 +514,69 @@ public class DashPanels : MonoBehaviourWithLogging
         _pictureSettingsPopup.SetActive(true);
     }
 
+    public class Player : Dependent<DashPanels>, IDisposable
+    {
+        private ControllerLike? _controller;
+
+        public DraggingMode Dragging = DraggingMode.Disabled;
+        public string ID;
+
+        public GameObject Prefab;
+
+        public ControllerLike Controller =>
+            LazyHelper.EnsureInitialized(ref _controller, () => Prefab.GetComponent<ControllerLike>());
+
+        public bool IconIsVisible
+        {
+            set => Controller.icon.SetActive(value);
+        }
+
+        public void Dispose()
+        {
+            Destroy(Prefab);
+            Outer._activePlayers.Remove(ID);
+        }
+
+        public void Focus()
+        {
+            Controller.BindUI();
+            Outer.FocusedPlayerID = ID;
+
+            Outer._syncIcons();
+        }
+
+        public class DraggingMode
+        {
+            public static readonly DraggingMode Disabled = new();
+
+            public class Enabled : DraggingMode
+            {
+                public Quaternion Offset;
+            }
+
+            public class _2D : Enabled
+            {
+            }
+
+            public class _3D : Enabled
+            {
+            }
+        }
+    }
+
     public class Lock
     {
-        private bool _screenLocked = false;
         private float _brightnessOnLock;
+        private bool _screenLocked;
 
         protected GameObject HideWhenLocked;
 
         protected GameObject LockScreenNotice;
 
-        protected GameObject MenuToggleButton;
-
         //
         protected GameObject Logo;
+
+        protected GameObject MenuToggleButton;
 
         // TODO: set the following in editor
         // _hideWhenLocked = GameObject.Find("HideWhenScreenLocked");

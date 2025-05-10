@@ -1,5 +1,5 @@
 using System;
-using MAVLinkAPI.Editor.Util;
+using MAVLinkAPI.Scripts.Util;
 using UnityEngine;
 
 namespace HMD.Scripts.Util
@@ -9,9 +9,25 @@ namespace HMD.Scripts.Util
         public bool loggerVerbosity = true; // TODO: should be a number
         public string loggerPrefix;
 
+        protected Logger Log => _log();
+
+        protected Logger Warning => _log(LogType.Warning);
+
+
+        protected Logger Error => _log(LogType.Error);
+
         protected void Awake()
         {
             if (loggerPrefix == "") loggerPrefix = name;
+        }
+
+        private Logger _log(LogType? type = null)
+        {
+            return new Logger
+            {
+                Outer = this,
+                Type = type
+            };
         }
 
         protected class Logger : Dependent<MonoBehaviourWithLogging>
@@ -43,21 +59,5 @@ namespace HMD.Scripts.Util
                 if (Outer.loggerVerbosity) Write(message);
             }
         }
-
-        private Logger _log(LogType? type = null)
-        {
-            return new Logger
-            {
-                Outer = this,
-                Type = type
-            };
-        }
-
-        protected Logger Log => _log();
-
-        protected Logger Warning => _log(LogType.Warning);
-
-
-        protected Logger Error => _log(LogType.Error);
     }
 }
