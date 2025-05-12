@@ -1,18 +1,17 @@
 using System;
-using HMD.Scripts.Pickle;
 using HMD.Scripts.Streaming.VCap;
+using MAVLinkAPI.Scripts.Streaming;
 using NUnit.Framework;
 
-namespace HMD.Editor.Steaming
+namespace HMD.Editor.Streaming
 {
-    public class PickleSpike
+    public class VCapSpec
     {
         // A Test behaves as an ordinary method
         [Test]
         public void SpikeMissingField()
         {
             // Use the Assert class to test conditions
-
             var str = "name: '/dev/video0'";
             var yaml = new Yaml();
 
@@ -22,7 +21,6 @@ namespace HMD.Editor.Steaming
             Assert.AreEqual(str2, $"index: {Environment.NewLine}" +
                                   $"name: /dev/video0{Environment.NewLine}" +
                                   $"resolution: {Environment.NewLine}");
-            // Use the Assert class to test conditions
         }
 
         // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use

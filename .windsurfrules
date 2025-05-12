@@ -1,3 +1,8 @@
 ﻿ 
 # Environment
 - This is a Unity 2022 project
+- The project can be built with dotnet
+
+# Rules
+- avoid using GUID in asmdef files
+- build with dotnet to figure out build errors

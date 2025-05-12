@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using HMD.Scripts.Pickle;
 using HMDCommons.Scripts;
+using MAVLinkAPI.Scripts.Streaming;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -12,14 +12,8 @@ namespace HMD.Scripts.Streaming.VCap
 {
     public class VCapFeed : FeedLike
     {
-        private Yaml _pickler = new();
-
-        public struct ArgsT
-        {
-            public int? Index;
-            public string Name;
-            public Resolution? Resolution;
-        }
+        private WebCamDevice? _activeDevice;
+        private readonly Yaml _pickler = new();
 
         private WebCamTexture? _webCamTex;
 
@@ -31,8 +25,6 @@ namespace HMD.Scripts.Streaming.VCap
                 return result;
             }
         }
-
-        private WebCamDevice? _activeDevice;
 
 
         public void PlayNext(Resolution? res)
@@ -88,7 +80,7 @@ namespace HMD.Scripts.Streaming.VCap
                 var resList = pair.v.availableResolutions;
 
                 {
-                    var v = new ArgsT()
+                    var v = new ArgsT
                     {
                         Index = pair.i,
                         Name = pair.v.name
@@ -99,7 +91,7 @@ namespace HMD.Scripts.Streaming.VCap
                 if (resList != null)
                     foreach (var res in resList)
                     {
-                        var v = new ArgsT()
+                        var v = new ArgsT
                         {
                             Index = pair.i,
                             Name = pair.v.name,
@@ -169,7 +161,7 @@ namespace HMD.Scripts.Streaming.VCap
             _webCamTex.GetPixels(); // otherwise width and height will always be 16x16
 
             Log.V(
-                $"Setting up camera:\n"
+                "Setting up camera:\n"
                 + $"    Seleccted: `{selector.Name}` ({selector.Resolution.ToSafeString()})\n"
                 + $"    Actual: `{_webCamTex.deviceName}` ({_webCamTex.width}x{_webCamTex.height} @ {_webCamTex.requestedFPS}fps)"
             );
@@ -214,8 +206,7 @@ namespace HMD.Scripts.Streaming.VCap
         {
             if (_webCamTex == null)
                 return (0, 0);
-            else
-                return ((uint)_webCamTex.width, (uint)_webCamTex.height);
+            return ((uint)_webCamTex.width, (uint)_webCamTex.height);
         }
 
         public override void Dispose()
@@ -224,6 +215,13 @@ namespace HMD.Scripts.Streaming.VCap
 
             Log.V("Destroy Camera Feed");
             _webCamTex = null;
+        }
+
+        public struct ArgsT
+        {
+            public int? Index;
+            public string Name;
+            public Resolution? Resolution;
         }
     }
 }

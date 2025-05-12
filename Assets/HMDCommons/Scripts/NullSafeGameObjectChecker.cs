@@ -1,4 +1,4 @@
-﻿namespace HMDCommons.Scripts
+namespace HMDCommons.Scripts
 {
     using System;
     using System.Reflection;
@@ -8,6 +8,22 @@
     // [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Class)] TODO: enable this
     public class RequiredAttribute : PropertyAttribute
     {
+    }
+
+    // Add extension method for IsUnityNull
+    public static class UnityObjectExtensions
+    {
+        public static bool IsUnityNull(this object obj)
+        {
+            if (obj == null)
+                return true;
+                
+            // Check if it's a UnityEngine.Object and if it has been destroyed
+            if (obj is UnityEngine.Object unityObject)
+                return unityObject == null;
+                
+            return false;
+        }
     }
 
     public static class NullSafeGameObjectChecker

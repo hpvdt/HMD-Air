@@ -1,0 +1,23 @@
+{
+  "name": "HMD.Scripts",
+  "rootNamespace": "",
+  "references": [
+    "MAVLinkAPI.Scripts",
+    "HMDCommons.Scripts",
+    "Unity.VisualScripting",
+    "Unity.InputSystem",
+    "Unity.TextMeshPro",
+    "Unity.ugui",
+    "StandaloneFileBrowser",
+    "Unity.VisualScripting.Core"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

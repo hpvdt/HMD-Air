@@ -1,0 +1,19 @@
+{
+    "name": "XRPoseAPI.Scripts",
+    "rootNamespace": "XRPoseAPI.Scripts",
+    "references": [
+        "Unity.XR.Management",
+        "UnityEngine.SpatialTracking",
+        "Unity.InputSystem",
+        "Unity.XR.Interaction.Toolkit"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

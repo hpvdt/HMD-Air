@@ -52,6 +52,8 @@ public class DashPanels : MonoBehaviourWithLogging
 
     private readonly Dictionary<string, Player> _activePlayers = new();
 
+    private readonly AtomicLong _incCounter = new();
+
     private List<GameObject>? _allMenus;
 
     private List<GameObject>? _allPopups;
@@ -63,8 +65,6 @@ public class DashPanels : MonoBehaviourWithLogging
 
     private List<Display>? _extendDisplay;
     private GameObject _formatPopup;
-
-    private readonly AtomicLong _incCounter = new();
 
     private GameObject _lockScreenNotice;
 

@@ -1,0 +1,19 @@
+{
+    "name": "Simulator.Scripts",
+    "rootNamespace": "Simulator.Scripts",
+    "references": [
+        "MAVLinkAPI.Scripts",
+        "HMD.Scripts",
+        "Unity.XR.Management",
+        "Unity.XR.Management.Editor"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

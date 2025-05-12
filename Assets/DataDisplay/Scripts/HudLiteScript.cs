@@ -1,6 +1,8 @@
 namespace DataDisplay.Scripts
 {
+#if UNITY_TEXTMESHPRO
     using TMPro;
+#endif
     using UnityEngine;
     using UnityEngine.UI;
     public class HudLiteScript : MonoBehaviour
@@ -48,7 +50,11 @@ namespace DataDisplay.Scripts
         public float speedAmplitude = 1, speedOffSet = 0, speedFilterFactor = 0.25f;
         public Text speedTxt;
 
+#if UNITY_TEXTMESHPRO
         public TMP_Text energyTxt;
+#else
+        public Text energyTxt;
+#endif
         //
 
 
