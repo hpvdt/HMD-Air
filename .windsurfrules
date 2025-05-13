@@ -1,7 +1,7 @@
 ﻿ 
 # Environment
 - This is a Unity 2022 project
-- The project can be built with dotnet
+- The project can be built with `dotnet build HMD-Air.sln`
 
 # Rules
 - avoid using GUID in asmdef files

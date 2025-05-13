@@ -1,6 +1,6 @@
 {
     "name": "VisionDesignA.Scripts",
-    "rootNamespace": "VisionDesignA.Scripts",
+    "rootNamespace": "",
     "references": [
         "HMD.Scripts"
     ],

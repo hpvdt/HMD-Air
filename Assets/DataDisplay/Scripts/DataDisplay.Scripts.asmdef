@@ -1,19 +1,19 @@
 {
-    "name": "DataDisplay.Scripts",
-    "rootNamespace": "DataDisplay.Scripts",
-    "references": [
-        "MAVLinkAPI.Scripts",
-        "HMD.Scripts",
-        "HMDCommons.Scripts",
-        "Unity.TextMeshPro"
-    ],
-    "includePlatforms": [],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+  "name": "DataDisplay.Scripts",
+  "rootNamespace": "",
+  "references": [
+    "MAVLinkAPI.Scripts",
+    "HMD.Scripts",
+    "HMDCommons.Scripts",
+    "Unity.TextMeshPro"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
 }

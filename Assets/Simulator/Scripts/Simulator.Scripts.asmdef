@@ -1,6 +1,6 @@
 {
     "name": "Simulator.Scripts",
-    "rootNamespace": "Simulator.Scripts",
+    "rootNamespace": "",
     "references": [
         "MAVLinkAPI.Scripts",
         "HMD.Scripts",

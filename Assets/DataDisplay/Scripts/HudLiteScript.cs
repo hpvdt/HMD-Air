@@ -1,10 +1,9 @@
 namespace DataDisplay.Scripts
 {
-#if UNITY_TEXTMESHPRO
     using TMPro;
-#endif
     using UnityEngine;
     using UnityEngine.UI;
+
     public class HudLiteScript : MonoBehaviour
     {
         public static HudLiteScript current;
@@ -28,11 +27,13 @@ namespace DataDisplay.Scripts
         public Text horizonRollTxt;
 
         public bool usePitch = true;
+
         public float pitchAmplitude = 1,
             pitchOffSet = 0,
             pitchXOffSet = 0,
             pitchYOffSet = 0,
             pitchFilterFactor = 0.125f;
+
         public RectTransform horizonPitch;
         public Text horizonPitchTxt;
 
@@ -92,7 +93,6 @@ namespace DataDisplay.Scripts
         //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Inicialization
 
 
-
         /////////////////////////////////////////////////////// Updates and Calculations
         private void Update()
         {
@@ -135,9 +135,8 @@ namespace DataDisplay.Scripts
                 //Send values to Gui and Instruments
                 if (compassHSI != null) compassHSI.localRotation = Quaternion.Euler(0, 0, headingAmplitude * heading);
                 //if (compassBar != null) compassBar.heading = heading;
-                if (headingTxt != null) { headingTxt.text = SerialReader.heading.ToString("000"); }
+                if (headingTxt != null) headingTxt.text = SerialReader.heading.ToString("000");
                 //if (headingTxt != null) { if (heading < 0) headingTxt.text = (heading + 360f).ToString("000"); else headingTxt.text = heading.ToString("000"); }
-
             }
             //////////////////////////////////////////// Compass, Heading and/or HSI
 
@@ -203,10 +202,7 @@ namespace DataDisplay.Scripts
                 if (speedTxt != null) speedTxt.text = speed.ToString("0").PadLeft(5); //.ToString("##0");
             }
             //////////////////////////////////////////// Speed
-
-
         }
         /////////////////////////////////////////////////////// Updates and Calculations
-
     }
 }
