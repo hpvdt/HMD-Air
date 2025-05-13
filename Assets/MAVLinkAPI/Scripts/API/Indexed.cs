@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
-using MAVLinkAPI.Editor.Util;
+using MAVLinkAPI.Scripts.Util;
 
 namespace MAVLinkAPI.Scripts.API
 {

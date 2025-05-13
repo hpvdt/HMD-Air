@@ -48,13 +48,13 @@ namespace MAVLinkAPI.Scripts.API
             return Topics.Get(message.msgid).ValueOr(TopicMissing)(message);
         }
 
-        public abstract class BinaryT : Subscriber<T>
+        public abstract class BothT : Subscriber<T>
         {
             public Subscriber<T> Left = null!; // TODO: T in left and right can have different subtypes
             public Subscriber<T> Right = null!;
         }
 
-        public class UnionT : BinaryT
+        public class UnionT : BothT
         {
             protected override Indexed<Topic> Topics_Mk()
             {
@@ -81,7 +81,7 @@ namespace MAVLinkAPI.Scripts.API
             };
         }
 
-        public class OrElseT : BinaryT
+        public class OrElseT : BothT
         {
             protected override Indexed<Topic> Topics_Mk()
             {
@@ -127,8 +127,7 @@ namespace MAVLinkAPI.Scripts.API
 
                             if (prevV == null) return null;
 
-                            var result = prevV.SelectMany(
-                                x => Fn(ii, x)
+                            var result = prevV.SelectMany(x => Fn(ii, x)
                             ).ToList();
 
                             return result;

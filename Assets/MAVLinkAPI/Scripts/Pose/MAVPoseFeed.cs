@@ -7,10 +7,25 @@ using MAVLinkAPI.Scripts.API;
 using MAVLinkAPI.Scripts.API.Minimal;
 using MAVLinkAPI.Scripts.Util;
 using UnityEngine;
+using System.ComponentModel;
+using MAVLinkAPI.Scripts.Routing;
+
+namespace System.Runtime.CompilerServices
+{
+    /// <summary>
+    /// Reserved to be used by the compiler for tracking metadata.
+    /// This class should not be used by developers in source code.
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    internal static class IsExternalInit
+    {
+    }
+}
+
 
 namespace MAVLinkAPI.Scripts.Pose
 {
-    public record MAVPoseFeed(Routing.ArgsT Args) : IDisposable
+    public record MAVPoseFeed(DataStream.ArgsT Args) : IDisposable
     {
         // public ;
 
@@ -49,7 +64,7 @@ namespace MAVLinkAPI.Scripts.Pose
 
         private Reader<Quaternion> Reader_Mk()
         {
-            var discovered = MAVConnection.Discover(Args.className, Args.portName).ToList();
+            var discovered = MAVConnection.Discover(Args.typeName, Args.portName).ToList();
 
             _candidates.Set(discovered);
 
@@ -57,8 +72,7 @@ namespace MAVLinkAPI.Scripts.Pose
 
             var readers = discovered
                 .AsParallel().WithExecutionMode(ParallelExecutionMode.ForceParallelism)
-                .SelectMany(
-                    connection =>
+                .SelectMany(connection =>
                     {
                         // Debug.Log("parallel filtering started for " + connection.Port.PortName);
 
@@ -135,8 +149,7 @@ namespace MAVLinkAPI.Scripts.Pose
                 );
             }
 
-            var only = readers.Where(
-                (v, i) =>
+            var only = readers.Where((v, i) =>
                 {
                     if (i != 0)
                     {

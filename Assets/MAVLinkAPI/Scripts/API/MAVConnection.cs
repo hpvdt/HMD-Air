@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using MAVLinkAPI.Scripts.Comms;
+using MAVLinkAPI.Scripts.Routing;
 using MAVLinkAPI.Scripts.Util;
 using UnityEngine;
 
@@ -14,7 +15,7 @@ namespace MAVLinkAPI.Scripts.API
 {
     public class MAVConnection : IDisposable
     {
-        public Routing IO = null!;
+        public DataStream IO = null!;
 
         // public SerialPort Port => IO.Port;
         // TODO: generalised this to read from any () => Stream
@@ -101,7 +102,7 @@ namespace MAVLinkAPI.Scripts.API
 
                 yield return new MAVConnection
                 {
-                    IO = new Routing(serial)
+                    IO = new DataStream(serial)
                 };
             }
         }
@@ -148,8 +149,7 @@ namespace MAVLinkAPI.Scripts.API
                     TimeSpan.FromSeconds(0.2),
                     (i, j) => token.IsCancellationRequested
                 )
-                .FixedInterval.Run(
-                    (baud, i) =>
+                .FixedInterval.Run((baud, i) =>
                     {
                         IO.BaudRate = baud;
                         return Get(token);

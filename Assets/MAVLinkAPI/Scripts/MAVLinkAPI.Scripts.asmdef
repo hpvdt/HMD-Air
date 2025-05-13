@@ -1,0 +1,23 @@
+{
+  "name": "MAVLinkAPI.Scripts",
+  "rootNamespace": "",
+  "references": [
+    "Unity.ResourceManager",
+    "Unity.InputSystem",
+    "Unity.TextMeshPro",
+    "Unity.ugui",
+    "YamlDotNet",
+    "StandaloneFileBrowser",
+    "UnityEngine.SpatialTracking",
+    "Unity.VisualScripting.Core"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": true,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
