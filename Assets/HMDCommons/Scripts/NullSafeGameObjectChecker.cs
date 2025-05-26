@@ -4,6 +4,7 @@ namespace HMDCommons.Scripts
     using System.Reflection;
     using Unity.VisualScripting;
     using UnityEngine;
+
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Class)]
     // [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Class)] TODO: enable this
     public class RequiredAttribute : PropertyAttribute
@@ -17,11 +18,11 @@ namespace HMDCommons.Scripts
         {
             if (obj == null)
                 return true;
-                
+
             // Check if it's a UnityEngine.Object and if it has been destroyed
             if (obj is UnityEngine.Object unityObject)
                 return unityObject == null;
-                
+
             return false;
         }
     }
@@ -36,8 +37,8 @@ namespace HMDCommons.Scripts
             {
                 var type = obj.GetType();
                 var fields = type.GetFields(BindingFlags.Instance |
-                    BindingFlags.Public |
-                    BindingFlags.NonPublic);
+                                            BindingFlags.Public |
+                                            BindingFlags.NonPublic);
 
                 // var properties = type.GetProperties(BindingFlags.Instance |
                 //                                     BindingFlags.Public |

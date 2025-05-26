@@ -166,3 +166,7 @@ UserSettings
 # Python
 **/venv
 **/__pycache__
+
+# AI coding
+**/.windsurf
+**/.cursor

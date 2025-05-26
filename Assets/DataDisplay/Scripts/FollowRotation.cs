@@ -1,6 +1,7 @@
 namespace DataDisplay.Scripts
 {
     using UnityEngine;
+
     public class FollowRotation : MonoBehaviour
     {
         // Start is called before the first frame update
@@ -12,15 +13,10 @@ namespace DataDisplay.Scripts
         // Update is called once per frame
         private void Update()
         {
-
             if (!inverse)
-            {
                 transform.rotation = leader.rotation;
-            }
             else
-            {
                 transform.rotation = Quaternion.Inverse(leader.rotation);
-            }
         }
     }
 }

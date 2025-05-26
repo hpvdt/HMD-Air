@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using HMDCommons.Scripts;
+using MAVLinkAPI.Scripts.Ext;
 using MAVLinkAPI.Scripts.Streaming;
 using Unity.VisualScripting;
 using UnityEngine;

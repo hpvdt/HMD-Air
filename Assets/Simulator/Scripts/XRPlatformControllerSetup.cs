@@ -3,6 +3,7 @@ using UnityEditor;
 #if UNITY_XR_MANAGEMENT_EDITOR
 using UnityEditor.XR.Management;
 #endif
+
 #else
 using UnityEngine.XR.Management;
 #endif
@@ -10,24 +11,22 @@ using UnityEngine.XR.Management;
 namespace Unity.Template.VR
 {
     using UnityEngine;
+
     internal class XRPlatformControllerSetup : MonoBehaviour
     {
-        [SerializeField]
-        GameObject m_LeftController;
+        [SerializeField] private GameObject m_LeftController;
 
-        [SerializeField]
-        GameObject m_RightController;
+        [SerializeField] private GameObject m_RightController;
 
-        [SerializeField]
-        GameObject m_LeftControllerOculusPackage;
+        [SerializeField] private GameObject m_LeftControllerOculusPackage;
 
-        [SerializeField]
-        GameObject m_RightControllerOculusPackage;
+        [SerializeField] private GameObject m_RightControllerOculusPackage;
 
-        void Start()
+        private void Start()
         {
 #if UNITY_EDITOR && UNITY_XR_MANAGEMENT_EDITOR
-            var loaders = XRGeneralSettingsPerBuildTarget.XRGeneralSettingsForBuildTarget(BuildTargetGroup.Standalone).Manager.activeLoaders;
+            var loaders =
+ XRGeneralSettingsPerBuildTarget.XRGeneralSettingsForBuildTarget(BuildTargetGroup.Standalone).Manager.activeLoaders;
 #elif UNITY_EDITOR
             // Fallback when XR Management Editor is not available
             m_RightController.SetActive(true);

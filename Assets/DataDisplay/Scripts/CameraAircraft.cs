@@ -1,6 +1,4 @@
-﻿
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////// - CameraAircraft Script - Created by Maloke Games 2019 - Visit us here: https://maloke.itch.io/ 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////
@@ -10,9 +8,11 @@
 ////// Controls: W-S (Pitch), A-D (Roll), Q-E (Yaw), R-F (Ligt), T-Space (Reset Attitude), Y (Toogle Sound), Shift-Ctrl (Faster/Slower speed)
 //////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 namespace DataDisplay.Scripts
 {
     using UnityEngine;
+
     public class CameraAircraft : MonoBehaviour
     {
         public static CameraAircraft current;
@@ -31,12 +31,17 @@ namespace DataDisplay.Scripts
             Application.targetFrameRate = 60;
             if (audioSource == null) audioSource.GetComponent<AudioSource>();
         }
+
         private void Start()
         {
             if (cursorStartLocked) Cursor.lockState = CursorLockMode.Locked;
             else Cursor.lockState = CursorLockMode.None;
         }
-        private void OnEnable() { current = this; }
+
+        private void OnEnable()
+        {
+            current = this;
+        }
         //////////////////
 
 
@@ -87,25 +92,23 @@ namespace DataDisplay.Scripts
 
             //Mouse Control (Only if cursor is locked)
             if (Cursor.lockState == CursorLockMode.Locked)
-            {
                 transform.Rotate(
                     Input.GetAxis("Mouse Y") * Time.deltaTime * (pitchFactor * 100) * boost * brake * 2,
                     0, //Input.GetAxis("Mouse X") * Time.deltaTime * (yawFactor * 100) * boost * brake,
                     -Input.GetAxis("Mouse X") * Time.deltaTime * (rollFactor * 100) * boost * brake / 2,
                     Space.Self);
-            }
             //
 
             //Keyboard Control
             transform.Rotate(
                 ((Input.GetKey(KeyCode.W) ? 1 : 0) - (Input.GetKey(KeyCode.S) ? 1 : 0)
-                    + (turbulence ? Random.Range(-0.05f, 0.05f) : 0)) * Time.deltaTime * (pitchFactor * 100) * boost
+                 + (turbulence ? Random.Range(-0.05f, 0.05f) : 0)) * Time.deltaTime * (pitchFactor * 100) * boost
                 * brake,
                 ((Input.GetKey(KeyCode.E) ? 1 : 0) - (Input.GetKey(KeyCode.Q) ? 1 : 0)
-                    + (turbulence ? Random.Range(-0.1f, 0.1f) : 0)) * Time.deltaTime * (yawFactor * 100) * boost
+                 + (turbulence ? Random.Range(-0.1f, 0.1f) : 0)) * Time.deltaTime * (yawFactor * 100) * boost
                 * brake,
                 ((Input.GetKey(KeyCode.A) ? 1 : 0) - (Input.GetKey(KeyCode.D) ? 1 : 0)
-                    + (turbulence ? Random.Range(-0.125f, 0.125f) : 0)) * Time.deltaTime * (rollFactor * 100) * boost
+                 + (turbulence ? Random.Range(-0.125f, 0.125f) : 0)) * Time.deltaTime * (rollFactor * 100) * boost
                 * brake,
                 Space.Self);
             //

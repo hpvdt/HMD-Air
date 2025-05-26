@@ -4,7 +4,7 @@ namespace XRPoseAPI.Scripts
 {
     public class AirPoseProvider_debugging : AirPoseProvider
     {
-        class Rotation_debugging : Rotation
+        private class Rotation_debugging : Rotation
         {
             public Rotation_debugging(AirPoseProvider outer) : base(outer)
             {
@@ -68,13 +68,9 @@ namespace XRPoseAPI.Scripts
 
 
                 if (Outer.useQuaternion)
-                {
                     return r1;
-                }
                 else
-                {
                     return r2;
-                }
             }
         }
 

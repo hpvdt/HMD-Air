@@ -2,9 +2,9 @@ namespace DataDisplay.Scripts
 {
     using UnityEditor;
     using UnityEngine;
+
     public class DisplayMovementController : MonoBehaviour
     {
-
         [MenuItem("Assets/Create/My Custom Asset Type", false, 1)]
         private static void CreateNewAsset()
         {
@@ -12,6 +12,7 @@ namespace DataDisplay.Scripts
                 "Default Name.extension",
                 string.Empty);
         }
+
         public bool keyboardController = false;
         public float rotationSpeed = 10f;
         public float movementSpeed = 10f;
@@ -20,7 +21,7 @@ namespace DataDisplay.Scripts
 
         public Transform HUDDisplay;
 
-        private Vector3 rotationVector = new Vector3(0, 0, 0);
+        private Vector3 rotationVector = new(0, 0, 0);
 
         private void Update()
         {
@@ -29,83 +30,41 @@ namespace DataDisplay.Scripts
 
             if (keyboardController)
             {
-
-
-                if (Input.GetKey(KeyCode.W))
-                {
-                    SerialReader.GPSY += movementAmount;
-                }
-                if (Input.GetKey(KeyCode.A))
-                {
-                    SerialReader.GPSX += -movementAmount;
-                }
-                if (Input.GetKey(KeyCode.S))
-                {
-                    SerialReader.GPSY += -movementAmount;
-                }
-                if (Input.GetKey(KeyCode.D))
-                {
-                    SerialReader.GPSX += movementAmount;
-                }
-                if (Input.GetKey(KeyCode.Space))
-                {
-                    SerialReader.Altimeter += movementAmount;
-                }
-                if (Input.GetKey(KeyCode.C))
-                {
-                    SerialReader.Altimeter += -movementAmount;
-                }
+                if (Input.GetKey(KeyCode.W)) SerialReader.GPSY += movementAmount;
+                if (Input.GetKey(KeyCode.A)) SerialReader.GPSX += -movementAmount;
+                if (Input.GetKey(KeyCode.S)) SerialReader.GPSY += -movementAmount;
+                if (Input.GetKey(KeyCode.D)) SerialReader.GPSX += movementAmount;
+                if (Input.GetKey(KeyCode.Space)) SerialReader.Altimeter += movementAmount;
+                if (Input.GetKey(KeyCode.C)) SerialReader.Altimeter += -movementAmount;
 
                 // Handle rotation inputs
                 var rotationAmount = rotationSpeed * Time.deltaTime;
 
                 if (Input.GetKey(KeyCode.K))
-                {
                     // Rotate up
                     //halo.Rotate(Vector3.right, rotationAmount);
                     rotationVector += Vector3.right * rotationAmount;
-                }
 
                 if (Input.GetKey(KeyCode.I))
-                {
                     // Rotate down
                     //halo.Rotate(Vector3.left, rotationAmount);
                     rotationVector += Vector3.left * rotationAmount;
 
-                }
-
                 if (Input.GetKey(KeyCode.U))
-                {
                     // Rotate cork screw left
                     //halo.Rotate(Vector3.forward, rotationAmount);
                     rotationVector += Vector3.forward * rotationAmount;
 
-                }
-
                 if (Input.GetKey(KeyCode.O))
-                {
                     // Rotate cork screw right
                     //halo.Rotate(Vector3.back, rotationAmount);
                     rotationVector += Vector3.back * rotationAmount;
 
-                }
-
-                if (Input.GetKey(KeyCode.J))
-                {
-                    SerialReader.heading += rotationAmount;
-                }
-                if (Input.GetKey(KeyCode.L))
-                {
-                    SerialReader.heading -= rotationAmount;
-                }
+                if (Input.GetKey(KeyCode.J)) SerialReader.heading += rotationAmount;
+                if (Input.GetKey(KeyCode.L)) SerialReader.heading -= rotationAmount;
                 if (SerialReader.heading < 0)
-                {
                     SerialReader.heading += 360;
-                }
-                else if (SerialReader.heading > 360)
-                {
-                    SerialReader.heading -= 360;
-                }
+                else if (SerialReader.heading > 360) SerialReader.heading -= 360;
 
                 var rotation = Quaternion.Euler(rotationVector);
                 //Debug.Log("controller: " + rotation.x + " " + rotation.y + " " + rotation.z + " " + rotation.w);
@@ -129,8 +88,6 @@ namespace DataDisplay.Scripts
             var vector = new Vector3(0, -SerialReader.heading, 0);
             //halo.Rotate(0, -SerialReader.heading, 0);
             HUDDisplay.rotation = Quaternion.Euler(0, SerialReader.heading, 0);
-
-
         }
     }
 }

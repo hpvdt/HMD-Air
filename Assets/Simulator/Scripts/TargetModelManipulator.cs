@@ -81,3 +81,4 @@
 //             Vector3.one * currentScale; // Vector3.one * Mathf.SmoothStep(minScale, maxScale, currentScale);
 //     }
 // }
+

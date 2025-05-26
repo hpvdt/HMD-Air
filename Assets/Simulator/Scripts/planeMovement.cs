@@ -1,28 +1,23 @@
 using UnityEngine;
+
 public class planeMovement : MonoBehaviour
 {
-
-    [SerializeField] Vector3 targetPosition;
-    [SerializeField] float velocity = 10f;
-    [SerializeField] float smoothTime;
-    Vector3 forward = new Vector3(0, (float)0.15, -1);
-    bool canMove = false;
-
+    [SerializeField] private Vector3 targetPosition;
+    [SerializeField] private float velocity = 10f;
+    [SerializeField] private float smoothTime;
+    private Vector3 forward = new(0, (float)0.15, -1);
+    private bool canMove = false;
 
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        if (canMove)
-        {
-            transform.Translate(forward * Time.deltaTime * velocity, Space.World);
-        }
+        if (canMove) transform.Translate(forward * Time.deltaTime * velocity, Space.World);
     }
 
     public void setCanMove(bool a)

@@ -4,12 +4,13 @@ namespace DataDisplay.Scripts
     using System.IO.Ports;
     using System.Threading;
     using UnityEngine;
+
     public class SerialReader : MonoBehaviour
     {
-        [Header("Serial Port")]
-        public string
+        [Header("Serial Port")] public string
             portName =
                 "/dev/tty.usbserial-1120"; // Set the port name (e.g., /dev/ttyUSB0 for Linux or /dev/tty.usbserial-* for Mac)
+
         public int baudRate = 115200; // Set the baud rate
 
         private SerialPort serialPort;
@@ -18,7 +19,7 @@ namespace DataDisplay.Scripts
 
         private byte[] buffer = new byte[4]; // Larger buffer to read multiple floats
         private int bufferIndex = 0;
-        private object bufferLock = new object();
+        private object bufferLock = new();
 
         private float[] dataArray = new float[17];
         private int counter = 0;
@@ -50,9 +51,8 @@ namespace DataDisplay.Scripts
             windY = 0,
             windZ = 0;
 
-        public static Quaternion IMU = new Quaternion(GyroX, GyroY, GyroZ, GyroW);
-        public static Vector3 windDir = new Vector3(windX, windY, windZ);
-
+        public static Quaternion IMU = new(GyroX, GyroY, GyroZ, GyroW);
+        public static Vector3 windDir = new(windX, windY, windZ);
 
 
         private void Start()
@@ -104,17 +104,14 @@ namespace DataDisplay.Scripts
         private void ReadSerialData()
         {
             while (isRunning && serialPort.IsOpen)
-            {
                 try
                 {
                     var bytesRead = serialPort.Read(buffer, bufferIndex, buffer.Length - bufferIndex);
                     if (bytesRead > 0)
-                    {
                         lock (bufferLock)
                         {
                             bufferIndex += bytesRead;
                         }
-                    }
                 }
                 catch (TimeoutException)
                 {
@@ -124,12 +121,10 @@ namespace DataDisplay.Scripts
                 {
                     Debug.LogError($"Error reading from serial port: {e.Message}");
                 }
-            }
         }
 
         private void UpdateData()
         {
-
             if (dataArray.Length == 17)
             {
                 Airspeed = dataArray[0];
@@ -158,41 +153,27 @@ namespace DataDisplay.Scripts
                 IMU.Set(GyroX, GyroY, GyroZ, GyroW);
                 windDir.Set(windX, windY, windZ);
             }
-
-
         }
 
         private void PrintData()
         {
             var print = "";
 
-            foreach (var value in dataArray)
-            {
-                print += " " + value.ToString();
-            }
+            foreach (var value in dataArray) print += " " + value.ToString();
             Debug.Log(print);
         }
 
         private void OnApplicationQuit()
         {
             isRunning = false;
-            if (readThread != null && readThread.IsAlive)
-            {
-                readThread.Join();
-            }
+            if (readThread != null && readThread.IsAlive) readThread.Join();
 
-            if (serialPort != null && serialPort.IsOpen)
-            {
-                serialPort.Close();
-            }
+            if (serialPort != null && serialPort.IsOpen) serialPort.Close();
 
             Debug.Log("Serial port closed.");
 
             // Optionally, log all the collected floats
-            foreach (var value in dataArray)
-            {
-                Debug.Log(value);
-            }
+            foreach (var value in dataArray) Debug.Log(value);
         }
     }
 }

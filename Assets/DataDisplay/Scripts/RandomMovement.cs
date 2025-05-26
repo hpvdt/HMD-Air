@@ -1,6 +1,7 @@
 namespace DataDisplay.Scripts
 {
     using UnityEngine;
+
     public class RandomMovement : MonoBehaviour
     {
         public Quaternion moveTo;
@@ -36,12 +37,10 @@ namespace DataDisplay.Scripts
             //create another random quaternion
 
             // }
-
         }
 
         private Quaternion RandomQ()
         {
-
             var x = Random.Range(-1f, 1f);
             var y = Random.Range(-1f, 1f);
             var z = Random.Range(-1f, 1f);

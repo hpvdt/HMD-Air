@@ -4,11 +4,10 @@ namespace DataDisplay.Scripts
     using TMPro;
 #endif
     using UnityEngine;
+
     public class HeadingHaloSpawner : MonoBehaviour
     {
-
-        [Header("Parameters")]
-        public float radius = 10f;
+        [Header("Parameters")] public float radius = 10f;
 
         public float fontSize = 10f;
 
@@ -62,8 +61,8 @@ namespace DataDisplay.Scripts
 #endif
                     textMeshPro.transform.LookAt(new Vector3(textMeshPro.transform.position.x * 2,
                         textMeshPro.transform.position.y, textMeshPro.transform.position.z * 2));
-
                 }
+
                 degree += angleBetweenPins;
             }
         }

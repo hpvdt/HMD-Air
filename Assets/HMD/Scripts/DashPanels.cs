@@ -5,6 +5,7 @@ using System.Linq;
 using HMD.Scripts.Streaming;
 using HMD.Scripts.Util;
 using HMDCommons.Scripts;
+using MAVLinkAPI.Scripts.Ext;
 using MAVLinkAPI.Scripts.Util;
 using UnityEngine;
 using UnityEngine.EventSystems;

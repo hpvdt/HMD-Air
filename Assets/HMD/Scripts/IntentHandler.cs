@@ -42,7 +42,6 @@ public class IntentHandler : MonoBehaviour
 
         if (Application.platform == RuntimePlatform.Android)
         {
-
             var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             var currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
 
