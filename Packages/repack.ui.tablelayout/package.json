@@ -1,0 +1,18 @@
+{
+  "name": "repack.ui.tablelayout",
+  "version": "1.0.0",
+  "displayName": "Table Layout",
+  "description": "A UI component for creating table layouts in Unity.",
+  "unity": "2022.3",
+  "author": {
+    "name": "HPVDT.ca",
+    "email": "contact@hpvdt.ca",
+    "url": "https://hpvdt.ca"
+  },
+  "keywords": [
+    "ui",
+    "table",
+    "layout"
+  ],
+  "type": "library"
+}

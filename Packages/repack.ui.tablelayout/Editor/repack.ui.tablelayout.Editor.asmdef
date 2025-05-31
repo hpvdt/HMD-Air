@@ -1,0 +1,18 @@
+{
+  "name": "repack.ui.tablelayout.Editor",
+  "rootNamespace": "UI.Tables",
+  "references": [
+    "repack.ui.tablelayout.Runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
