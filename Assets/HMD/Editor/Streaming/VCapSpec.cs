@@ -1,6 +1,6 @@
 using System;
 using HMD.Scripts.Streaming.VCap;
-using MAVLinkAPI.Scripts.Streaming;
+using MAVLinkAPI.Streaming;
 using NUnit.Framework;
 
 namespace HMD.Editor.Streaming

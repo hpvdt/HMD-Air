@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using HMD.Scripts.Util;
 using HMDCommons.Scripts;
-using MAVLinkAPI.Scripts.Util;
+using MAVLinkAPI.Util;
 using UnityEngine;
 using UnityEngine.UI;
 

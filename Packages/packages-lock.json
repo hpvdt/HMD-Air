@@ -1,5 +1,11 @@
 {
   "dependencies": {
+    "ca.hpvdt.mavlinkapi": {
+      "version": "file:ca.hpvdt.mavlinkapi",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.tayx.graphy": {
       "version": "3.0.5",
       "depth": 0,
@@ -248,6 +254,12 @@
       "source": "registry",
       "dependencies": {},
       "url": "https://package.openupm.com"
+    },
+    "repack.ui.tablelayout": {
+      "version": "file:repack.ui.tablelayout",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

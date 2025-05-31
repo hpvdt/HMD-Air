@@ -1,5 +1,4 @@
 #if UNITY_EDITOR
-using UnityEditor;
 #if UNITY_XR_MANAGEMENT_EDITOR
 using UnityEditor.XR.Management;
 #endif

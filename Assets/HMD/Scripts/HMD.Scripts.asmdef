@@ -1,13 +1,11 @@
 {
   "name": "HMD.Scripts",
-  "rootNamespace": "",
+  "rootNamespace": "HMD.Scripts",
   "references": [
-    "MAVLinkAPI.Scripts",
+    "ca.hpvdt.mavlinkapi",
     "HMDCommons.Scripts",
-    "Unity.VisualScripting",
     "Unity.InputSystem",
     "Unity.TextMeshPro",
-    "Unity.ugui",
     "StandaloneFileBrowser",
     "Unity.VisualScripting.Core"
   ],
