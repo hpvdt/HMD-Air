@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using HMD.Scripts.Util;
-using HMDCommons.Scripts;
 using LibVLCSharp;
+using MAVLinkAPI.Util.NullSafety;
 using UnityEngine;
 using UnityEngine.UI;
 

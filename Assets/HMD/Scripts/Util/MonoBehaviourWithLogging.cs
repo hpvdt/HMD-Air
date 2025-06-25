@@ -30,7 +30,7 @@ namespace HMD.Scripts.Util
             };
         }
 
-        protected class Logger : Dependent<MonoBehaviourWithLogging>
+        protected class Logger : HasOuter<MonoBehaviourWithLogging>
         {
             public LogType? Type;
 

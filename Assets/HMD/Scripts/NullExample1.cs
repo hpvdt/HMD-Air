@@ -1,7 +1,8 @@
-﻿namespace HMDCommons.Scripts
-{
-    using UnityEngine;
+﻿using MAVLinkAPI.Util.NullSafety;
+using UnityEngine;
 
+namespace HMD.Scripts
+{
     [Required]
     public class NullExample1 : MonoBehaviour
     {
