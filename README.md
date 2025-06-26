@@ -15,28 +15,29 @@
 
 - For every new feature or patch, always `git checkout <a new branch>`
 - Edit and test your changes with your favourite tools, recommended tools are:
-  - Unity Engine:
-    - Eidtor 2022 LTS
-    - Unity Package Manager
-  - IDE:
-    - JetBrains Riders
-    - Visual Studio 2022
-    - Visual Studio Code
-  - Git GUI:
-    - Also JetBrains Riders
-    - GitKraken Pro
-  - Documentation
-    - Obsidian
+    - Unity Engine:
+        - Eidtor 2022 LTS
+        - Unity Package Manager
+    - IDE:
+        - JetBrains Riders
+        - Visual Studio 2022
+        - Visual Studio Code
+    - Git GUI:
+        - Also JetBrains Riders
+        - GitKraken Pro
+    - Documentation
+        - Obsidian
 - For all changes, `git add *` & `git commit`
 - `git push` and submit a PR (pull request)
 - To keep up your branch with the latest version, `git rebase` all commits of your branch with squashing
-  - For beginners, this should be performed with a Git GUI
+    - For beginners, this should be performed with a Git GUI
 
 ## Communication
 
 - Project status: https://github.com/orgs/hpvdt/projects/2
 - Feel free to propose new feature & hotfix as task list items
-- Please be nice be respectful, particularly to all test pilots (Calvin, Bill, Claire) who are risking their lives to push the envelop
+- Please be nice be respectful, particularly to all test pilots (Calvin, Bill, Claire) who are risking their lives to
+  push the envelop
 
 ## How to ask questions
 
