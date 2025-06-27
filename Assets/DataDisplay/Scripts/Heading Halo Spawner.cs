@@ -29,7 +29,7 @@ namespace DataDisplay.Scripts
             var numberBetweenMajors = (int)(angleBetweenMajor / angleBetweenPins);
             var degree = 0f;
 
-            Debug.Log(numberOfIterations);
+            // Debug.Log(numberOfIterations);
             for (var i = 0; i < numberOfIterations; i++)
             {
                 var newPin = Instantiate(pin, GetPinLocation(degree), Quaternion.identity, transform);

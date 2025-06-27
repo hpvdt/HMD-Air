@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using MAVLinkAPI.Util.NullSafety;
 using UnityEngine;
 using UnityEngine.Experimental.XR.Interaction;
 using UnityEngine.SpatialTracking;
@@ -8,9 +9,9 @@ namespace XRPoseAPI.Scripts
 {
     public class AirPoseProvider : BasePoseProvider
     {
-        public bool useQuaternion = false;
-
         public bool verboseLogging = false;
+
+        public bool useQuaternion = false;
 
         public float mouseSensitivity = 100.0f;
 
@@ -110,15 +111,8 @@ namespace XRPoseAPI.Scripts
 
         // private static readonly Quaternion Q_ID = Quaternion.identity.normalized;
 
-        public class Rotation
+        public record RotationT(AirPoseProvider Outer)
         {
-            protected readonly AirPoseProvider Outer;
-
-            public Rotation(AirPoseProvider outer)
-            {
-                Outer = outer;
-            }
-
             public Quaternion Glasses = Quaternion.identity;
             public Quaternion Mouse = Quaternion.identity;
             public Quaternion Zeroing = Quaternion.identity;
@@ -157,7 +151,8 @@ namespace XRPoseAPI.Scripts
 
                 var qRaw = new Quaternion(-arr[1], -arr[3], -arr[2], arr[0]);
 
-                if (Outer.verboseLogging) Debug.Log($"Quaternion raw: {qRaw.x}, {qRaw.y}, {qRaw.z}, {qRaw.w}");
+                if (Outer.verboseLogging)
+                    Debug.Log($"update from XR (Quaternion): {qRaw.x}, {qRaw.y}, {qRaw.z}, {qRaw.w}");
 
 
                 var qNormalised = qRaw.normalized;
@@ -182,7 +177,8 @@ namespace XRPoseAPI.Scripts
                 var yaw = arr[2];
 
                 var arr2 = new Vector3(-(pitch - 90f), -yaw, -roll);
-                if (Outer.verboseLogging) Debug.Log($"Euler raw: {arr2[0]}, {arr2[1]}, {arr2[2]}");
+                if (Outer.verboseLogging)
+                    Debug.Log($"update from XR (Euler): {arr2[0]}, {arr2[1]}, {arr2[2]}");
 
                 // converting to LDB order (right hand axes, right hand rotation)
                 // Left - pitch
@@ -221,7 +217,7 @@ namespace XRPoseAPI.Scripts
                     }
                     else
                     {
-                        if (Outer.verboseLogging) Debug.Log("Glasses has no reading");
+                        if (Outer.verboseLogging) Debug.Log("XR has no reading");
                     }
                 }
                 else
@@ -257,18 +253,13 @@ namespace XRPoseAPI.Scripts
             }
         }
 
-        protected Rotation AttitudeVar;
+        [NonSerialized] protected Maybe<RotationT> ExistingRotation;
 
-        protected virtual Rotation Attitude
-        {
-            get
-            {
-                if (AttitudeVar == null) AttitudeVar = new Rotation(this);
-                return AttitudeVar;
-            }
-        }
+        protected virtual RotationT Rotation => ExistingRotation.Lazy(() =>
+            new RotationT(this)
+        );
 
-        public class Translation // TODO: enable it
+        public record TranslationT(AirPoseProvider Outer) // TODO: enable it
         {
             private Vector3 _fromGlasses = Vector3.zero;
 
@@ -289,14 +280,14 @@ namespace XRPoseAPI.Scripts
         // Update Pose
         public override PoseDataFlags GetPoseFromProvider(out Pose output)
         {
-            if (IsConnected()) Attitude.UpdateFromGlasses();
+            if (IsConnected()) Rotation.UpdateFromGlasses();
 
             var mousePressed = Input.GetMouseButton(1);
             var keyPressed = Input.GetKey(KeyCode.LeftAlt);
 
-            if (mousePressed || keyPressed) Attitude.UpdateFromMouse();
+            if (mousePressed || keyPressed) Rotation.UpdateFromMouse();
 
-            var compound = Attitude.Mouse * Attitude.Zeroing * Attitude.Glasses;
+            var compound = Rotation.Mouse * Rotation.Zeroing * Rotation.Glasses;
 
             output = new Pose(new Vector3(0, 0, 0), compound);
             return PoseDataFlags.Rotation;
@@ -304,12 +295,12 @@ namespace XRPoseAPI.Scripts
 
         public void ZeroXY()
         {
-            Attitude.Zero(true, true);
+            Rotation.Zero(true, true);
         }
 
         public void ZeroY()
         {
-            Attitude.Zero(y: true);
+            Rotation.Zero(y: true);
         }
     }
 }

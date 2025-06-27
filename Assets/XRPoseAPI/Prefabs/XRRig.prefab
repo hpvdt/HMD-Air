@@ -178,7 +178,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8903581258094712479}
   m_Layer: 0
-  m_Name: Camera Offset
+  m_Name: Offset
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
