@@ -15,14 +15,6 @@ namespace HMD.Scripts
 {
     public class DashPanels : MonoBehaviourWithLogging
     {
-        // private MenuID _visibleMenuID;
-
-        public enum MenuID
-        {
-            CONTROLLER_MENU,
-            APP_MENU
-        }
-
         private const string WHATS_NEW = "OnboardingSeen_0_0_5_g";
 
         private const string NEW_VLC_WINDOWS = "New VLC (Windows) ...";
@@ -36,8 +28,6 @@ namespace HMD.Scripts
         [Required] public GameObject vCapPlayerTemplate = null!;
 
         [Required] public Dropdown playerMenu = null!;
-
-        // SetupCaptureDevice()
 
         public GameObject playerTab;
 
@@ -154,10 +144,10 @@ namespace HMD.Scripts
 
             _lockScreenNotice.SetActive(false);
 
-            HideAllMenus();
+            // HideAllMenus();
             HideAllPopups();
 
-            UIShowControllerMenu();
+            ShowRootMenu();
 
             if (PlayerPrefs.GetInt(WHATS_NEW) == 1)
             {
@@ -440,45 +430,20 @@ namespace HMD.Scripts
             PlayerPrefs.DeleteAll();
         }
 
-        private void ShowAppMenu()
+        public void ShowAppMenu()
         {
+            HideAllMenus();
             // UpdateReferences();
 
             _appMenu.SetActive(true);
             CenterXY(_appMenu);
         }
 
-        private void ShowRootMenu()
-        {
-            _rootMenu.SetActive(true);
-            _optionsButton.SetActive(true);
-        }
-
-        public void UIShowControllerMenu()
-        {
-            ShowMenuByID(MenuID.CONTROLLER_MENU);
-        }
-
-        public void UIShowAppMenu()
-        {
-            ShowMenuByID(MenuID.APP_MENU);
-        }
-
-        public void ShowMenuByID(MenuID id)
+        public void ShowRootMenu()
         {
             HideAllMenus();
-            // _visibleMenuID = id;
-            // _menuToggleButton.SetActive(false);
-            _optionsButton.SetActive(false);
-            switch (id)
-            {
-                case MenuID.CONTROLLER_MENU:
-                    ShowRootMenu();
-                    break;
-                case MenuID.APP_MENU:
-                    ShowAppMenu();
-                    break;
-            }
+            _rootMenu.SetActive(true);
+            _optionsButton.SetActive(true);
         }
 
         private void HideAllMenus()
