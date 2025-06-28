@@ -15917,6 +15917,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
+--- !u!1 &1126316305 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 259098159286946393, guid: 329389adc05a1cc4ab401912c37e515e, type: 3}
+  m_PrefabInstance: {fileID: 1673614941}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1127582307
 GameObject:
   m_ObjectHideFlags: 0
@@ -26037,7 +26042,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 926780394963133843, guid: 329389adc05a1cc4ab401912c37e515e, type: 3}
   m_PrefabInstance: {fileID: 1673614941}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1126316305}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a0d51b7dbe4c8c7439ec1aec1bff1b82, type: 3}
@@ -32131,7 +32136,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   loggerVerbosity: 0
   loggerPrefix: 
-  playerRig: {fileID: 1146037110}
+  playerRig: {fileID: 1126316305}
   vlcPlayerTemplate: {fileID: 4732923173715968485}
   vCapPlayerTemplate: {fileID: 146006058662195917}
   playerMenu: {fileID: 692852524}

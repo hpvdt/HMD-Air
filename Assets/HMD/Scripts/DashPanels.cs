@@ -23,7 +23,7 @@ namespace HMD.Scripts
         // [HideInInspector]
         // public VlcController controller;
 
-        [Required] public GameObject playerRig = null!;
+        [Required] public GameObject playerParent = null!;
         [Required] public GameObject vlcPlayerTemplate = null!;
         [Required] public GameObject vCapPlayerTemplate = null!;
 
@@ -205,7 +205,7 @@ namespace HMD.Scripts
 
 
             var prefab =
-                Instantiate(template, Vector3.zero, heading, playerRig.transform);
+                Instantiate(template, Vector3.zero, heading, playerParent.transform);
 
             var player = _setupPlayerFromPrefab(prefab, prefix);
 
