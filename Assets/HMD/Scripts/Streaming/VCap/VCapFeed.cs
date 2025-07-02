@@ -78,7 +78,6 @@ namespace HMD.Scripts.Streaming.VCap
 
             var selectors = new List<ArgsT>();
 
-
             foreach (var pair in devices.Select((v, i) => (v, i)))
             {
                 var resList = pair.v.availableResolutions;
