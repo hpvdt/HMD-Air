@@ -1,4 +1,4 @@
-﻿using HMD.Scripts.Util;
+using HMD.Scripts.Util;
 using MAVLinkAPI.Util.NullSafety;
 using UnityEngine;
 using UnityEngine.UI;

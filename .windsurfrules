@@ -1,4 +1,4 @@
-﻿# Environment
+# Environment
 
 - This is a Unity 2022.3 project
 - The project can be built with `dotnet build HMD-Air.sln`

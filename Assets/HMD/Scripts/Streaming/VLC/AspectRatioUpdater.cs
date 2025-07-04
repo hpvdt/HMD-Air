@@ -1,4 +1,4 @@
-﻿using HMD.Scripts.Util;
+using HMD.Scripts.Util;
 using UnityEngine.UI;
 
 namespace HMD.Scripts.Streaming.VLC

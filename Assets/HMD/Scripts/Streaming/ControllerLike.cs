@@ -1,4 +1,4 @@
-﻿using MAVLinkAPI.Util.NullSafety;
+using MAVLinkAPI.Util.NullSafety;
 using UnityEngine;
 using UnityEngine.UI;
 

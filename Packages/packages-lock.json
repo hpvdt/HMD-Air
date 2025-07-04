@@ -14,6 +14,13 @@
         "com.jonagill.autofill": "1.0.7"
       }
     },
+    "com.ecasillas.missingrefsfinder": {
+      "version": "https://github.com/tribbloid/unity-missing-references-finder.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "0c2024efe13f648dd0efc4f70d86ec028f9e8bb6"
+    },
     "com.jonagill.autofill": {
       "version": "1.0.7",
       "depth": 1,
