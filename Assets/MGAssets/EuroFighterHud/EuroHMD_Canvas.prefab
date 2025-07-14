@@ -123,7 +123,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 5904243661218039637}
         m_TargetAssemblyTypeName: 
-        m_MethodName: toggleHud
+        m_MethodName: toogleHud
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -359,7 +359,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 1
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -1204,7 +1204,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 0264abf276f39ed4a8d2850982dcbd92, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 311885f993caa924aabb44d9e6fa92c3, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -1815,7 +1815,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 610, y: 430}
-  m_SizeDelta: {x: 16, y: 30}
+  m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 1, y: 1}
 --- !u!222 &5904243660964261323
 CanvasRenderer:
@@ -2349,7 +2349,7 @@ MonoBehaviour:
   pitchOffSet: 0
   pitchXOffSet: 0
   pitchYOffSet: 0
-  pitchFilterFactor: 0.25
+  pitchFilterFactor: 0.125
   horizonPitch: {fileID: 5904243659680261271}
   horizonPitchTxt: {fileID: 0}
   useHeading: 1

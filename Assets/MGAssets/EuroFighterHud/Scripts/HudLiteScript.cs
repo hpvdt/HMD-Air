@@ -56,8 +56,7 @@ public class HudLiteScript : MonoBehaviour
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Inicialization
     void Awake() { if (aircraft == null && aircraftRB != null) aircraft = aircraftRB.transform; }
-    
-    public void toggleHud()
+    public void toogleHud()
     {
         SndPlayer.playClick();
         hudPanel.gameObject.SetActive(!hudPanel.gameObject.activeSelf);
