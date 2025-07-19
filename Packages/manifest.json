@@ -17,7 +17,7 @@
     "com.unity.visualscripting": "1.9.8",
     "com.unity.xr.management": "4.5.1",
     "com.yamldotnet.uni": "13.2.0",
-    "com.yasirkula.ingamedebugconsole": "https://github.com/yasirkula/UnityIngameDebugConsole.git#v1.6.7",
+    "com.yasirkula.ingamedebugconsole": "https://github.com/yasirkula/UnityIngameDebugConsole.git",
     "io.github.gkngkc.unity-standalone-file-browser": "1.3.2",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
