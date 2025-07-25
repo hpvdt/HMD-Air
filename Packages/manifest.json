@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "com.ecasillas.missingrefsfinder": "https://github.com/tribbloid/unity-missing-references-finder.git",
+    "com.justinpbarnett.unity-mcp": "https://github.com/justinpbarnett/unity-mcp.git?path=/UnityMcpBridge",
     "com.tayx.graphy": "3.0.5",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.feature.development": "1.0.1",
