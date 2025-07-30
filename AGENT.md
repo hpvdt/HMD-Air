@@ -3,12 +3,11 @@
 ## Build/Test Commands
 
 - **Build**: `dotnet build HMD-Air.sln` (compile frequently to verify work)
-- **Test All**: `dotnet test ca.hpvdt.mavlinkapi.Tests.csproj` (runs NUnit tests)
-- **Single Test**: `dotnet test ca.hpvdt.mavlinkapi.Tests.csproj --filter "TestName"` or use Unity Test Runner
-- **Unity**: Open project in Unity 2022.3 LTS, use Unity Test Runner for Play Mode tests
-- The path of Unity editor is OS-dependent:
-    - `C:\Program Files\Unity\Hub\Editor\2022.3.62f1\Editor\Unity.exe` on Windows
-    - `/home/peng/Unity/Hub/Editor/2022.3.62f1/Editor/Unity` on Linux
+- **Unity**: Open project in Unity 2022.3 LTS
+  - For running Play/Editor Model tests, Use Unity MCP to list all menu options under `Tools/MCP Tools` menu, the choose the right option to run the test collection, all test results will be printed in the console.
+  - If the above option is not possible, use Unity editor in batch mode for running tests, The path of Unity editor is OS-dependent:
+    - `C:\Program Files\Unity\Hub\Editor\<editor-version>\Editor\Unity.exe` on Windows
+    - `~/Unity/Hub/Editor/<editor-version>/Editor/Unity` on Linux
 
 ## Architecture
 

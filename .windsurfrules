@@ -1,13 +1,1 @@
-# Environment
-
-- This is a Unity 2022.3 project
-- The project can be built with `dotnet build HMD-Air.sln`
-
-# Rules
-
-- avoid using GUID in asmdef files
-- build with dotnet to figure out build errors
-- compile the project often to verify your work
-- The path of Unity editor is OS-dependent:
-    - `C:\Program Files\Unity\Hub\Editor\2022.3.62f1\Editor\Unity.exe` on Windows
-    - `/home/peng/Unity/Hub/Editor/2022.3.62f1/Editor/Unity` on Linux
+See the detailed instructions in [AGENT system prompt](./AGENT.md).

@@ -1,0 +1,21 @@
+{
+  "name": "HMD.Tests",
+  "rootNamespace": "",
+  "references": [
+    "HMD.Scripts",
+    "ca.hpvdt.mavlinkapi.Runtime"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "nunit.framework.dll"
+  ],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

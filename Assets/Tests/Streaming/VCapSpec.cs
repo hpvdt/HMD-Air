@@ -3,7 +3,7 @@ using HMD.Scripts.Streaming.VCap;
 using MAVLinkAPI.Routing;
 using NUnit.Framework;
 
-namespace HMD.Editor.Streaming
+namespace HMD.Tests.Streaming
 {
     public class VCapSpec
     {
