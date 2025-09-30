@@ -4,10 +4,14 @@
 
 - **Build**: `dotnet build HMD-Air.sln` (compile frequently to verify work)
 - **Unity**: Open project in Unity 2022.3 LTS
-  - For running Play/Editor Model tests, Use Unity MCP to list all menu options under `Tools/MCP Tools` menu, the choose the right option to run the test collection, all test results will be printed in the console.
-  - If the above option is not possible, use Unity editor in batch mode for running tests, The path of Unity editor is OS-dependent:
-    - `C:\Program Files\Unity\Hub\Editor\<editor-version>\Editor\Unity.exe` on Windows
-    - `~/Unity/Hub/Editor/<editor-version>/Editor/Unity` on Linux
+    - For running Play/Editor Model tests, Use Unity MCP to execute menu options under `Tools/MCP Tools` menu, all test
+      results will be printed in the console.
+    - If the above option is not possible, use Unity editor in batch mode for running tests, The path of Unity editor is
+      OS-dependent:
+        - `C:\Program Files\Unity\Hub\Editor\<editor-version>\Editor\Unity.exe` on Windows
+        - `~/Unity/Hub/Editor/<editor-version>/Editor/Unity` on Linux
+    - Do not ask the user to run the tests, check test results, or close Unity instance
+    - Do not close or quit Unity Editor
 
 ## Architecture
 

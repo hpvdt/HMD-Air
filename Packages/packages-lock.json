@@ -14,6 +14,15 @@
         "com.jonagill.autofill": "1.0.7"
       }
     },
+    "com.coplaydev.unity-mcp": {
+      "version": "https://github.com/CoplayDev/unity-mcp.git?path=/UnityMcpBridge",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.0.2"
+      },
+      "hash": "048b1252de3bff367cde234b397f99efc2be0c6b"
+    },
     "com.ecasillas.missingrefsfinder": {
       "version": "https://github.com/tribbloid/unity-missing-references-finder.git",
       "depth": 0,
@@ -27,15 +36,6 @@
       "source": "registry",
       "dependencies": {},
       "url": "https://package.openupm.com"
-    },
-    "com.justinpbarnett.unity-mcp": {
-      "version": "https://github.com/justinpbarnett/unity-mcp.git?path=/UnityMcpBridge",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {
-        "com.unity.nuget.newtonsoft-json": "3.0.2"
-      },
-      "hash": "00765c527704a1cb81c07d0e26f5aae65fb48b51"
     },
     "com.tayx.graphy": {
       "version": "3.0.5",
@@ -79,7 +79,7 @@
       }
     },
     "com.unity.ide.rider": {
-      "version": "3.0.36",
+      "version": "3.0.38",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -260,7 +260,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.management": {
-      "version": "4.5.1",
+      "version": "4.5.2",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -287,7 +287,7 @@
       "hash": "80c0c42131d4824f9ff6439eda11c2378251fe6d"
     },
     "io.github.gkngkc.unity-standalone-file-browser": {
-      "version": "1.3.2",
+      "version": "1.3.4",
       "depth": 0,
       "source": "registry",
       "dependencies": {},
