@@ -49,19 +49,21 @@
     "com.unity.modules.video": "1.0.0",
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
-    "com.unity.modules.xr": "1.0.0"
+    "com.unity.modules.xr": "1.0.0",
+    "com.coplaydev.unity-mcp": "7.0.0"
   },
   "scopedRegistries": [
     {
       "name": "package.openupm.com",
       "url": "https://package.openupm.com",
       "scopes": [
-        "com.tayx.graphy",
-        "io.github.gkngkc.unity-standalone-file-browser",
-        "com.yamldotnet.uni",
-        "com.unity.uiextensions",
-        "com.yasirkula.ingamedebugconsole",
+        "com.coplaydev.unity-mcp",
         "com.jonagill.autofill",
+        "com.tayx.graphy",
+        "com.unity.uiextensions",
+        "com.yamldotnet.uni",
+        "com.yasirkula.ingamedebugconsole",
+        "io.github.gkngkc.unity-standalone-file-browser",
         "net.tnrd.autohook"
       ]
     }
