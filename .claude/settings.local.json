@@ -5,7 +5,17 @@
       "Bash(timeout 5 uv run:*)",
       "Bash(timeout:*)",
       "Bash(python:*)",
-      "Bash(icacls:*)"
+      "Bash(icacls:*)",
+      "mcp__UnityMCP",
+      "mcp__UnityMCP__*",
+      "mcp__UnityMCP__execute_menu_item",
+      "mcp__UnityMCP__run_tests",
+      "Bash(ldd:*)",
+      "Bash(rm:*)",
+      "Bash(nm:*)",
+      "Bash(objdump:*)",
+      "Bash(vlc:*)",
+      "Bash(dpkg:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
