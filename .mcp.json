@@ -32,17 +32,13 @@
       ],
       "type": "stdio"
     },
-    "unityMCP": {
-      "command": "uv",
+    "UnityMCP": {
+      "command": "uvx",
       "args": [
-        "run",
-        "--directory",
-        "$HOME/.local/share/UnityMCP/UnityMcpServer/src",
-        "server.py"
-      ],
-      "env": {
-        "HOME": "${HOME}"
-      }
+        "--from",
+        "git+https://github.com/CoplayDev/unity-mcp@v7.0.0#subdirectory=Server",
+        "mcp-for-unity"
+      ]
     }
   }
 }

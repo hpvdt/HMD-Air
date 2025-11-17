@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv:*)",
+      "Bash(timeout 5 uv run:*)",
+      "Bash(timeout:*)",
+      "Bash(python:*)",
+      "Bash(icacls:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "fetch",
+    "playwright",
+    "memory",
+    "deepwiki",
+    "unityMCP"
+  ]
+}
