@@ -11,8 +11,16 @@
 ## Build/Test Commands
 
 - **Build**: `dotnet build HMD-Air.sln`
-- **Test**:  Use Unity MCP to run PlayMode or EditMode tests, search menu under `Tools/ MCP Tools` to find the right
-  tools, test results will be reported in the console.
+- **Test**:
+    - **Run tests Directly**: Use Unity MCP `run_tests` with mode="EditMode" or "PlayMode"
+      ```bash
+      mcp__UnityMCP__run_tests(mode="<EditMode|PlayMode>")
+      ```
+    - **Run tests through menu option**:  Use Unity MCP to search menu under
+      `Tools/ MCP Tools` to find the right option, test results will be reported in the console.
+    - Test results will be reported in the console with detailed pass/fail information
+    - EditMode tests run in Unity Editor environment (faster, no scene loading required)
+    - PlayMode tests run in actual gameplay mode (slower, but tests runtime behavior)
 
 ## Architecture
 

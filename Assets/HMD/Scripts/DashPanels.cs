@@ -17,7 +17,7 @@ namespace HMD.Scripts
     {
         private const string WHATS_NEW = "OnboardingSeen_0_0_5_g";
 
-        private const string NEW_VLC_WINDOWS = "New VLC (Windows) ...";
+        private const string NEW_VLC_WINDOWS = "New VLC ...";
 
         private const string NEW_V_CAP = "New Video Capture ...";
         // [HideInInspector]

@@ -74,19 +74,19 @@ namespace XRPoseAPI.Scripts
         public static extern IntPtr GetEuler();
 
 #elif (UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX)
-    [DllImport("libar_drivers.dylib", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int StartConnection();
+        [DllImport("libar_drivers.dylib", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int StartConnection();
 
-    [DllImport("libar_drivers.dylib", CallingConvention = CallingConvention.Cdecl)]
-    public static extern int StopConnection();
+        [DllImport("libar_drivers.dylib", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int StopConnection();
 
-    [DllImport("libar_drivers.dylib", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr GetEuler();
+        [DllImport("libar_drivers.dylib", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr GetEuler();
 
-    [DllImport("libar_drivers.dylib", CallingConvention = CallingConvention.Cdecl)]
-    public static extern IntPtr GetQuaternion();
+        [DllImport("libar_drivers.dylib", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr GetQuaternion();
 
-#else
+#elif (UNITY_STANDALONE_LINUX || UNITY_EDITOR_LINUX)
         [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
         public static extern int StartConnection();
 
@@ -98,7 +98,8 @@ namespace XRPoseAPI.Scripts
 
         [DllImport("libar_drivers.so", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr GetQuaternion();
-
+#else
+    // unsupported
 #endif
 
         protected enum ConnectionStates
