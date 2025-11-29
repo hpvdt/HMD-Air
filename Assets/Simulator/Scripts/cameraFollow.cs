@@ -38,9 +38,8 @@ public class cameraFollow : MonoBehaviour
         else if (Input.GetMouseButtonDown(0) && count < 2 && !freeCamera)
         {
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit))
+            if (Physics.Raycast(ray, out var hit))
             {
                 Debug.Log(hit.point);
                 sf[count] = hit.point;

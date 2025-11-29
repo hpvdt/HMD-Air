@@ -29,16 +29,15 @@ namespace HMD.Scripts
 
         [Required] public Dropdown playerMenu = null!;
 
-        public GameObject playerTab;
+        [Required] public GameObject playerTab;
 
-        public FOVController fovController;
+        [Required] public FOVController fovController;
 
-        public GameObject consoleTab;
+        [Required] public GameObject consoleTab;
 
-        public GameObject trackTab;
+        [Required] public GameObject trackTab;
 
-        public GameObject volumeTab;
-
+        [Required] public GameObject volumeTab;
 
         public Button? playerMove2DButton;
         public Button? playerMove3DButton;
