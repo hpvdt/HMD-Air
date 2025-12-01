@@ -2,7 +2,11 @@
 
 ## Rules
 
-- Compile and run tests frequently to verify work.
+- Verify your work after every change:
+  1. Compile the project using dotnet
+  2. Load the project using UnityMCP
+- Write a test suite for every new feature
+  - Run the test suite during verification
 - Avoid GUIDs in asmdef files, use [Required]/[Autofill] attributes for Unity references
 - No Unity cross-asset references except prefabs
 - Do not ask the user to run the tests, check test results, or close Unity instance
