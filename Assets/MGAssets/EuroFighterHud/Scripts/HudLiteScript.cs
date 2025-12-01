@@ -10,39 +10,39 @@ public class HudLiteScript : MonoBehaviour
     //Config Variables
     public bool isActive = false;
 
-    public Transform aircraft;
-    public Rigidbody aircraftRB;
+    public Transform aircraft = null!;
+    public Rigidbody aircraftRB = null!;
     //
 
     //Hud Display Variables
     public string activeMsg = "HUD Activated";
 
-    public RectTransform hudPanel;
+    public RectTransform hudPanel = null!;
 
     public bool useRoll = true;
     public float rollAmplitude = 1, rollOffSet = 0, rollFilterFactor = 0.25f;
-    public RectTransform horizonRoll;
-    public Text horizonRollTxt;
+    public RectTransform horizonRoll = null!;
+    public Text horizonRollTxt = null!;
 
     public bool usePitch = true;
     public float pitchAmplitude = 1, pitchOffSet = 0, pitchXOffSet = 0, pitchYOffSet = 0, pitchFilterFactor = 0.125f;
-    public RectTransform horizonPitch;
-    public Text horizonPitchTxt;
-    
+    public RectTransform horizonPitch = null!;
+    public Text horizonPitchTxt = null!;
+
     public bool useHeading = true;
     public float headingAmplitude = 1, headingOffSet = 0, headingFilterFactor = 0.1f;
-    public RectTransform compassHSI;
-    public Text headingTxt;
-    public CompassBar compassBar;
+    public RectTransform compassHSI = null!;
+    public Text headingTxt = null!;
+    public CompassBar compassBar = null!;
 
 
     public bool useAltitude = true;
     public float altitudeAmplitude = 1, altitudeOffSet = 0, altitudeFilterFactor = 0.5f;
-    public Text altitudeTxt;
+    public Text altitudeTxt = null!;
 
     public bool useSpeed = true;
     public float speedAmplitude = 1, speedOffSet = 0, speedFilterFactor = 0.25f;
-    public Text speedTxt;
+    public Text speedTxt = null!;
     //
 
 

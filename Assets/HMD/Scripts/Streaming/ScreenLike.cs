@@ -24,8 +24,8 @@ namespace HMD.Scripts.Streaming
         protected abstract FeedLike Feed { get; }
 
 
-        [Required] [SerializeField] private GameObject leftEyeScreen;
-        [Required] [SerializeField] private GameObject rightEyeScreen;
+        [Required] [SerializeField] private GameObject leftEyeScreen = null!;
+        [Required] [SerializeField] private GameObject rightEyeScreen = null!;
 
         private List<GameObject> AllScreens()
         {
@@ -38,13 +38,13 @@ namespace HMD.Scripts.Streaming
 
         // [SerializeField] public Slider scaleBar;
 
-        [Required] [SerializeField] public Slider distanceBar;
+        [Required] [SerializeField] public Slider distanceBar = null!;
 
-        [Required] [SerializeField] public Slider deformBar;
+        [Required] [SerializeField] public Slider deformBar = null!;
 
-        [Required] [SerializeField] public Slider horizontalBar;
+        [Required] [SerializeField] public Slider horizontalBar = null!;
 
-        [Required] [SerializeField] public Slider verticalBar;
+        [Required] [SerializeField] public Slider verticalBar = null!;
 
         // TODO: enable
         // [SerializeField] public Slider depthBar; // affect distance between left/right eyes
@@ -52,17 +52,17 @@ namespace HMD.Scripts.Streaming
 
         private bool _flipStereo = false;
 
-        public Material m_lMaterial;
-        public Material m_rMaterial;
-        public Material m_monoMaterial;
-        public Material m_leftEyeTBMaterial;
-        public Material m_rightEyeTBMaterial;
+        public Material m_lMaterial = null!;
+        public Material m_rMaterial = null!;
+        public Material m_monoMaterial = null!;
+        public Material m_leftEyeTBMaterial = null!;
+        public Material m_rightEyeTBMaterial = null!;
 
         private float Yaw;
         private float Pitch;
         private float Roll;
 
-        public TextureView Texture;
+        public TextureView Texture = null!;
 
         //Unity Awake, OnDestroy, and Update functions
 

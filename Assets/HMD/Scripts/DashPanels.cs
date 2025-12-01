@@ -29,15 +29,15 @@ namespace HMD.Scripts
 
         [Required] public Dropdown playerMenu = null!;
 
-        [Required] public GameObject playerTab;
+        [Required] public GameObject playerTab = null!;
 
-        [Required] public FOVController fovController;
+        [Required] public FOVController fovController = null!;
 
-        [Required] public GameObject consoleTab;
+        [Required] public GameObject consoleTab = null!;
 
-        [Required] public GameObject trackTab;
+        [Required] public GameObject trackTab = null!;
 
-        [Required] public GameObject volumeTab;
+        [Required] public GameObject volumeTab = null!;
 
         public Button? playerMove2DButton;
         public Button? playerMove3DButton;
@@ -51,24 +51,24 @@ namespace HMD.Scripts
         private List<GameObject>? _allPopups;
 
         private List<Button>? _allTabs;
-        private GameObject _appMenu;
+        private GameObject _appMenu = null!;
 
-        private GameObject _aspectRatioPopup;
+        private GameObject _aspectRatioPopup = null!;
 
         private List<Display>? _extendDisplay;
-        private GameObject _formatPopup;
+        private GameObject _formatPopup = null!;
 
-        private GameObject _lockScreenNotice;
+        private GameObject _lockScreenNotice = null!;
 
-        private GameObject _optionsButton;
-        private GameObject _pictureSettingsPopup;
-        private GameObject _releaseInfoPopup;
+        private GameObject _optionsButton = null!;
+        private GameObject _pictureSettingsPopup = null!;
+        private GameObject _releaseInfoPopup = null!;
 
 
         // the following are set in `UpdateReferences`
 
-        private GameObject _rootMenu;
-        private GameObject _screenPopup;
+        private GameObject _rootMenu = null!;
+        private GameObject _screenPopup = null!;
 
         private string FocusedPlayerID
         {
@@ -486,9 +486,9 @@ namespace HMD.Scripts
             private ControllerLike? _controller;
 
             public DraggingMode Dragging = DraggingMode.Disabled;
-            public string ID;
+            public string ID = null!;
 
-            public GameObject Prefab;
+            public GameObject Prefab = null!;
 
             public ControllerLike Controller =>
                 LazyHelper.EnsureInitialized(ref _controller, () => Prefab.GetComponent<ControllerLike>());
@@ -536,14 +536,14 @@ namespace HMD.Scripts
             private float _brightnessOnLock;
             private bool _screenLocked;
 
-            protected GameObject HideWhenLocked;
+            protected GameObject HideWhenLocked = null!;
 
-            protected GameObject LockScreenNotice;
+            protected GameObject LockScreenNotice = null!;
 
             //
-            protected GameObject Logo;
+            protected GameObject Logo = null!;
 
-            protected GameObject MenuToggleButton;
+            protected GameObject MenuToggleButton = null!;
 
             // TODO: set the following in editor
             // _hideWhenLocked = GameObject.Find("HideWhenScreenLocked");

@@ -9,11 +9,11 @@ namespace HMD.Scripts.Streaming
         // public ScreenLike screen;
         // public DashPanels dashPanels;
 
-        [Required] public GameObject icon;
+        [Required] public GameObject icon = null!;
 
-        [Required] public Button playButton;
-        [Required] public Button pauseButton;
-        [Required] public Button stopButton;
+        [Required] public Button playButton = null!;
+        [Required] public Button pauseButton = null!;
+        [Required] public Button stopButton = null!;
 
         public abstract void BindUI();
     }

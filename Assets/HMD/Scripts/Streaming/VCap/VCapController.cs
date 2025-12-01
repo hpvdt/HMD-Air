@@ -7,11 +7,11 @@ namespace HMD.Scripts.Streaming.VCap
 {
     public class VCapController : ControllerLike
     {
-        [Required] public VCapScreen screen;
+        [Required] public VCapScreen screen = null!;
 
-        [Required] public Button fileButton;
+        [Required] public Button fileButton = null!;
 
-        [Required] public Button devicesButton;
+        [Required] public Button devicesButton = null!;
 
         // TODO: do we need buttons for next/previous track/vCapDevice?
 

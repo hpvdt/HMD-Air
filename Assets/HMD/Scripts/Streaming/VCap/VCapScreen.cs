@@ -9,7 +9,7 @@ namespace HMD.Scripts.Streaming.VCap
 {
     public class VCapScreen : ScreenLike
     {
-        [Required] public VCapFeed feed;
+        [Required] public VCapFeed feed = null!;
 
         protected override FeedLike Feed => feed;
 

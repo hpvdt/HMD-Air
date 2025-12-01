@@ -6,8 +6,8 @@ namespace HMD.Scripts
     [Required]
     public class NullExample1 : MonoBehaviour
     {
-        [SerializeField] private GameObject field1;
+        [SerializeField] private GameObject field1 = null!;
 
-        public GameObject field2;
+        public GameObject field2 = null!;
     }
 }

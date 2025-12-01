@@ -12,7 +12,7 @@ using UnityEngine;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 public class CameraAircraft : MonoBehaviour
 {
-    public static CameraAircraft current;
+    public static CameraAircraft current = null!;
 
     public bool isActive = true, cursorStartLocked = false, turbulence = true;
     public float pitchFactor = 1, rollFactor = 1, yawFactor = 1, thrust = 1, lift = 1;

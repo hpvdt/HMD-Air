@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class SndPlayer : MonoBehaviour
 {
-    public static SndPlayer current;
-    public AudioSource som;
+    public static SndPlayer current = null!;
+    public AudioSource som = null!;
 
     public bool mute = false;
 

@@ -4,8 +4,8 @@ using UnityEngine.UI;
 
 public class DisplayMsg : MonoBehaviour
 {
-    public static DisplayMsg current;
-    public Text msgTxt;
+    public static DisplayMsg current = null!;
+    public Text msgTxt = null!;
 
     string lastTimedMsg;
 
