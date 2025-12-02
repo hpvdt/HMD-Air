@@ -36,6 +36,7 @@ MonoBehaviour:
     - com.unity.uiextensions
     - com.yamldotnet.uni
     - com.yasirkula.ingamedebugconsole
+    - com.yasirkula.texttotmp
     - io.github.gkngkc.unity-standalone-file-browser
     - net.tnrd.autohook
     m_IsDefault: 0

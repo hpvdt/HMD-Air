@@ -50,7 +50,8 @@
     "com.unity.modules.video": "1.0.0",
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
-    "com.unity.modules.xr": "1.0.0"
+    "com.unity.modules.xr": "1.0.0",
+    "com.yasirkula.texttotmp": "1.2.0"
   },
   "scopedRegistries": [
     {
@@ -63,6 +64,7 @@
         "com.unity.uiextensions",
         "com.yamldotnet.uni",
         "com.yasirkula.ingamedebugconsole",
+        "com.yasirkula.texttotmp",
         "io.github.gkngkc.unity-standalone-file-browser",
         "net.tnrd.autohook"
       ]
