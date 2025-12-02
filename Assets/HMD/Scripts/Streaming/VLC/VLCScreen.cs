@@ -91,7 +91,7 @@ namespace HMD.Scripts.Streaming.VLC
             var paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", fileTypes, false);
             var path = paths.FirstOrDefault();
 
-            if (path == null)
+            if (string.IsNullOrEmpty(path))
             {
                 Debug.Log("Operation cancelled");
             }

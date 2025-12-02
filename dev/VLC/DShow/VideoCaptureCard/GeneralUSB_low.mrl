@@ -1,0 +1,5 @@
+dshow://
+:dshow-vdev=USB Video
+:dshow-size=1920x1080
+:dshow-adev=none
+:live-caching=0

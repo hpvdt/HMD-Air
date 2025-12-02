@@ -15,7 +15,7 @@
       }
     },
     "com.coplaydev.unity-mcp": {
-      "version": "8.1.4",
+      "version": "8.2.3",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -283,7 +283,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "80c0c42131d4824f9ff6439eda11c2378251fe6d"
+      "hash": "192208bb4e01d0fcae194fa9bfa603c3d108d050"
     },
     "com.yasirkula.texttotmp": {
       "version": "1.2.0",
