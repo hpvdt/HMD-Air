@@ -54,9 +54,15 @@ namespace HMD.Scripts.Util
                 }
             }
 
-            public void V(string message)
+
+            public void Verbose(string message)
             {
                 if (Outer.loggerVerbosity) Write(message);
+            }
+
+            public void V(string message)
+            {
+                Verbose(message);
             }
         }
     }

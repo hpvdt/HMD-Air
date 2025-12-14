@@ -33392,11 +33392,11 @@ MonoBehaviour:
   vlcPlayerTemplate: {fileID: 4732923173715968485}
   vCapPlayerTemplate: {fileID: 146006058662195917}
   playerMenu: {fileID: 692852524}
-  playerTab: {fileID: 122855088}
+  playerTab: {fileID: 868215162}
   fovController: {fileID: 2089846055}
-  consoleTab: {fileID: 994516388}
-  trackTab: {fileID: 1791341481}
-  volumeTab: {fileID: 1680133536}
+  consoleTab: {fileID: 1809665528}
+  trackTab: {fileID: 834860604}
+  volumeTab: {fileID: 854288384}
   playerMove2DButton: {fileID: 2018526925}
   playerMove3DButton: {fileID: 89711116}
   optionsButton: {fileID: 192152658}

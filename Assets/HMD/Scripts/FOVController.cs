@@ -1,7 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
 using HMD.Scripts.Util;
-using MAVLinkAPI.Util;
 using MAVLinkAPI.Util.NullSafety;
 using UnityEngine;
 using UnityEngine.UI;
@@ -43,8 +42,8 @@ namespace HMD.Scripts
         private static float minFocal = -15.0f;
 
 
-        private List<Camera>? _allCameras;
-        private List<Camera> AllCameras => LazyHelper.EnsureInitialized(ref _allCameras, () => MainCameras);
+        private Maybe<List<Camera>> _allCameras;
+        private List<Camera> AllCameras => _allCameras.Lazy(() => MainCameras);
 
         private float FOV // 20 for 2D 140 for spherical
         {

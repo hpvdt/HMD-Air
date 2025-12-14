@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using LibVLCSharp;
+using MAVLinkAPI.Util.NullSafety;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Serialization;
@@ -20,33 +21,45 @@ namespace HMD.Scripts.Streaming.VLC
         public bool debugVLCPlayer;
 
 
-        private LibVLC? _libVLC;
+        private Maybe<LibVLC> _libVLC;
 
-        private MediaPlayer? _player;
+        private LibVLC LibVLC => _libVLC.Lazy(MkLibVLC);
 
-        private LibVLC LibVLC
+        //Create a new static LibVLC instance and dispose of the old one. You should only ever have one LibVLC instance.
+        private LibVLC MkLibVLC()
         {
-            get
-            {
-                if (_libVLC == null) RefreshLibVLC();
-                return _libVLC;
-            }
-        }
+            Core.Initialize(Application.dataPath); //Load VLC dlls
+            var result = new LibVLC(
+                true
+            ); //You can customize LibVLC with advanced CLI options here https://wiki.videolan.org/VLC_command-line_help/
 
-        public MediaPlayer Player
-        {
-            get
+            //Setup Error Logging
+            Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
+            result.Log += (s, e) =>
             {
-                if (_player == null)
+                //Always use try/catch in LibVLC events.
+                //LibVLC can freeze Unity if an exception goes unhandled inside an event handler.
+                try
                 {
-                    Log.V($"LibVLC version and architecture {LibVLC.Changeset}");
-                    Log.V($"LibVLCSharp version {typeof(LibVLC).Assembly.GetName().Version}");
-                    _player = new MediaPlayer(LibVLC);
+                    if (debugVLCPlayer) Log.V($"[VLC-{e.Level}] [{s}{e.Module}] " + e.Message);
                 }
-
-                return _player;
-            }
+                catch (Exception ex)
+                {
+                    Error.V("[VLC]Exception caught in libVLC.Log:\n" + ex);
+                }
+            };
+            return result;
         }
+
+        private Maybe<MediaPlayer> _player;
+
+        public MediaPlayer Player => _player.Lazy(() =>
+            {
+                Log.V($"LibVLC version and architecture {LibVLC.Changeset}");
+                Log.V($"LibVLCSharp version {typeof(LibVLC).Assembly.GetName().Version}");
+                return new MediaPlayer(LibVLC);
+            }
+        );
 
         public int Volume => Player.Volume;
 
@@ -64,52 +77,20 @@ namespace HMD.Scripts.Streaming.VLC
 
         public long Time => Player.Time;
 
-        //Create a new static LibVLC instance and dispose of the old one. You should only ever have one LibVLC instance.
-        private void RefreshLibVLC()
-        {
-            //Dispose of the old libVLC if necessary
-            if (_libVLC != null)
-            {
-                _libVLC.Dispose();
-                _libVLC = null;
-            }
-
-            Core.Initialize(Application.dataPath); //Load VLC dlls
-            _libVLC = new LibVLC(
-                true
-            ); //You can customize LibVLC with advanced CLI options here https://wiki.videolan.org/VLC_command-line_help/
-
-            //Setup Error Logging
-            Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
-            _libVLC.Log += (s, e) =>
-            {
-                //Always use try/catch in LibVLC events.
-                //LibVLC can freeze Unity if an exception goes unhandled inside an event handler.
-                try
-                {
-                    if (debugVLCPlayer) Log.V($"[VLC-{e.Level}] [{s}{e.Module}] " + e.Message);
-                }
-                catch (Exception ex)
-                {
-                    Error.V("[VLC]Exception caught in libVLC.Log:\n" + ex);
-                }
-            };
-        }
-
 
         //Dispose of the MediaPlayer object. 
         public void DestroyMediaPlayer()
         {
-            if (_player != null)
+            if (_player.ValueOrNull != null)
             {
                 Stop();
 
-                _player?.Stop();
-                _player?.Dispose();
-                _player = null;
+                _player.ValueOrNull?.Stop();
+                _player.ValueOrNull?.Dispose();
+                _player.ValueOrNull = null;
 
-                _libVLC?.Dispose();
-                _libVLC = null;
+                _libVLC.ValueOrNull?.Dispose();
+                _libVLC.ValueOrNull = null;
 
                 Log.V("Destroyed");
             }
@@ -220,7 +201,7 @@ namespace HMD.Scripts.Streaming.VLC
 
         public void OpenArgs(VLCArgs args)
         {
-            if (Player?.Media != null)
+            if (Player.Media != null)
                 Player.Media.Dispose();
 
             var parameters = args.Parameters;
@@ -232,27 +213,11 @@ namespace HMD.Scripts.Streaming.VLC
             // mediaPlayer.Media = new Media(new Uri(Args.Location), parameters);
             // mediaPlayer.Media = new Media(Args.Location, Args.FromType, parameters);
 
-            var m = new Media(args.Location, args.FromType);
-            foreach (var parameter in parameters) m.AddOption(parameter);
+            var m = new Media(args.Location, args.FromType, parameters);
+            // var m = new Media(new Uri(args.Location), parameters);
+            // foreach (var parameter in parameters) m.AddOption(parameter); // TODO: remove, already in constructor
 
             Player.Media = m;
-
-            // Task.Run(async () =>
-            // {
-            //     var result = await Player.Media.ParseAsync(LibVLC, MediaParseOptions.ParseNetwork);
-            //     var trackList = Player.Media.TrackList(TrackType.Video);
-            //
-            //     Debug.Log($"tracklist of {trackList.Count}");
-            //
-            //     // TODO: add SBS / OU / TB filename recognition
-            //
-            //     var first = trackList[0];
-            //     var projection = first.Data.Video.Projection;
-            //
-            //     Debug.Log($"Video uses {projection} projection and {result} parsed status");
-            //
-            //     trackList.Dispose();
-            // });
         }
 
         public override void Stop()
@@ -265,6 +230,28 @@ namespace HMD.Scripts.Streaming.VLC
         {
             Task.Run(async () =>
                 {
+                    var link = Player.Media!;
+
+                    Log.V($"start parsing {link.Mrl}");
+
+                    // TODO: this part doesn't work for youtube, why?
+                    var status = await link.ParseAsync(LibVLC,
+                        MediaParseOptions.DoInteract | MediaParseOptions.ParseNetwork, 1000);
+                    if (status == MediaParsedStatus.Done)
+                    {
+                        if (link.SubItems.Count <= 0) throw new IOException($"No subitems in media {link.Mrl}");
+
+                        var first = link.SubItems.First();
+
+                        Log.V($"resolving media link: {link.Mrl} -> {first.Mrl} ({link.SubItems.Count} in total)");
+
+                        Player.Media = first;
+                    }
+                    else
+                    {
+                        Log.V($"parsing status is {status} for media {link.Mrl}");
+                    }
+
                     var isSuccessful = await Player.PlayAsync();
 
                     Assert.IsTrue(isSuccessful && IsPlaying, "should be playing");

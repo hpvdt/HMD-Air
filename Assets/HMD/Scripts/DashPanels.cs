@@ -96,9 +96,9 @@ namespace HMD.Scripts
             }
         }
 
-        private List<Button>? _allTabs;
+        private Maybe<List<Button>> _allTabs;
 
-        private List<Button> AllTabs => LazyHelper.EnsureInitialized(ref _allTabs, () => new List<Button>
+        private List<Button> AllTabs => _allTabs.Lazy(() => new List<Button>
         {
             playerTab,
             consoleTab,
@@ -106,17 +106,17 @@ namespace HMD.Scripts
             volumeTab
         });
 
-        private List<GameObject>? _allMenus;
+        private Maybe<List<GameObject>> _allMenus;
 
-        private List<GameObject> AllMenus => LazyHelper.EnsureInitialized(ref _allMenus, () => new List<GameObject>
+        private List<GameObject> AllMenus => _allMenus.Lazy(() => new List<GameObject>
         {
             rootMenu,
             appMenu
         });
 
-        private List<GameObject>? _allPopups;
+        private Maybe<List<GameObject>> _allPopups;
 
-        private List<GameObject> AllPopups => LazyHelper.EnsureInitialized(ref _allPopups, () => new List<GameObject>
+        private List<GameObject> AllPopups => _allPopups.Lazy(() => new List<GameObject>
         {
             aspectRatioPopup,
             screenPopup,
@@ -456,13 +456,20 @@ namespace HMD.Scripts
         {
             private ControllerLike? _controller;
 
+            private Maybe<ControllerLike> _controllerExisting;
+
             public DraggingMode Dragging = DraggingMode.Disabled;
             public string ID = null!;
 
             public GameObject Prefab = null!;
 
             public ControllerLike Controller =>
-                LazyHelper.EnsureInitialized(ref _controller, () => Prefab.GetComponent<ControllerLike>());
+                _controllerExisting.Lazy(() =>
+                {
+                    var controller = Prefab.GetComponent<ControllerLike>();
+                    _controller = controller;
+                    return controller;
+                });
 
             public bool IconIsVisible
             {

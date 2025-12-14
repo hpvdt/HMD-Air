@@ -41,20 +41,20 @@ namespace HMD.Scripts.Streaming.VCap
             PlayCurrent(res);
         }
 
-        public void PlayCurrent(Resolution? res)
+        public void PlayCurrent(Resolution? resolution)
         {
             foreach (var d in _activeDevice.Wrap())
             {
                 var resList = _activeDevice?.availableResolutions;
 
-                if (res == null)
+                if (resolution == null)
                 {
                     Log.V($"Setting up camera `{d.name}`");
                     Open(new ArgsT { Name = d.name });
                 }
                 else
                 {
-                    var resV = res.Value;
+                    var resV = resolution.Value;
                     if (resList != null && !resList.Contains(resV))
                         Warning.V(
                             $"resolution `{resV.ToString()}` may be unsupported:\n"
@@ -65,7 +65,7 @@ namespace HMD.Scripts.Streaming.VCap
                         new ArgsT
                         {
                             Name = d.name,
-                            Resolution = res
+                            Resolution = resolution
                         }
                     );
                 }
