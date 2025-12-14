@@ -19,21 +19,13 @@ namespace HMD.Scripts.Streaming
             // TODO: there is no Mono_OU?
         }
 
-        [Required] [SerializeField] public VideoMode videoMode = VideoMode.Mono; // 2d by default
+        private static readonly Vector2 SCALE_RANGE = new(1f, 4.702173720867682f);
 
-        protected abstract FeedLike Feed { get; }
+        [Required] [SerializeField] public VideoMode videoMode = VideoMode.Mono; // 2d by default
 
 
         [Required] [SerializeField] private GameObject leftEyeScreen = null!;
         [Required] [SerializeField] private GameObject rightEyeScreen = null!;
-
-        private List<GameObject> AllScreens()
-        {
-            return new List<GameObject> { leftEyeScreen, rightEyeScreen };
-        }
-
-        private Renderer _morphLeftRenderer;
-        private Renderer _morphRightRenderer;
 
 
         // [SerializeField] public Slider scaleBar;
@@ -46,74 +38,35 @@ namespace HMD.Scripts.Streaming
 
         [Required] [SerializeField] public Slider verticalBar = null!;
 
-        // TODO: enable
-        // [SerializeField] public Slider depthBar; // affect distance between left/right eyes
-        // [SerializeField] public Slider focusBar; // affect viewing angle of left/right eyes
-
-        private bool _flipStereo = false;
-
         public Material m_lMaterial = null!;
         public Material m_rMaterial = null!;
         public Material m_monoMaterial = null!;
         public Material m_leftEyeTBMaterial = null!;
         public Material m_rightEyeTBMaterial = null!;
 
-        private float Yaw;
+        // TODO: enable
+        // [SerializeField] public Slider depthBar; // affect distance between left/right eyes
+        // [SerializeField] public Slider focusBar; // affect viewing angle of left/right eyes
+
+        private bool _flipStereo;
+
+        private Renderer _morphLeftRenderer;
+        private Renderer _morphRightRenderer;
+
+        private float _sphereScale;
         private float Pitch;
         private float Roll;
 
         public TextureView Texture = null!;
 
-        //Unity Awake, OnDestroy, and Update functions
+        private float Yaw;
 
-        #region unity
+        protected abstract FeedLike Feed { get; }
 
-        public void BindUI()
+        private List<GameObject> AllScreens()
         {
-            deformBar.onValueChanged.Rebind(OnDeformBarUpdated);
-            distanceBar.onValueChanged.Rebind(OnDistanceSliderUpdated);
-            horizontalBar.onValueChanged.Rebind(OnHorizontalSliderUpdated);
-            verticalBar.onValueChanged.Rebind(OnVerticalSliderUpdated);
+            return new List<GameObject> { leftEyeScreen, rightEyeScreen };
         }
-
-        protected new void Awake()
-        {
-            base.Awake();
-
-            if (deformBar is not null) deformBar.value = 0.0f;
-
-            _morphLeftRenderer = leftEyeScreen.GetComponent<Renderer>();
-            _morphRightRenderer = rightEyeScreen.GetComponent<Renderer>();
-
-            SetVideoModeMono();
-        }
-
-        private void Update()
-        {
-            var newTexture = Feed?.TryGetTexture(Texture);
-            if (newTexture != null && newTexture != Texture)
-            {
-                Texture = newTexture;
-                SetVideoModeAsap();
-
-                SetARDefault();
-            }
-        }
-
-        private void OnApplicationQuit()
-        {
-            OnDestroy();
-        }
-
-        private void OnDestroy()
-        {
-            //Dispose of mediaPlayer, or it will stay in nemory and keep playing audio
-            Feed.Dispose();
-        }
-
-        #endregion
-
-        private static Vector2 SCALE_RANGE = new(1f, 4.702173720867682f);
 
         public void OnDeformBarUpdated(float value)
         {
@@ -164,12 +117,60 @@ namespace HMD.Scripts.Streaming
             );
         }
 
-        private float _sphereScale;
+        //Unity Awake, OnDestroy, and Update functions
+
+        #region unity
+
+        public void BindUI()
+        {
+            deformBar.onValueChanged.Rebind(OnDeformBarUpdated);
+            distanceBar.onValueChanged.Rebind(OnDistanceSliderUpdated);
+            horizontalBar.onValueChanged.Rebind(OnHorizontalSliderUpdated);
+            verticalBar.onValueChanged.Rebind(OnVerticalSliderUpdated);
+        }
+
+        protected new void Awake()
+        {
+            base.Awake();
+
+            if (deformBar is not null) deformBar.value = 0.0f;
+
+            _morphLeftRenderer = leftEyeScreen.GetComponent<Renderer>();
+            _morphRightRenderer = rightEyeScreen.GetComponent<Renderer>();
+
+            SetVideoModeMono();
+        }
+
+        private void Update()
+        {
+            var newTexture = Feed?.TryGetTexture(Texture);
+            if (newTexture != null && newTexture != Texture)
+            {
+                Texture = newTexture;
+                SetVideoModeAsap();
+
+                SetARDefault();
+            }
+        }
+
+        private void OnApplicationQuit()
+        {
+            OnDestroy();
+        }
+
+        private void OnDestroy()
+        {
+            //Dispose of mediaPlayer, or it will stay in nemory and keep playing audio
+            Feed.Dispose();
+        }
+
+        #endregion
 
         #region vlc
 
         public void Play()
         {
+            Debug.Log("Playing ...");
             if (Feed != null)
                 // icon.SetActive(false); // hide cone logo
                 // gameObject.SetActive(true);

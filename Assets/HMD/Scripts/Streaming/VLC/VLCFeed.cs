@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,7 +20,49 @@ namespace HMD.Scripts.Streaming.VLC
         public bool debugVLCPlayer;
 
 
-        private LibVLC _libVLC;
+        private LibVLC? _libVLC;
+
+        private MediaPlayer? _player;
+
+        private LibVLC LibVLC
+        {
+            get
+            {
+                if (_libVLC == null) RefreshLibVLC();
+                return _libVLC;
+            }
+        }
+
+        public MediaPlayer Player
+        {
+            get
+            {
+                if (_player == null)
+                {
+                    Log.V($"LibVLC version and architecture {LibVLC.Changeset}");
+                    Log.V($"LibVLCSharp version {typeof(LibVLC).Assembly.GetName().Version}");
+                    _player = new MediaPlayer(LibVLC);
+                }
+
+                return _player;
+            }
+        }
+
+        public int Volume => Player.Volume;
+
+        private bool IsPlaying => Player.IsPlaying;
+
+        public long Duration
+        {
+            get
+            {
+                if (Player.Media == null)
+                    return 0;
+                return Player.Media.Duration;
+            }
+        }
+
+        public long Time => Player.Time;
 
         //Create a new static LibVLC instance and dispose of the old one. You should only ever have one LibVLC instance.
         private void RefreshLibVLC()
@@ -51,32 +94,6 @@ namespace HMD.Scripts.Streaming.VLC
                     Error.V("[VLC]Exception caught in libVLC.Log:\n" + ex);
                 }
             };
-        }
-
-        private LibVLC libVLC
-        {
-            get
-            {
-                if (_libVLC == null) RefreshLibVLC();
-                return _libVLC;
-            }
-        }
-
-        private MediaPlayer _player;
-
-        public MediaPlayer Player
-        {
-            get
-            {
-                if (_player == null)
-                {
-                    Log.V($"LibVLC version and architecture {libVLC.Changeset}");
-                    Log.V($"LibVLCSharp version {typeof(LibVLC).Assembly.GetName().Version}");
-                    _player = new MediaPlayer(libVLC);
-                }
-
-                return _player;
-            }
         }
 
 
@@ -146,11 +163,11 @@ namespace HMD.Scripts.Streaming.VLC
                 //If the currently playing video uses the Bottom Right orientation, we have to do this to avoid stretching it.
                 if (GetVideoOrientation() == VideoOrientation.BottomRight) (px, py) = (py, px);
 
-                var _source =
+                var source =
                     Texture2D.CreateExternalTexture((int)px, (int)py, TextureFormat.RGBA32, false, true, texPtr);
                 //Make a texture of the proper size for the video to output to
 
-                var result = new TextureView(_source);
+                var result = new TextureView(source);
 
                 // Player.AspectRatio = result.AspectRatioStr.Value;
 
@@ -177,12 +194,12 @@ namespace HMD.Scripts.Streaming.VLC
             return orientation;
         }
 
-        public void Open(string path)
+        public void Open(string _path)
         {
-            var _path = path.ToLower();
+            var path = _path.ToLower();
 
             VLCArgs args;
-            if (_path.EndsWith(".url") || _path.EndsWith(".txt") || _path.EndsWith(".mrl"))
+            if (path.EndsWith(".url") || path.EndsWith(".txt") || path.EndsWith(".mrl"))
             {
                 // TODO: merge with file picker in VlcScreen
                 var urlContent = File.ReadAllText(path);
@@ -220,21 +237,22 @@ namespace HMD.Scripts.Streaming.VLC
 
             Player.Media = m;
 
-            Task.Run(async () =>
-            {
-                var result = await Player.Media.ParseAsync(libVLC, MediaParseOptions.ParseNetwork);
-                var trackList = Player.Media.TrackList(TrackType.Video);
-
-                Debug.Log($"tracklist of {trackList.Count}");
-
-                // TODO: add SBS / OU / TB filename recognition
-
-                var projection = trackList[0].Data.Video.Projection;
-
-                Debug.Log($"Video uses {projection} projection");
-
-                trackList.Dispose();
-            });
+            // Task.Run(async () =>
+            // {
+            //     var result = await Player.Media.ParseAsync(LibVLC, MediaParseOptions.ParseNetwork);
+            //     var trackList = Player.Media.TrackList(TrackType.Video);
+            //
+            //     Debug.Log($"tracklist of {trackList.Count}");
+            //
+            //     // TODO: add SBS / OU / TB filename recognition
+            //
+            //     var first = trackList[0];
+            //     var projection = first.Data.Video.Projection;
+            //
+            //     Debug.Log($"Video uses {projection} projection and {result} parsed status");
+            //
+            //     trackList.Dispose();
+            // });
         }
 
         public override void Stop()
@@ -249,13 +267,14 @@ namespace HMD.Scripts.Streaming.VLC
                 {
                     var isSuccessful = await Player.PlayAsync();
 
-                    Assert.IsTrue(isSuccessful && isPlaying, "should be playing");
+                    Assert.IsTrue(isSuccessful && IsPlaying, "should be playing");
 
                     // TODO: this should be useless now after VLC DirectShow fix
-                    // Assert.AreNotEqual(height, 0, "height should not be 0");
-                    // Assert.AreNotEqual(width, 0, "width should not be 0");
 
-                    Debug.Log("Playing ...");
+                    var (height, width) = GetSize();
+
+                    Assert.AreNotEqual(height, 0, "height should not be 0");
+                    Assert.AreNotEqual(width, 0, "width should not be 0");
                 }
             );
         }
@@ -305,46 +324,6 @@ namespace HMD.Scripts.Streaming.VLC
         {
             Log.V("SetVolume " + volume);
             Player.SetVolume(volume);
-        }
-
-        public int Volume
-        {
-            get
-            {
-                if (Player == null)
-                    return 0;
-                return Player.Volume;
-            }
-        }
-
-        private bool isPlaying
-        {
-            get
-            {
-                if (Player == null)
-                    return false;
-                return Player.IsPlaying;
-            }
-        }
-
-        public long Duration
-        {
-            get
-            {
-                if (Player == null || Player.Media == null)
-                    return 0;
-                return Player.Media.Duration;
-            }
-        }
-
-        public long Time
-        {
-            get
-            {
-                if (Player == null)
-                    return 0;
-                return Player.Time;
-            }
         }
 
         //Converts MediaTrackList objects to Unity-friendly generic lists. Might not be worth the trouble.

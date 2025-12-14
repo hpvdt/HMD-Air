@@ -179,7 +179,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: cd7f6d98578d688e5bf3538d30cc2ff4, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 21af39097b133d1499d8e26c8b134acb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -13115,7 +13115,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 832aec3d389e40043af33c445a8d3d3f, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 21af39097b133d1499d8e26c8b134acb, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -15779,7 +15779,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1064780855}
   m_Layer: 0
-  m_Name: WhatsNewPopup
+  m_Name: ReleaseInfoPopup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26632,7 +26632,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7060042029957205240, guid: 8f88a0c632d0a68cd9f4096972e93af2, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.00025032074
+      value: 0.0009367104
       objectReference: {fileID: 0}
     - target: {fileID: 7139818477378023627, guid: 8f88a0c632d0a68cd9f4096972e93af2, type: 3}
       propertyPath: m_AnchorMax.y
@@ -29109,7 +29109,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: cd7f6d98578d688e5bf3538d30cc2ff4, type: 3}
+  m_Sprite: {fileID: 21300000, guid: dbab7a80c75ef45bcb4d1e3ead7730f8, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -33399,6 +33399,16 @@ MonoBehaviour:
   volumeTab: {fileID: 1680133536}
   playerMove2DButton: {fileID: 2018526925}
   playerMove3DButton: {fileID: 89711116}
+  optionsButton: {fileID: 192152658}
+  appMenu: {fileID: 665850562}
+  aspectRatioPopup: {fileID: 868209545}
+  formatPopup: {fileID: 2046266930}
+  pictureSettingsPopup: {fileID: 2078410530}
+  releaseInfoPopup: {fileID: 1064780854}
+  rootMenu: {fileID: 1259967513}
+  screenPopup: {fileID: 482070164}
+  lockScreenNotice: {fileID: 72062985}
+  versionInfo: {fileID: 322484468}
 --- !u!114 &2089846055
 MonoBehaviour:
   m_ObjectHideFlags: 0

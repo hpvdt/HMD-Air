@@ -17,10 +17,10 @@ namespace HMD.Scripts
         // [SerializeField] private Camera rightCamera;
 
 
-        private List<Camera>? _mainCameras;
+        private Maybe<List<Camera>> _mainCameras;
 
         private List<Camera> MainCameras =>
-            LazyHelper.EnsureInitialized(ref _mainCameras, () => new List<Camera> { mainCamera });
+            _mainCameras.Lazy(() => new List<Camera> { mainCamera });
 
         [Required] [SerializeField] private Slider fovBar = null!;
 

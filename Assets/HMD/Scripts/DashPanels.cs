@@ -29,46 +29,44 @@ namespace HMD.Scripts
 
         [Required] public Dropdown playerMenu = null!;
 
-        [Required] public GameObject playerTab = null!;
+        [Required] public Button playerTab = null!;
 
         [Required] public FOVController fovController = null!;
 
-        [Required] public GameObject consoleTab = null!;
+        [Required] public Button consoleTab = null!;
 
-        [Required] public GameObject trackTab = null!;
+        [Required] public Button trackTab = null!;
 
-        [Required] public GameObject volumeTab = null!;
+        [Required] public Button volumeTab = null!;
 
         public Button? playerMove2DButton;
         public Button? playerMove3DButton;
+
+        [Required] public GameObject optionsButton = null!;
+
+        [Required] public GameObject appMenu = null!;
+
+        [Required] public GameObject aspectRatioPopup = null!;
+        [Required] public GameObject formatPopup = null!;
+        [Required] public GameObject pictureSettingsPopup = null!;
+        [Required] public GameObject releaseInfoPopup = null!;
+
+
+        // the following are set in `UpdateReferences`
+
+        [Required] public GameObject rootMenu = null!;
+        [Required] public GameObject screenPopup = null!;
+
+        [Required] public GameObject lockScreenNotice = null!;
+
+        [Required] public Text versionInfo = null!;
 
         private readonly Dictionary<string, Player> _activePlayers = new();
 
         private readonly AtomicLong _incCounter = new();
 
-        private List<GameObject>? _allMenus;
-
-        private List<GameObject>? _allPopups;
-
-        private List<Button>? _allTabs;
-        private GameObject _appMenu = null!;
-
-        private GameObject _aspectRatioPopup = null!;
 
         private List<Display>? _extendDisplay;
-        private GameObject _formatPopup = null!;
-
-        private GameObject _lockScreenNotice = null!;
-
-        private GameObject _optionsButton = null!;
-        private GameObject _pictureSettingsPopup = null!;
-        private GameObject _releaseInfoPopup = null!;
-
-
-        // the following are set in `UpdateReferences`
-
-        private GameObject _rootMenu = null!;
-        private GameObject _screenPopup = null!;
 
         private string FocusedPlayerID
         {
@@ -98,27 +96,33 @@ namespace HMD.Scripts
             }
         }
 
+        private List<Button>? _allTabs;
+
         private List<Button> AllTabs => LazyHelper.EnsureInitialized(ref _allTabs, () => new List<Button>
         {
-            playerTab.GetComponent<Button>(),
-            consoleTab.GetComponent<Button>(),
-            trackTab.GetComponent<Button>(),
-            volumeTab.GetComponent<Button>()
+            playerTab,
+            consoleTab,
+            trackTab,
+            volumeTab
         });
+
+        private List<GameObject>? _allMenus;
 
         private List<GameObject> AllMenus => LazyHelper.EnsureInitialized(ref _allMenus, () => new List<GameObject>
         {
-            _rootMenu,
-            _appMenu
+            rootMenu,
+            appMenu
         });
+
+        private List<GameObject>? _allPopups;
 
         private List<GameObject> AllPopups => LazyHelper.EnsureInitialized(ref _allPopups, () => new List<GameObject>
         {
-            _aspectRatioPopup,
-            _screenPopup,
-            _formatPopup,
-            _releaseInfoPopup,
-            _pictureSettingsPopup
+            aspectRatioPopup,
+            screenPopup,
+            formatPopup,
+            releaseInfoPopup,
+            pictureSettingsPopup
         });
 
         // Start is called before the first frame update
@@ -126,38 +130,26 @@ namespace HMD.Scripts
         {
             BindUI();
 
-            _lockScreenNotice = GlobalFinder.Find("LockScreenNotice").Only();
-
             var versionName = Application.version;
             var versionCode = Application.buildGUID;
-            GlobalFinder.Find("AppMenu/AppMenuInner/Subtitle").Only().GetComponent<Text>().text =
+            versionInfo.text =
                 $"{versionName} ({versionCode})";
+
 
             // center UI things that i had spread out in Editor
             CenterPopupLocations();
 
             // Center Menus/Objects
-            CenterXY(_lockScreenNotice);
-            CenterXY(_rootMenu);
-            CenterXY(_appMenu);
+            CenterXY(lockScreenNotice);
+            CenterXY(rootMenu);
+            CenterXY(appMenu);
 
-            _lockScreenNotice.SetActive(false);
+            lockScreenNotice.SetActive(false);
 
-            // HideAllMenus();
             HideAllPopups();
+            HideAllMenus();
 
             ShowRootMenu();
-
-            if (PlayerPrefs.GetInt(WHATS_NEW) == 1)
-            {
-                // The user has already seen the onboarding tutorial text
-            }
-            else
-            {
-                // The user has not yet seen the onboarding tutorial text
-                PlayerPrefs.SetInt(WHATS_NEW, 1);
-                ShowWhatsNewPopup();
-            }
         }
 
 
@@ -227,7 +219,7 @@ namespace HMD.Scripts
         public void TogglePlayerTab()
         {
             ExtendDisplayOnce();
-            ToggleElement(playerTab);
+            ToggleElement(playerTab.gameObject);
 
             _syncIcons();
         }
@@ -236,7 +228,7 @@ namespace HMD.Scripts
         {
             foreach (var player in _activePlayers.Values) player.IconIsVisible = false;
 
-            if (playerTab.activeInHierarchy)
+            if (playerTab.gameObject.activeInHierarchy)
                 foreach (var player in FocusedPlayers)
                     player.IconIsVisible = true;
         }
@@ -272,17 +264,17 @@ namespace HMD.Scripts
 
         public void ToggleConsoleTab()
         {
-            ToggleElement(consoleTab);
+            ToggleElement(consoleTab.gameObject);
         }
 
         public void ToggleTrackTab()
         {
-            ToggleElement(trackTab);
+            ToggleElement(trackTab.gameObject);
         }
 
         public void ToggleVolumeTab()
         {
-            ToggleElement(volumeTab);
+            ToggleElement(volumeTab.gameObject);
         }
 
         //Enable a GameObject if it is disabled, or disable it if it is enabled
@@ -298,17 +290,14 @@ namespace HMD.Scripts
             // Get the "Popups" game object, then loop over each of it's top-level children
             // and center them on the screen
 
-            var popups = GlobalFinder.Find("Canvas/Popups").Only();
-            for (var i = 0; i < popups.transform.childCount; i++)
-            {
-                var childGameObject = popups.transform.GetChild(i).gameObject;
-
-                Log.V("centering " + childGameObject.name);
-                CenterXY(childGameObject);
-            }
+            foreach (var popup in AllPopups)
+                // Log.V("centering " + childGameObject.name);
+                CenterXY(popup);
         }
 
         private void CenterXY(GameObject o)
+
+
         {
             o.transform.localPosition = new Vector3(
                 0.0f,
@@ -321,26 +310,9 @@ namespace HMD.Scripts
         // { TODO: remove, useless
         // }
 
-        private void UpdateReferences()
-        {
-            // TODO: this is unsafe, should change to static binding
-            _rootMenu = gameObject.ByName("RootPanel").Only();
-            _appMenu = gameObject.ByName("AppMenu").Only();
-
-            // _unlock_3d_sphere_mode_prompt_popup = FindGameObjectsAllFirst("Unlock3DSphereModePopup");
-
-            _aspectRatioPopup = gameObject.ByName("AspectRatioPopup").Only();
-            _optionsButton = gameObject.ByName("OptionsButton").Only();
-            _screenPopup = gameObject.ByName("ScreenPopup").Only();
-            _formatPopup = gameObject.ByName("FormatPopup").Only();
-            _releaseInfoPopup = gameObject.ByName("WhatsNewPopup").Only();
-            _pictureSettingsPopup = gameObject.ByName("PictureSettingsPopup").Only();
-        }
 
         private void BindUI()
         {
-            UpdateReferences();
-
             // playerDropdown.RefreshShownValue();
 
             playerMenu.options.Add(new Dropdown.OptionData(NEW_VLC_WINDOWS));
@@ -434,15 +406,15 @@ namespace HMD.Scripts
             HideAllMenus();
             // UpdateReferences();
 
-            _appMenu.SetActive(true);
-            CenterXY(_appMenu);
+            appMenu.SetActive(true);
+            CenterXY(appMenu);
         }
 
         public void ShowRootMenu()
         {
             HideAllMenus();
-            _rootMenu.SetActive(true);
-            _optionsButton.SetActive(true);
+            rootMenu.SetActive(true);
+            optionsButton.SetActive(true);
         }
 
         private void HideAllMenus()
@@ -455,30 +427,29 @@ namespace HMD.Scripts
             foreach (var p in AllPopups) p.SetActive(false);
         }
 
-// TODO: aggregate into a view
         public void ShowAspectRatioPopup()
         {
-            _aspectRatioPopup.SetActive(true);
+            aspectRatioPopup.SetActive(true);
         }
 
         public void ShowScreenPopup()
         {
-            _screenPopup.SetActive(true);
+            screenPopup.SetActive(true);
         }
 
         public void ShowFormatPopup()
         {
-            _formatPopup.SetActive(true);
+            formatPopup.SetActive(true);
         }
 
         public void ShowWhatsNewPopup()
         {
-            _releaseInfoPopup.SetActive(true);
+            releaseInfoPopup.SetActive(true);
         }
 
         public void ShowPictureSettingsPopup()
         {
-            _pictureSettingsPopup.SetActive(true);
+            pictureSettingsPopup.SetActive(true);
         }
 
         public class Player : HasOuter<DashPanels>, IDisposable
@@ -531,25 +502,18 @@ namespace HMD.Scripts
             }
         }
 
-        public class Lock
+        public class Lock // TODO: it should be used
         {
             private float _brightnessOnLock;
             private bool _screenLocked;
 
-            protected GameObject HideWhenLocked = null!;
+            private readonly GameObject _hideWhenLocked = null!;
 
-            protected GameObject LockScreenNotice = null!;
+            private readonly GameObject _lockScreenNotice = null!;
 
-            //
-            protected GameObject Logo = null!;
+            private readonly GameObject _logo = null!;
 
-            protected GameObject MenuToggleButton = null!;
-
-            // TODO: set the following in editor
-            // _hideWhenLocked = GameObject.Find("HideWhenScreenLocked");
-            // _lockScreenNotice = GameObject.Find("LockScreenNotice");
-            // _logo = GameObject.Find("logo");
-            // _menuToggleButton = GameObject.Find("MenuToggleButton");
+            private readonly GameObject _menuToggleButton = null!;
 
             public void ToggleScreenLock()
             {
@@ -558,10 +522,10 @@ namespace HMD.Scripts
                 if (_screenLocked)
                 {
                     // Hide All UI except for the lock button
-                    HideWhenLocked.SetActive(false);
-                    LockScreenNotice.SetActive(true);
-                    Logo.SetActive(false);
-                    MenuToggleButton.SetActive(false);
+                    _hideWhenLocked.SetActive(false);
+                    _lockScreenNotice.SetActive(true);
+                    _logo.SetActive(false);
+                    _menuToggleButton.SetActive(false);
                     // Lower Brightness
                     var unityBrightnessOnLock = Screen.brightness;
                     Debug.Log($"lockbrightness Unity brightness on lock {unityBrightnessOnLock}");
@@ -574,10 +538,10 @@ namespace HMD.Scripts
                     Screen.brightness = _brightnessOnLock;
 
                     // Show All UI when screen is unlocked
-                    HideWhenLocked.SetActive(true);
-                    LockScreenNotice.SetActive(false);
-                    Logo.SetActive(true);
-                    MenuToggleButton.SetActive(true);
+                    _hideWhenLocked.SetActive(true);
+                    _lockScreenNotice.SetActive(false);
+                    _logo.SetActive(true);
+                    _menuToggleButton.SetActive(true);
                 }
             }
         }
