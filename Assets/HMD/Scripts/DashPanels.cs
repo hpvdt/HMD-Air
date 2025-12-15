@@ -29,15 +29,12 @@ namespace HMD.Scripts
 
         [Required] public Dropdown playerMenu = null!;
 
-        [Required] public Button playerTab = null!;
-
         [Required] public FOVController fovController = null!;
 
-        [Required] public Button consoleTab = null!;
-
-        [Required] public Button trackTab = null!;
-
-        [Required] public Button volumeTab = null!;
+        [Required] public GameObject playerTab = null!;
+        [Required] public GameObject consoleTab = null!;
+        [Required] public GameObject trackTab = null!;
+        [Required] public GameObject volumeTab = null!;
 
         public Button? playerMove2DButton;
         public Button? playerMove3DButton;
@@ -95,16 +92,6 @@ namespace HMD.Scripts
                 // return result.Where(v => v != null).ToList();
             }
         }
-
-        private Maybe<List<Button>> _allTabs;
-
-        private List<Button> AllTabs => _allTabs.Lazy(() => new List<Button>
-        {
-            playerTab,
-            consoleTab,
-            trackTab,
-            volumeTab
-        });
 
         private Maybe<List<GameObject>> _allMenus;
 

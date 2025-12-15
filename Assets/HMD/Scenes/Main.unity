@@ -1684,7 +1684,7 @@ GameObject:
   - component: {fileID: 122855089}
   - component: {fileID: 122855090}
   m_Layer: 5
-  m_Name: Player Group
+  m_Name: PlayerTab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5537,7 +5537,7 @@ GameObject:
   - component: {fileID: 354522962}
   - component: {fileID: 354522963}
   m_Layer: 0
-  m_Name: Tabs
+  m_Name: SystemTabGroup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5733,7 +5733,7 @@ GameObject:
   m_Component:
   - component: {fileID: 369974037}
   m_Layer: 0
-  m_Name: TabGroup
+  m_Name: PlayerTabGroup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9118,6 +9118,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a206b04ec8125d4eaa37f6d6965b773, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  loggerVerbosity: 1
+  loggerPrefix: 
 --- !u!1 &586652722
 GameObject:
   m_ObjectHideFlags: 0
@@ -10703,7 +10705,7 @@ GameObject:
   m_Component:
   - component: {fileID: 730978576}
   m_Layer: 0
-  m_Name: VLCControls
+  m_Name: PlayerControls
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14736,7 +14738,7 @@ GameObject:
   - component: {fileID: 994516389}
   - component: {fileID: 994516391}
   m_Layer: 5
-  m_Name: Console Group
+  m_Name: ConsoleTab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27514,7 +27516,7 @@ GameObject:
   - component: {fileID: 1680133540}
   - component: {fileID: 1680133539}
   m_Layer: 5
-  m_Name: Volume Group
+  m_Name: VolumeTab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29006,7 +29008,7 @@ GameObject:
   - component: {fileID: 1791341482}
   - component: {fileID: 1791341483}
   m_Layer: 5
-  m_Name: Track Group
+  m_Name: TrackTab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33392,11 +33394,11 @@ MonoBehaviour:
   vlcPlayerTemplate: {fileID: 4732923173715968485}
   vCapPlayerTemplate: {fileID: 146006058662195917}
   playerMenu: {fileID: 692852524}
-  playerTab: {fileID: 868215162}
   fovController: {fileID: 2089846055}
-  consoleTab: {fileID: 1809665528}
-  trackTab: {fileID: 834860604}
-  volumeTab: {fileID: 854288384}
+  playerTab: {fileID: 122855088}
+  consoleTab: {fileID: 994516388}
+  trackTab: {fileID: 1791341481}
+  volumeTab: {fileID: 1680133536}
   playerMove2DButton: {fileID: 2018526925}
   playerMove3DButton: {fileID: 89711116}
   optionsButton: {fileID: 192152658}
