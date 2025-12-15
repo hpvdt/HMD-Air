@@ -1,11 +1,10 @@
-using HMD.Scripts.Util;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 
 namespace HMD.Scripts
 {
-    public class IntentHandler : MonoBehaviourWithLogging
+    public class IntentHandler : MonoBehaviour
     {
         // public MainDisplay mainDisplay;
 
@@ -20,12 +19,12 @@ namespace HMD.Scripts
         {
             if (hasFocus)
             {
-                Log.V("Application gained focus");
+                Debug.Log("Application gained focus");
                 OnIntent();
             }
             else
             {
-                Log.V("Application lost focus");
+                Debug.Log("Application lost focus");
             }
         }
 
@@ -49,14 +48,14 @@ namespace HMD.Scripts
                 var currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
 
                 var intent = currentActivity.Call<AndroidJavaObject>("getIntent");
-                Log.V("On Intent" + intent.Call<string>("getAction"));
+                Debug.Log("On Intent" + intent.Call<string>("getAction"));
 
                 var result = intent.Call<string>("getDataString");
 
                 if (result != null)
                 {
                     result = UnityWebRequest.UnEscapeURL(result);
-                    Log.V("On Intent" + result);
+                    Debug.Log("On Intent" + result);
                     // mainDisplay.VLC.Open(result);
                 }
 
@@ -64,7 +63,7 @@ namespace HMD.Scripts
                 if (extras != null)
                 {
                     var data = extras.Call<string>("getString", "data");
-                    Log.V("Data: " + data);
+                    Debug.Log("Data: " + data);
                 }
             }
         }

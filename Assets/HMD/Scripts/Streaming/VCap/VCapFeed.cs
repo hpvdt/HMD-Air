@@ -3,12 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using MAVLinkAPI.Ext;
-using MAVLinkAPI.Routing;
-// using MAVLinkAPI.Ext;
 using MAVLinkAPI.Routing;
 using MAVLinkAPI.Util.NullSafety;
-// using MAVLinkAPI.Streaming;
 using Unity.VisualScripting;
 using UnityEngine;
 
