@@ -32,7 +32,7 @@ namespace HMD.Scripts
         [Required] public FOVController fovController = null!;
 
         [Required] public GameObject playerTab = null!;
-        [Required] public GameObject consoleTab = null!;
+        [Required] public GameObject locatorTab = null!;
         [Required] public GameObject trackTab = null!;
         [Required] public GameObject volumeTab = null!;
 
@@ -110,6 +110,17 @@ namespace HMD.Scripts
             formatPopup,
             releaseInfoPopup,
             pictureSettingsPopup
+        });
+
+
+        private Maybe<List<GameObject>> _allTabs;
+
+        private List<GameObject> AllTabs => _allTabs.Lazy(() => new List<GameObject>
+        {
+            playerTab,
+            locatorTab,
+            trackTab,
+            volumeTab
         });
 
         // Start is called before the first frame update
@@ -203,13 +214,6 @@ namespace HMD.Scripts
             return _setupPlayerFromTemplate(vCapPlayerTemplate, "Video Capture");
         }
 
-        public void TogglePlayerTab()
-        {
-            ExtendDisplayOnce();
-            ToggleElement(playerTab.gameObject);
-
-            _syncIcons();
-        }
 
         private void _syncIcons()
         {
@@ -249,25 +253,36 @@ namespace HMD.Scripts
             return _extendDisplay;
         }
 
-        public void ToggleConsoleTab()
+        public void TogglePlayerTab()
         {
-            ToggleElement(consoleTab.gameObject);
+            ExtendDisplayOnce();
+            ToggleTab(playerTab.gameObject);
+
+            _syncIcons();
+        }
+
+        public void ToggleLocatorTab()
+        {
+            ToggleTab(locatorTab.gameObject);
         }
 
         public void ToggleTrackTab()
         {
-            ToggleElement(trackTab.gameObject);
+            ToggleTab(trackTab.gameObject);
         }
 
         public void ToggleVolumeTab()
         {
-            ToggleElement(volumeTab.gameObject);
+            ToggleTab(volumeTab.gameObject);
         }
 
         //Enable a GameObject if it is disabled, or disable it if it is enabled
-        private static bool ToggleElement(GameObject element)
+        private bool ToggleTab(GameObject element)
         {
             var toggled = !element.activeInHierarchy;
+
+            AllTabs.ForEach(tab => tab.SetActive(false));
+
             element.SetActive(toggled);
             return toggled;
         }

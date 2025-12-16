@@ -28,15 +28,6 @@ namespace HMD.Scripts
             }
         }
 
-        private void Update()
-        {
-            // TODO: can F1 be generalised?
-#if UNITY_EDITOR
-            if (Input.GetKeyDown(KeyCode.F1))
-                EditorWindow.focusedWindow.maximized = !EditorWindow.focusedWindow.maximized;
-#endif
-        }
-
         // OnIntent
         private void OnIntent()
         {

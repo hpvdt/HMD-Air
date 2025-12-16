@@ -12,4 +12,6 @@ EditorBuildSettings:
     path: Packages/ca.hpvdt.mavlinkapi/Scenes/MAVPoseDemo.unity
     guid: 5dfb2db3294bcc847846837cedf32328
   m_configObjects:
+    com.unity.input.settings: {fileID: 11400000, guid: 229872f465873174aae191e2142ca67a, type: 2}
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 9f490c7d69c21a044bd4dfb9282fb2bd, type: 3}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 9e7eabb4af9c950c8a10951620128702, type: 2}

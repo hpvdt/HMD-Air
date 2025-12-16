@@ -273,8 +273,9 @@ namespace XRPoseAPI.Scripts
 
             public void UpdateFromMouse()
             {
-                var deltaY = Input.GetAxis("Mouse X") * Outer.mouseSensitivity * Time.deltaTime;
-                var deltaX = -Input.GetAxis("Mouse Y") * Outer.mouseSensitivity * Time.deltaTime;
+                var delta = UnityEngine.InputSystem.Mouse.current?.delta.ReadValue() ?? Vector2.zero;
+                var deltaY = delta.x * Outer.mouseSensitivity * Time.deltaTime;
+                var deltaX = -delta.y * Outer.mouseSensitivity * Time.deltaTime;
                 // Mouse & Unity XY axis are opposite
 
                 if (Outer.verboseLogging) Debug.Log($"update from mouse: Y = {deltaY}, X = {deltaX}");
@@ -314,8 +315,8 @@ namespace XRPoseAPI.Scripts
         {
             if (IsConnected()) Rotation.UpdateFromGlasses();
 
-            var mousePressed = Input.GetMouseButton(1);
-            var keyPressed = Input.GetKey(KeyCode.LeftAlt);
+            var mousePressed = UnityEngine.InputSystem.Mouse.current?.rightButton.isPressed ?? false;
+            var keyPressed = UnityEngine.InputSystem.Keyboard.current?.leftAltKey.isPressed ?? false;
 
             if (mousePressed || keyPressed) Rotation.UpdateFromMouse();
 
