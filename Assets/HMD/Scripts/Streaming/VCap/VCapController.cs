@@ -9,6 +9,8 @@ namespace HMD.Scripts.Streaming.VCap
     {
         [Required] public VCapScreen screen = null!;
 
+        public override FeedLike Feed => screen.feed;
+
         [Required] public Button fileButton = null!;
 
         // TODO: do we need buttons for next/previous track/vCapDevice?

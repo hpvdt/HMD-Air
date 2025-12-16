@@ -79,7 +79,7 @@ MonoBehaviour:
   loggerVerbosity: 0
   loggerPrefix: 
   flipTextureX: 0
-  flipTextureY: 1
+  flipTextureY: 0
   automaticallyFlipOnAndroid: 1
 --- !u!1 &1382681614020943171
 GameObject:
@@ -164,7 +164,6 @@ MonoBehaviour:
   stopButton: {fileID: 0}
   screen: {fileID: 7159244430690923377}
   fileButton: {fileID: 0}
-  devicesButton: {fileID: 0}
 --- !u!1 &3494572869652255093
 GameObject:
   m_ObjectHideFlags: 0

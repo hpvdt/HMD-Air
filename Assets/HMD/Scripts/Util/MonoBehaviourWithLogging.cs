@@ -6,7 +6,7 @@ namespace HMD.Scripts.Util
 {
     public class MonoBehaviourWithLogging : MonoBehaviour
     {
-        public bool loggerVerbosity = true; // TODO: should be a number
+        public bool verbose = true; // TODO: should be a number
         public string loggerPrefix;
 
         protected Logger Log => _log();
@@ -57,7 +57,7 @@ namespace HMD.Scripts.Util
 
             public void Verbose(string message)
             {
-                if (Outer.loggerVerbosity) Write(message);
+                if (Outer.verbose) Write(message);
             }
 
             public void V(string message)

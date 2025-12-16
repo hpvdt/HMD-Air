@@ -11,6 +11,8 @@ namespace HMD.Scripts.Streaming
 
         [Required] public GameObject icon = null!;
 
+        public abstract FeedLike Feed { get; }
+
         [Required] public Button playButton = null!;
         [Required] public Button pauseButton = null!;
         [Required] public Button stopButton = null!;

@@ -39,6 +39,9 @@ namespace HMD.Scripts
         public Button? playerMove2DButton;
         public Button? playerMove3DButton;
 
+        public Button? playerFlipXButton;
+        public Button? playerFlipYButton;
+
         [Required] public GameObject optionsButton = null!;
 
         [Required] public GameObject appMenu = null!;
@@ -392,6 +395,25 @@ namespace HMD.Scripts
                         }
                     );
             }
+
+            playerFlipXButton?.onClick.AddListener(() =>
+                {
+                    foreach (var player in FocusedPlayers)
+                    {
+                        player.Controller.Feed.invertedX ^= true;
+                    }
+                }
+            );
+
+
+            playerFlipYButton?.onClick.AddListener(() =>
+                {
+                    foreach (var player in FocusedPlayers)
+                    {
+                        player.Controller.Feed.invertedY ^= true;
+                    }
+                }
+            );
         }
 
         public void ClearPlayerPrefs()

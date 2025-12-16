@@ -17,9 +17,9 @@ namespace HMD.Scripts.Streaming.VLC
 
     public class VLCFeed : FeedLike
     {
-        [FormerlySerializedAs("DebugVLCPlayer")]
         public bool debugVLCPlayer;
 
+        public int mrlResolveTimeoutMS = 5000;
 
         private Maybe<LibVLC> _libVLC;
 
@@ -230,29 +230,37 @@ namespace HMD.Scripts.Streaming.VLC
         {
             Task.Run(async () =>
                 {
-                    var link = Player.Media!;
+                    var media = Player.Media;
 
-                    Log.V($"start parsing {link.Mrl}");
-
-                    // TODO: this part doesn't work for youtube, why?
-                    var status = await link.ParseAsync(LibVLC,
-                        MediaParseOptions.DoInteract | MediaParseOptions.ParseNetwork, 1000);
-                    if (status == MediaParsedStatus.Done)
+                    if (media == null) Log.V("No Media, cannot play");
+                    else if (media.ParsedStatus == MediaParsedStatus.Done)
                     {
-                        if (link.SubItems.Count <= 0) throw new IOException($"No subitems in media {link.Mrl}");
-
-                        var first = link.SubItems.First();
-
-                        Log.V($"resolving {link.Mrl} -> {first.Mrl} ({link.SubItems.Count} in total)");
-
-                        Player.Media = first;
                     }
-                    else if (status == MediaParsedStatus.Skipped)
+                    else if (media.ParsedStatus == MediaParsedStatus.Skipped)
                     {
                     }
                     else
                     {
-                        Log.V($"cannot resolve {link.Mrl} (status: {status})");
+                        // TODO: this part doesn't work for youtube, why?
+                        var status = await media.ParseAsync(LibVLC,
+                            MediaParseOptions.DoInteract | MediaParseOptions.ParseNetwork, mrlResolveTimeoutMS);
+                        if (status == MediaParsedStatus.Done)
+                        {
+                            if (media.SubItems.Count <= 0) throw new IOException($"No subitems in media {media.Mrl}");
+
+                            var first = media.SubItems.First();
+
+                            Log.V($"resolving {media.Mrl} -> {first.Mrl} ({media.SubItems.Count} in total)");
+
+                            Player.Media = first;
+                        }
+                        else if (status == MediaParsedStatus.Skipped)
+                        {
+                        }
+                        else
+                        {
+                            Log.V($"cannot resolve {media.Mrl} (status: {status})");
+                        }
                     }
 
                     var isSuccessful = await Player.PlayAsync();
@@ -262,7 +270,6 @@ namespace HMD.Scripts.Streaming.VLC
                     // TODO: this should be useless now after VLC DirectShow fix
 
                     var (height, width) = GetSize();
-
                     Assert.AreNotEqual(height, 0, "height should not be 0");
                     Assert.AreNotEqual(width, 0, "width should not be 0");
                 }

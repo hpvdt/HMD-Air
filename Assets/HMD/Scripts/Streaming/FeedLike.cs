@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using HMD.Scripts.Util;
 using UnityEngine;
@@ -48,10 +49,11 @@ namespace HMD.Scripts.Streaming
             return new Frac((int)_s.Item1, (int)_s.Item2);
         }
 
-        public bool flipTextureX; //No particular reason you'd need this but it is sometimes useful
-        public bool flipTextureY; //Set to false on Android, to true on Windows
+        public bool invertedX; //No particular reason you'd need this but it is sometimes useful
+        public bool invertedY; //Set to false on Android, to true on Windows
+
         public bool automaticallyFlipOnAndroid = true; //Automatically invert Y on Android
-        protected Vector2 Transform => new(flipTextureX ? -1 : 1, flipTextureY ? -1 : 1);
+        protected Vector2 Transform => new(invertedX ? -1 : 1, invertedY ? -1 : 1);
 
         protected Vector2 Offset { get; } = Vector2.one;
 
@@ -61,8 +63,8 @@ namespace HMD.Scripts.Streaming
             //Automatically flip on android
             if (automaticallyFlipOnAndroid && Application.platform == RuntimePlatform.Android)
             {
-                flipTextureX = !flipTextureX;
-                flipTextureY = !flipTextureY;
+                invertedX = true;
+                invertedY = true;
             }
 
 // #if UNITY_ANDROID
@@ -82,14 +84,5 @@ namespace HMD.Scripts.Streaming
         }
 
         public abstract void Dispose();
-
-        // private string? isTextureConforming(TextureView tex, (uint, uint) size)
-        // {
-        //     if (tex == null) return $"initializing texture";
-        //
-        //     if ()
-        //
-        //         return tex.width == size.Item1 && tex.height == size.Item2;
-        // }
     }
 }

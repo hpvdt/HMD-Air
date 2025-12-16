@@ -170,11 +170,14 @@ namespace HMD.Scripts.Streaming
 
         public void Play()
         {
-            Debug.Log("Playing ...");
             if (Feed != null)
+            {
+                Debug.Log("Playing ...");
+
                 // icon.SetActive(false); // hide cone logo
                 // gameObject.SetActive(true);
                 Feed.Play();
+            }
         }
 
         private void _stopFeed()

@@ -14,6 +14,8 @@ namespace HMD.Scripts.Streaming.VLC
     {
         [Required] public VLCScreen screen;
 
+        public override FeedLike Feed => screen.feed;
+
         //GUI Elements
         //public RawImage screen;
         //public AspectRatioFitter screenAspectRatioFitter;
