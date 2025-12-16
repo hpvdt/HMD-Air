@@ -12,7 +12,7 @@ namespace HMD.Scripts.Streaming.VLC
     ///This example shows how to safely set up LibVLC events and a simple way to call Unity functions from them
     public class VLCController : ControllerLike
     {
-        public VLCScreen screen;
+        [Required] public VLCScreen screen;
 
         //GUI Elements
         //public RawImage screen;
@@ -24,7 +24,7 @@ namespace HMD.Scripts.Streaming.VLC
 
         [Required] public Button fileButton = null!;
 
-        [Required] public InputField pathInputField = null!; // TODO: this won't be on the dashUI, will be moved to HUD
+        [Required] public InputField pathInputField = null!;
         [Required] public Button pathEnterButton = null!;
 
         [Required] public Slider volumeBar = null!;

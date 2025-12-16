@@ -11,8 +11,6 @@ namespace HMD.Scripts.Streaming.VCap
 
         [Required] public Button fileButton = null!;
 
-        [Required] public Button devicesButton = null!;
-
         // TODO: do we need buttons for next/previous track/vCapDevice?
 
         private void Start()
@@ -34,8 +32,6 @@ namespace HMD.Scripts.Streaming.VCap
             stopButton.onClick.Rebind(() => { screen.Stop(); });
 
             fileButton.onClick.Rebind(() => { screen.PromptUserFilePicker(); });
-
-            devicesButton.onClick.Rebind(() => { screen.feed.LogAllDevices(); });
 
             screen.BindUI();
         }

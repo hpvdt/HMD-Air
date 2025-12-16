@@ -68,41 +68,6 @@ namespace HMD.Scripts.Streaming.VCap
             }
         }
 
-        public void LogAllDevices()
-        {
-            var devices = Devices;
-
-            var selectors = new List<ArgsT>();
-
-            foreach (var pair in devices.Select((v, i) => (v, i)))
-            {
-                var resList = pair.v.availableResolutions;
-
-                {
-                    var v = new ArgsT
-                    {
-                        Index = pair.i,
-                        Name = pair.v.name
-                    };
-                    selectors.Add(v);
-                }
-
-                if (resList != null)
-                    foreach (var res in resList)
-                    {
-                        var v = new ArgsT
-                        {
-                            Index = pair.i,
-                            Name = pair.v.name,
-                            Resolution = res
-                        };
-                        selectors.Add(v);
-                    }
-            }
-
-            var yamls = _pickler.Fwd(selectors);
-            Debug.Log($"Found {devices.Length} capture devices >>>>>\n" + yamls + "\n<<<<<");
-        }
 
         public void Open(string path)
         {

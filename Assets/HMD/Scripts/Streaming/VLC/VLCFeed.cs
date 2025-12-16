@@ -243,13 +243,16 @@ namespace HMD.Scripts.Streaming.VLC
 
                         var first = link.SubItems.First();
 
-                        Log.V($"resolving media link: {link.Mrl} -> {first.Mrl} ({link.SubItems.Count} in total)");
+                        Log.V($"resolving {link.Mrl} -> {first.Mrl} ({link.SubItems.Count} in total)");
 
                         Player.Media = first;
                     }
+                    else if (status == MediaParsedStatus.Skipped)
+                    {
+                    }
                     else
                     {
-                        Log.V($"parsing status is {status} for media {link.Mrl}");
+                        Log.V($"cannot resolve {link.Mrl} (status: {status})");
                     }
 
                     var isSuccessful = await Player.PlayAsync();

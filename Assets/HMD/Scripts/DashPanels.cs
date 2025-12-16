@@ -15,7 +15,7 @@ namespace HMD.Scripts
 {
     public class DashPanels : MonoBehaviourWithLogging
     {
-        private const string WHATS_NEW = "OnboardingSeen_0_0_5_g";
+        // private const string WHATS_NEW = "OnboardingSeen_0_0_5_g";
 
         private const string NEW_VLC_WINDOWS = "New VLC ...";
 
@@ -101,27 +101,31 @@ namespace HMD.Scripts
             appMenu
         });
 
-        private Maybe<List<GameObject>> _allPopups;
-
-        private List<GameObject> AllPopups => _allPopups.Lazy(() => new List<GameObject>
+        private List<GameObject> PopupsNotCentered => new List<GameObject>
         {
             aspectRatioPopup,
             screenPopup,
             formatPopup,
             releaseInfoPopup,
-            pictureSettingsPopup
-        });
+            pictureSettingsPopup,
+        };
 
-
-        private Maybe<List<GameObject>> _allTabs;
-
-        private List<GameObject> AllTabs => _allTabs.Lazy(() => new List<GameObject>
+        private void CenterPopupLocations()
         {
-            playerTab,
-            locatorTab,
-            trackTab,
-            volumeTab
-        });
+            // Get the "Popups" game object, then loop over each of it's top-level children
+            // and center them on the screen
+
+            foreach (var popup in PopupsNotCentered)
+                // Log.V("centering " + childGameObject.name);
+                CenterXY(popup);
+        }
+
+        private Maybe<List<GameObject>> _allPopups;
+
+        private List<GameObject> AllPopups => _allPopups.Lazy(() => PopupsNotCentered
+            .Concat(new[] { playerTab, locatorTab, trackTab, volumeTab })
+            .ToList());
+
 
         // Start is called before the first frame update
         private void Start()
@@ -203,15 +207,15 @@ namespace HMD.Scripts
             return player;
         }
 
-        public Player SetupVlc()
+        public void SetupVlc()
         {
-            return _setupPlayerFromTemplate(vlcPlayerTemplate, "VLC");
+            _setupPlayerFromTemplate(vlcPlayerTemplate, "VLC");
         }
 
 
-        public Player SetupVCap()
+        public void SetupVCap()
         {
-            return _setupPlayerFromTemplate(vCapPlayerTemplate, "Video Capture");
+            _setupPlayerFromTemplate(vCapPlayerTemplate, "Video Capture");
         }
 
 
@@ -219,7 +223,7 @@ namespace HMD.Scripts
         {
             foreach (var player in _activePlayers.Values) player.IconIsVisible = false;
 
-            if (playerTab.gameObject.activeInHierarchy)
+            if (playerTab.activeInHierarchy)
                 foreach (var player in FocusedPlayers)
                     player.IconIsVisible = true;
         }
@@ -228,7 +232,7 @@ namespace HMD.Scripts
         {
         }
 
-        // TODO: this shouldn't be cached, display may be connected or disconnected during execution
+        // TODO: this should be bind to a new button in Subsystem
         private List<Display> ExtendDisplayOnce() // In Unity, display cannot be scrapped
         {
             if (_extendDisplay == null)
@@ -250,52 +254,42 @@ namespace HMD.Scripts
                 return result;
             }
 
-            return _extendDisplay;
+            return _extendDisplay!;
         }
 
         public void TogglePlayerTab()
         {
-            ExtendDisplayOnce();
-            ToggleTab(playerTab.gameObject);
+            // ExtendDisplayOnce();
+            TogglePopup(playerTab);
 
             _syncIcons();
         }
 
         public void ToggleLocatorTab()
         {
-            ToggleTab(locatorTab.gameObject);
+            TogglePopup(locatorTab);
         }
 
         public void ToggleTrackTab()
         {
-            ToggleTab(trackTab.gameObject);
+            TogglePopup(trackTab);
         }
 
         public void ToggleVolumeTab()
         {
-            ToggleTab(volumeTab.gameObject);
+            TogglePopup(volumeTab);
         }
 
         //Enable a GameObject if it is disabled, or disable it if it is enabled
-        private bool ToggleTab(GameObject element)
+        private bool TogglePopup(GameObject element)
         {
             var toggled = !element.activeInHierarchy;
-
-            AllTabs.ForEach(tab => tab.SetActive(false));
+            HideAllPopups();
 
             element.SetActive(toggled);
             return toggled;
         }
 
-        private void CenterPopupLocations()
-        {
-            // Get the "Popups" game object, then loop over each of it's top-level children
-            // and center them on the screen
-
-            foreach (var popup in AllPopups)
-                // Log.V("centering " + childGameObject.name);
-                CenterXY(popup);
-        }
 
         private void CenterXY(GameObject o)
 
@@ -346,6 +340,7 @@ namespace HMD.Scripts
             );
 
 
+            if (playerMove3DButton != null)
             {
                 // 3D
                 playerMove3DButton.OnEvent(EventTriggerType.PointerDown)
@@ -370,6 +365,7 @@ namespace HMD.Scripts
                     );
             }
 
+            if (playerMove2DButton != null)
             {
                 // 2D
                 playerMove2DButton.OnEvent(EventTriggerType.PointerDown)
@@ -431,27 +427,27 @@ namespace HMD.Scripts
 
         public void ShowAspectRatioPopup()
         {
-            aspectRatioPopup.SetActive(true);
+            TogglePopup(aspectRatioPopup);
         }
 
         public void ShowScreenPopup()
         {
-            screenPopup.SetActive(true);
+            TogglePopup(screenPopup);
         }
 
         public void ShowFormatPopup()
         {
-            formatPopup.SetActive(true);
+            TogglePopup(formatPopup);
         }
 
         public void ShowWhatsNewPopup()
         {
-            releaseInfoPopup.SetActive(true);
+            TogglePopup(releaseInfoPopup);
         }
 
         public void ShowPictureSettingsPopup()
         {
-            pictureSettingsPopup.SetActive(true);
+            TogglePopup(pictureSettingsPopup);
         }
 
         public class Player : HasOuter<DashPanels>, IDisposable
