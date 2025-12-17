@@ -3,10 +3,10 @@
 ## Rules
 
 - Verify your work after every change:
-  1. Compile the project using dotnet
-  2. Load the project using UnityMCP
+    1. Compile the project using dotnet
+    2. Load the project using UnityMCP
 - Write a test suite for every new feature
-  - Run the test suite during verification
+    - Run the test suite during verification
 - Avoid GUIDs in asmdef files, use [Required]/[Autofill] attributes for Unity references
 - No Unity cross-asset references except prefabs
 - Do not ask the user to run the tests, check test results, or close Unity instance
@@ -40,3 +40,9 @@
 - **Testing**: NUnit framework with [Test] and [UnityTest] attributes
 - **Imports**: Follow existing patterns in HMD.Scripts namespace
 - **Error Handling**: Use MonoBehaviourWithLogging base class for enhanced logging
+
+## Agent Script Rules
+
+- All script files should be under "AgentScript" namespace
+- If a Script file for the task exists, use it instead of writing a new one
+- All Unity Editor menu entries added by script should be under "Tools/Agent Scripts" menu
