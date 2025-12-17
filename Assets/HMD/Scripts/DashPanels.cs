@@ -502,10 +502,14 @@ namespace HMD.Scripts
 
             public void TearDown()
             {
-                FromAnyThread.Destroy(Prefab);
+                FromAnyThread.Queue(() =>
+                {
+                    Destroy(Prefab);
+                    Outer.playerMenu.options.Remove(Outer.playerMenu.options.Find(x => x.text == TextID));
+                    Outer.playerMenu.RefreshShownValue();
+                    return (object)null;
+                });
                 Outer._activePlayers.Remove(TextID);
-                Outer.playerMenu.options.Remove(Outer.playerMenu.options.Find(x => x.text == TextID));
-                Outer.playerMenu.RefreshShownValue();
             }
 
             public void Focus()
