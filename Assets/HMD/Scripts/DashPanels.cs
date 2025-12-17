@@ -7,6 +7,7 @@ using HMD.Scripts.Streaming;
 using HMD.Scripts.Util;
 using MAVLinkAPI.Util;
 using MAVLinkAPI.Util.NullSafety;
+using MAVLinkAPI.Util.Resource;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -17,17 +18,19 @@ namespace HMD.Scripts
     {
         // private const string WHATS_NEW = "OnboardingSeen_0_0_5_g";
 
-        private const string NEW_VLC_WINDOWS = "New VLC ...";
 
-        private const string NEW_V_CAP = "New Video Capture ...";
         // [HideInInspector]
         // public VlcController controller;
 
         [Required] public GameObject playerParent = null!;
-        [Required] public GameObject vlcPlayerTemplate = null!;
-        [Required] public GameObject vCapPlayerTemplate = null!;
 
-        [Required] public Dropdown playerMenu = null!;
+        [Required] public LifetimeBinding lifetimeBinding = null!;
+
+        private const string NEW_VLC_WINDOWS = "New VLC ...";
+        [Required] public GameObject vlcPlayerTemplate = null!;
+
+        private const string NEW_V_CAP = "New Video Capture ...";
+        [Required] public GameObject vCapPlayerTemplate = null!;
 
         [Required] public FOVController fovController = null!;
 
@@ -41,6 +44,8 @@ namespace HMD.Scripts
 
         public Button? playerFlipXButton;
         public Button? playerFlipYButton;
+
+        [Required] public Button playerDestroyButton = null!;
 
         [Required] public GameObject optionsButton = null!;
 
@@ -61,16 +66,18 @@ namespace HMD.Scripts
 
         [Required] public Text versionInfo = null!;
 
+        [Required] public Dropdown playerMenu = null!;
         private readonly Dictionary<string, Player> _activePlayers = new();
 
         private readonly AtomicLong _incCounter = new();
 
-
-        private List<Display>? _extendDisplay;
-
         private string FocusedPlayerID
         {
-            get => playerMenu.options[playerMenu.value].text;
+            get
+            {
+                if (playerMenu.value >= playerMenu.options.Count) playerMenu.value = 0;
+                return playerMenu.options[playerMenu.value].text;
+            }
             set
             {
                 var newIndex = playerMenu.options.FindIndex(option => option.text == value);
@@ -96,6 +103,11 @@ namespace HMD.Scripts
             }
         }
 
+        private Player? GetFocusedPlayer()
+        {
+            return _activePlayers.GetValueOrDefault(FocusedPlayerID);
+        }
+
         private Maybe<List<GameObject>> _allMenus;
 
         private List<GameObject> AllMenus => _allMenus.Lazy(() => new List<GameObject>
@@ -104,7 +116,7 @@ namespace HMD.Scripts
             appMenu
         });
 
-        private List<GameObject> PopupsNotCentered => new List<GameObject>
+        private List<GameObject> PopupsNotCentered => new()
         {
             aspectRatioPopup,
             screenPopup,
@@ -157,9 +169,6 @@ namespace HMD.Scripts
             ShowRootMenu();
         }
 
-
-        // private Player? _focusedPlayer;
-
         private void Update()
         {
             foreach (var player in FocusedPlayers)
@@ -173,24 +182,27 @@ namespace HMD.Scripts
                     var rotation = v2.Offset * fovController.mainCamera.transform.rotation.DropRoll();
                     player.Prefab.transform.rotation = rotation;
                 }
-            // TODO: add 2D
         }
 
-        private Player? GetFocusedPlayer()
+
+        private Player AddPlayer(GameObject prefab, string textID)
         {
-            return _activePlayers.GetValueOrDefault(FocusedPlayerID);
+            var player = new Player(lifetimeBinding.Lifetime) { Outer = this, Prefab = prefab, TextID = textID };
+
+            _activePlayers.Add(player.TextID, player);
+            playerMenu.options.Add(new Dropdown.OptionData(player.TextID));
+            playerMenu.RefreshShownValue();
+            return player;
         }
+
 
         private Player _setupPlayerFromPrefab(GameObject prefab, string playerName)
         {
+            var textID = playerName + "(" + _incCounter.Increment() + ")";
+
             prefab.SetActive(true);
-            var id = playerName + "(" + _incCounter.Increment() + ")";
-
-            var player = new Player { Outer = this, Prefab = prefab, ID = id };
-            _activePlayers.Add(id, player);
-
-            playerMenu.options.Add(new Dropdown.OptionData(player.ID));
-            playerMenu.RefreshShownValue();
+            var player = new Player(lifetimeBinding.Lifetime) { Outer = this, Prefab = prefab, TextID = textID };
+            player.Setup();
 
             return player;
         }
@@ -199,9 +211,7 @@ namespace HMD.Scripts
         {
             var heading = fovController.mainCamera.transform.rotation;
 
-
-            var prefab =
-                Instantiate(template, Vector3.zero, heading, playerParent.transform);
+            var prefab = Instantiate(template, Vector3.zero, heading, playerParent.transform);
 
             var player = _setupPlayerFromPrefab(prefab, prefix);
 
@@ -231,38 +241,8 @@ namespace HMD.Scripts
                     player.IconIsVisible = true;
         }
 
-        public void HideIcons()
-        {
-        }
-
-        // TODO: this should be bind to a new button in Subsystem
-        private List<Display> ExtendDisplayOnce() // In Unity, display cannot be scrapped
-        {
-            if (_extendDisplay == null)
-            {
-                Debug.Log("displays connected: " + Display.displays.Length);
-                // Display.displays[0] is the primary, default display and is always ON, so start at index 1.
-                // Check if additional displays are available and activate each.
-
-                var result = Display.displays.Skip(1).ToList();
-
-                foreach (var d in result)
-                {
-                    Debug.Log("display" + d.systemWidth + "x" + d.systemHeight + " : " + d.renderingWidth + "x"
-                              + d.renderingHeight);
-                    d.Activate();
-                }
-
-                _extendDisplay = result;
-                return result;
-            }
-
-            return _extendDisplay!;
-        }
-
         public void TogglePlayerTab()
         {
-            // ExtendDisplayOnce();
             TogglePopup(playerTab);
 
             _syncIcons();
@@ -295,8 +275,6 @@ namespace HMD.Scripts
 
 
         private void CenterXY(GameObject o)
-
-
         {
             o.transform.localPosition = new Vector3(
                 0.0f,
@@ -312,8 +290,6 @@ namespace HMD.Scripts
 
         private void BindUI()
         {
-            // playerDropdown.RefreshShownValue();
-
             playerMenu.options.Add(new Dropdown.OptionData(NEW_VLC_WINDOWS));
             playerMenu.options.Add(new Dropdown.OptionData(NEW_V_CAP));
             playerMenu.RefreshShownValue();
@@ -400,7 +376,7 @@ namespace HMD.Scripts
                 {
                     foreach (var player in FocusedPlayers)
                     {
-                        player.Controller.Feed.invertedX ^= true;
+                        player.VideoController.Feed.invertedX ^= true;
                     }
                 }
             );
@@ -410,7 +386,16 @@ namespace HMD.Scripts
                 {
                     foreach (var player in FocusedPlayers)
                     {
-                        player.Controller.Feed.invertedY ^= true;
+                        player.VideoController.Feed.invertedY ^= true;
+                    }
+                }
+            );
+
+            playerDestroyButton.onClick.AddListener(() =>
+                {
+                    foreach (var player in FocusedPlayers)
+                    {
+                        player.Dispose();
                     }
                 }
             );
@@ -472,40 +457,61 @@ namespace HMD.Scripts
             TogglePopup(pictureSettingsPopup);
         }
 
-        public class Player : HasOuter<DashPanels>, IDisposable
-        {
-            private ControllerLike? _controller;
 
-            private Maybe<ControllerLike> _controllerExisting;
+        public class Player : Cleanable
+        {
+            public Player(Lifetime? lifetime = null) : base(lifetime)
+            {
+            }
+
+            public DashPanels Outer { get; init; } = null!;
+            public string TextID { get; init; } = null!;
+            public GameObject Prefab { get; init; } = null!;
 
             public DraggingMode Dragging = DraggingMode.Disabled;
-            public string ID = null!;
 
-            public GameObject Prefab = null!;
+            private Maybe<VideoControllerLike> _videoController;
 
-            public ControllerLike Controller =>
-                _controllerExisting.Lazy(() =>
+            public VideoControllerLike VideoController =>
+                _videoController.Lazy(() =>
                 {
-                    var controller = Prefab.GetComponent<ControllerLike>();
-                    _controller = controller;
+                    var controller = Prefab.GetComponent<VideoControllerLike>();
                     return controller;
                 });
 
             public bool IconIsVisible
             {
-                set => Controller.icon.SetActive(value);
+                set => VideoController.icon.SetActive(value);
             }
 
-            public void Dispose()
+
+            public override void DoClean()
             {
-                Destroy(Prefab);
-                Outer._activePlayers.Remove(ID);
+                TearDown();
+            }
+
+            public void Setup()
+            {
+                Outer._activePlayers.Add(TextID, this);
+
+                // TODO: check if the playerMenu already has this textID
+
+                Outer.playerMenu.options.Add(new Dropdown.OptionData(TextID));
+                Outer.playerMenu.RefreshShownValue();
+            }
+
+            public void TearDown()
+            {
+                FromAnyThread.Destroy(Prefab);
+                Outer._activePlayers.Remove(TextID);
+                Outer.playerMenu.options.Remove(Outer.playerMenu.options.Find(x => x.text == TextID));
+                Outer.playerMenu.RefreshShownValue();
             }
 
             public void Focus()
             {
-                Controller.BindUI();
-                Outer.FocusedPlayerID = ID;
+                VideoController.BindUI();
+                Outer.FocusedPlayerID = TextID;
 
                 Outer._syncIcons();
             }

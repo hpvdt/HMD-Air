@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace HMD.Scripts.Streaming
 {
-    public abstract class ControllerLike : MonoBehaviour
+    public abstract class VideoControllerLike : MonoBehaviour
     {
         // public ScreenLike screen;
         // public DashPanels dashPanels;

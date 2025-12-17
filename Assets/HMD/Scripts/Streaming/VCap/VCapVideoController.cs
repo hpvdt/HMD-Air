@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace HMD.Scripts.Streaming.VCap
 {
-    public class VCapController : ControllerLike
+    public class VCapVideoController : VideoControllerLike
     {
         [Required] public VCapScreen screen = null!;
 

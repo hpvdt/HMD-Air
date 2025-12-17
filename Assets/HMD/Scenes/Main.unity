@@ -4208,7 +4208,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2145349689}
         m_TargetAssemblyTypeName: HMD.Scripts.Streaming.VCap.VCapNewFeed, HMD.Scripts
-        m_MethodName: LogAllDevices
+        m_MethodName: LogVCapInfo
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -26671,6 +26671,17 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 203644345}
   m_SourcePrefab: {fileID: 100100000, guid: 8f88a0c632d0a68cd9f4096972e93af2, type: 3}
+--- !u!114 &1656964760 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1161893056345704773, guid: 8f88a0c632d0a68cd9f4096972e93af2, type: 3}
+  m_PrefabInstance: {fileID: 1656964759}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 671fd73a802978a9cabb2dd500ef0cf7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1657714482
 GameObject:
   m_ObjectHideFlags: 0
@@ -33548,9 +33559,9 @@ MonoBehaviour:
   verbose: 1
   loggerPrefix: 
   playerParent: {fileID: 561896019}
+  lifetimeBinding: {fileID: 1656964760}
   vlcPlayerTemplate: {fileID: 4732923173715968485}
   vCapPlayerTemplate: {fileID: 146006058662195917}
-  playerMenu: {fileID: 692852524}
   fovController: {fileID: 2089846055}
   playerTab: {fileID: 122855088}
   locatorTab: {fileID: 994516388}
@@ -33560,6 +33571,7 @@ MonoBehaviour:
   playerMove3DButton: {fileID: 89711116}
   playerFlipXButton: {fileID: 1951330121}
   playerFlipYButton: {fileID: 1798803057}
+  playerDestroyButton: {fileID: 400906825}
   optionsButton: {fileID: 192152658}
   appMenu: {fileID: 665850562}
   aspectRatioPopup: {fileID: 868209545}
@@ -33570,6 +33582,7 @@ MonoBehaviour:
   screenPopup: {fileID: 482070164}
   lockScreenNotice: {fileID: 72062985}
   versionInfo: {fileID: 322484468}
+  playerMenu: {fileID: 692852524}
 --- !u!114 &2089846055
 MonoBehaviour:
   m_ObjectHideFlags: 0

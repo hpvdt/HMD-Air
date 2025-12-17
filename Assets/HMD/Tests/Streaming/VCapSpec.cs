@@ -24,8 +24,11 @@ namespace HMD.Tests.Streaming
                 Assert.AreEqual(expectedRes.width, actualRes.width);
                 Assert.AreEqual(expectedRes.height, actualRes.height);
 
-                if (expectedRes.refreshRate != 0 || actualRes.refreshRate != 0)
-                    Assert.AreEqual(expectedRes.refreshRate, actualRes.refreshRate);
+                if (expectedRes.refreshRateRatio.numerator != 0 || actualRes.refreshRateRatio.numerator != 0)
+                {
+                    Assert.AreEqual(expectedRes.refreshRateRatio.numerator, actualRes.refreshRateRatio.numerator);
+                    Assert.AreEqual(expectedRes.refreshRateRatio.denominator, actualRes.refreshRateRatio.denominator);
+                }
             }
         }
 
@@ -35,7 +38,11 @@ namespace HMD.Tests.Streaming
             {
                 width = width,
                 height = height,
-                refreshRate = refreshRate
+                refreshRateRatio = new RefreshRate
+                {
+                    numerator = (uint)refreshRate,
+                    denominator = 1
+                }
             };
             return res;
         }
@@ -51,9 +58,10 @@ namespace HMD.Tests.Streaming
             var obj = yaml.Rev<VCapFeed.ArgsT>(str);
             var str2 = yaml.Fwd(obj);
 
-            Assert.AreEqual(str2, $"index: {Environment.NewLine}" +
-                                  $"name: /dev/video0{Environment.NewLine}" +
-                                  $"resolution: {Environment.NewLine}");
+            var expected = "index: \n"
+                           + "name: /dev/video0\n"
+                           + "resolution: \n";
+            Assert.AreEqual(expected, str2.Replace("\r\n", "\n"));
         }
 
         [Test]
@@ -83,7 +91,7 @@ namespace HMD.Tests.Streaming
             Assert.IsTrue(obj.Resolution.HasValue);
             Assert.AreEqual(640, obj.Resolution.Value.width);
             Assert.AreEqual(480, obj.Resolution.Value.height);
-            Assert.AreEqual(0, obj.Resolution.Value.refreshRate);
+            Assert.AreEqual(0u, obj.Resolution.Value.refreshRateRatio.numerator);
         }
 
         [Test]

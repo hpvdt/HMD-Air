@@ -1,16 +1,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using MAVLinkAPI.Routing;
+using MAVLinkAPI.Util.NullSafety;
 using UnityEngine;
 using ArgsT = HMD.Scripts.Streaming.VCap.VCapFeed.ArgsT;
 
-namespace HMD.Scripts.Streaming.VCap
+namespace HMD.Scripts.Streaming
 {
-    public class VCapNewFeed : MonoBehaviour
+    public class NewFeedController : MonoBehaviour
     {
         private static readonly Yaml Pickler = new();
 
-        public void LogAllDevices()
+        public void LogVCapInfo()
         {
             var devices = WebCamTexture.devices;
 
