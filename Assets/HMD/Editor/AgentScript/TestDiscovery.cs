@@ -3,11 +3,11 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace HMD.Editor.McpTool
+namespace HMD.Editor.AgentScript
 {
     public static class TestDiscovery
     {
-        [MenuItem("Tools/MCP Tools/Discover All Tests")]
+        [MenuItem("Tools/Agent Scripts/Discover All Tests")]
         public static void DiscoverAllTests()
         {
             Debug.Log("=== DISCOVERING ALL TESTS ===");

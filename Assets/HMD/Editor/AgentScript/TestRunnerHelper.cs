@@ -3,14 +3,14 @@ using UnityEditor;
 using UnityEditor.TestTools.TestRunner.Api;
 using UnityEngine;
 
-namespace HMD.Editor.McpTool
+namespace HMD.Editor.AgentScript
 {
     public class TestRunnerHelper : ICallbacks
     {
         private static List<string> _testResults = new List<string>();
         private static TestRunnerApi _testRunnerApi;
 
-        [MenuItem("Tools/MCP Tools/Run All PlayMode Tests")]
+        [MenuItem("Tools/Agent Scripts/Run All PlayMode Tests")]
         public static void RunAllPlayModeTests()
         {
             Debug.Log("Starting PlayMode tests...");
@@ -29,7 +29,7 @@ namespace HMD.Editor.McpTool
             _testRunnerApi.Execute(new ExecutionSettings(filter));
         }
 
-        [MenuItem("Tools/MCP Tools/Run All EditMode Tests")]
+        [MenuItem("Tools/Agent Scripts/Run All EditMode Tests")]
         public static void RunAllEditModeTests()
         {
             Debug.Log("Starting EditMode tests...");
@@ -48,7 +48,7 @@ namespace HMD.Editor.McpTool
             _testRunnerApi.Execute(new ExecutionSettings(filter));
         }
 
-        [MenuItem("Tools/MCP Tools/List Test Results")]
+        [MenuItem("Tools/Agent Scripts/List Test Results")]
         public static void ListTestResults()
         {
             Debug.Log("=== TEST RESULTS ===");
