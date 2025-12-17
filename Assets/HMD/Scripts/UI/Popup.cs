@@ -1,48 +1,61 @@
-using Autofill;
-using MAVLinkAPI.Util.NullSafety;
-using UnityEngine;
-using UnityEngine.UI;
+#nullable enable
+ 
+ using Autofill;
+ using MAVLinkAPI.Util.NullSafety;
+ using UnityEngine;
+ using UnityEngine.UI;
 
-namespace HMD.Scripts.UI
-{
-    public class Popup : MonoBehaviour
-    {
-        [Autofill(AutofillType.Parent)] public PopupGroup group = null!;
+ namespace HMD.Scripts.UI
+ {
+     public class Popup : MonoBehaviour
+     {
+         [Autofill(AutofillType.Parent)]
+         public PopupGroup? group;
 
-        [Autofill] [Required] public Button toggleButton = null!;
+         [Autofill] [Required] public Button toggleButton = null!;
 
-        [Required] public GameObject panel = null!;
+         [Required] public GameObject panel = null!;
+
+         public static void CenterXY(GameObject o)
+         {
+             o.transform.localPosition = new Vector3(
+                 0.0f,
+                 0.0f,
+                 o.transform.localPosition.z
+             );
+         }
+
+         public static bool IsOutsideGroup(GameObject o, GameObject group)
+         {
+             var groupRect = group.GetComponent<RectTransform>();
+             var objRect = o.GetComponent<RectTransform>();
+
+             if (groupRect == null || objRect == null)
+                 return false;
+
+            var bounds = RectTransformUtility.CalculateRelativeRectTransformBounds(groupRect, objRect);
+            var rect = groupRect.rect;
+
+            var isInside =
+                bounds.min.x >= rect.xMin &&
+                bounds.max.x <= rect.xMax &&
+                bounds.min.y >= rect.yMin &&
+                bounds.max.y <= rect.yMax;
+
+
+             return !isInside;
+         }
 
         private void Awake()
         {
-            if (group == null)
-                group = GetComponentInParent<PopupGroup>();
-
-            if (group == null)
-            {
-                Debug.LogError(
-                    $"{nameof(Popup)} requires a {nameof(PopupGroup)} in parent hierarchy or assigned in inspector",
-                    this);
-                return;
-            }
-
-            if (toggleButton == null)
-            {
-                Debug.LogError($"{nameof(Popup)} requires {nameof(toggleButton)} to be assigned", this);
-                return;
-            }
-
-            group.Register(this);
+            group?.Register(this);
             toggleButton.onClick.AddListener(OnToggleClicked);
-        }
 
-        private void OnDestroy()
-        {
-            if (toggleButton != null)
-                toggleButton.onClick.RemoveListener(OnToggleClicked);
-
-            if (group != null)
-                group.Unregister(this);
+            if (group != null && IsOutsideGroup(panel, group.gameObject))
+            {
+                CenterXY(panel);
+                panel.SetActive(false);
+            }
         }
 
         private void OnToggleClicked()
@@ -54,10 +67,16 @@ namespace HMD.Scripts.UI
         private bool TogglePopup()
         {
             var toggled = !panel.activeInHierarchy;
-            group.HideAll();
+            group?.HideAll();
 
             panel.SetActive(toggled);
             return toggled;
         }
+
+        public void ClosePopup()
+        {
+            group?.HideAll();
+            panel.SetActive(false);
+        }
     }
-}
+ }

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HMD.Scripts.Streaming;
+using HMD.Scripts.UI;
 using HMD.Scripts.Util;
 using MAVLinkAPI.Util;
 using MAVLinkAPI.Util.NullSafety;
@@ -35,9 +36,6 @@ namespace HMD.Scripts
         [Required] public FOVController fovController = null!;
 
         [Required] public GameObject playerTab = null!;
-        [Required] public GameObject locatorTab = null!;
-        [Required] public GameObject trackTab = null!;
-        [Required] public GameObject volumeTab = null!;
 
         public Button? playerMove2DButton;
         public Button? playerMove3DButton;
@@ -51,16 +49,9 @@ namespace HMD.Scripts
 
         [Required] public GameObject appMenu = null!;
 
-        [Required] public GameObject aspectRatioPopup = null!;
-        [Required] public GameObject formatPopup = null!;
-        [Required] public GameObject pictureSettingsPopup = null!;
-        [Required] public GameObject releaseInfoPopup = null!;
-
-
         // the following are set in `UpdateReferences`
 
         [Required] public GameObject rootMenu = null!;
-        [Required] public GameObject screenPopup = null!;
 
         [Required] public GameObject lockScreenNotice = null!;
 
@@ -75,6 +66,7 @@ namespace HMD.Scripts
         {
             get
             {
+                if (playerMenu.options.Count == 0) return "";
                 if (playerMenu.value >= playerMenu.options.Count) playerMenu.value = 0;
                 return playerMenu.options[playerMenu.value].text;
             }
@@ -116,33 +108,33 @@ namespace HMD.Scripts
             appMenu
         });
 
-        private List<GameObject> PopupsNotCentered => new()
-        {
-            aspectRatioPopup,
-            screenPopup,
-            formatPopup,
-            releaseInfoPopup,
-            pictureSettingsPopup,
-        };
-
-        private void CenterPopupLocations()
-        {
-            // Get the "Popups" game object, then loop over each of it's top-level children
-            // and center them on the screen
-
-            foreach (var popup in PopupsNotCentered)
-                // Log.V("centering " + childGameObject.name);
-                CenterXY(popup);
-        }
-
-        private Maybe<List<GameObject>> _allPopups;
-
-        private List<GameObject> AllPopups => _allPopups.Lazy(() => PopupsNotCentered
-            .Concat(new[] { playerTab, locatorTab, trackTab, volumeTab })
-            .ToList());
-
 
         // Start is called before the first frame update
+        private GameObjectActiveStateRelay? _playerTabActiveStateRelay;
+
+        protected new void Awake()
+        {
+            base.Awake();
+
+            if (playerTab == null)
+                return;
+
+            var relay = playerTab.GetComponent<GameObjectActiveStateRelay>();
+            if (relay == null) relay = playerTab.AddComponent<GameObjectActiveStateRelay>();
+
+            _playerTabActiveStateRelay = relay;
+            relay.ActiveStateChanged -= _syncIcons;
+            relay.ActiveStateChanged += _syncIcons;
+
+            _syncIcons();
+        }
+
+        private void OnDestroy()
+        {
+            if (_playerTabActiveStateRelay != null)
+                _playerTabActiveStateRelay.ActiveStateChanged -= _syncIcons;
+        }
+
         private void Start()
         {
             BindUI();
@@ -153,17 +145,13 @@ namespace HMD.Scripts
                 $"{versionName} ({versionCode})";
 
 
-            // center UI things that i had spread out in Editor
-            CenterPopupLocations();
-
             // Center Menus/Objects
-            CenterXY(lockScreenNotice);
-            CenterXY(rootMenu);
-            CenterXY(appMenu);
+            Popup.CenterXY(lockScreenNotice);
+            Popup.CenterXY(rootMenu);
+            Popup.CenterXY(appMenu);
 
             lockScreenNotice.SetActive(false);
 
-            HideAllPopups();
             HideAllMenus();
 
             ShowRootMenu();
@@ -231,7 +219,6 @@ namespace HMD.Scripts
             _setupPlayerFromTemplate(vCapPlayerTemplate, "Video Capture");
         }
 
-
         private void _syncIcons()
         {
             foreach (var player in _activePlayers.Values) player.IconIsVisible = false;
@@ -240,53 +227,6 @@ namespace HMD.Scripts
                 foreach (var player in FocusedPlayers)
                     player.IconIsVisible = true;
         }
-
-        public void TogglePlayerTab()
-        {
-            TogglePopup(playerTab);
-
-            _syncIcons();
-        }
-
-        public void ToggleLocatorTab()
-        {
-            TogglePopup(locatorTab);
-        }
-
-        public void ToggleTrackTab()
-        {
-            TogglePopup(trackTab);
-        }
-
-        public void ToggleVolumeTab()
-        {
-            TogglePopup(volumeTab);
-        }
-
-        //Enable a GameObject if it is disabled, or disable it if it is enabled
-        private bool TogglePopup(GameObject element)
-        {
-            var toggled = !element.activeInHierarchy;
-            HideAllPopups();
-
-            element.SetActive(toggled);
-            return toggled;
-        }
-
-
-        private void CenterXY(GameObject o)
-        {
-            o.transform.localPosition = new Vector3(
-                0.0f,
-                0.0f,
-                o.transform.localPosition.z
-            );
-        }
-
-        // private void OnApplicationFocus(bool hasFocus)
-        // { TODO: remove, useless
-        // }
-
 
         private void BindUI()
         {
@@ -412,7 +352,7 @@ namespace HMD.Scripts
             // UpdateReferences();
 
             appMenu.SetActive(true);
-            CenterXY(appMenu);
+            Popup.CenterXY(appMenu);
         }
 
         public void ShowRootMenu()
@@ -425,36 +365,6 @@ namespace HMD.Scripts
         private void HideAllMenus()
         {
             foreach (var p in AllMenus) p.SetActive(false);
-        }
-
-        public void HideAllPopups()
-        {
-            foreach (var p in AllPopups) p.SetActive(false);
-        }
-
-        public void ShowAspectRatioPopup()
-        {
-            TogglePopup(aspectRatioPopup);
-        }
-
-        public void ShowScreenPopup()
-        {
-            TogglePopup(screenPopup);
-        }
-
-        public void ShowFormatPopup()
-        {
-            TogglePopup(formatPopup);
-        }
-
-        public void ShowWhatsNewPopup()
-        {
-            TogglePopup(releaseInfoPopup);
-        }
-
-        public void ShowPictureSettingsPopup()
-        {
-            TogglePopup(pictureSettingsPopup);
         }
 
 
@@ -582,5 +492,14 @@ namespace HMD.Scripts
                 }
             }
         }
+    }
+
+    internal sealed class GameObjectActiveStateRelay : MonoBehaviour
+    {
+        public event Action? ActiveStateChanged;
+
+        private void OnEnable() => ActiveStateChanged?.Invoke();
+
+        private void OnDisable() => ActiveStateChanged?.Invoke();
     }
 }

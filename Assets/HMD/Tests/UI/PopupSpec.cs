@@ -62,5 +62,82 @@ namespace HMD.Tests.UI
             Object.DestroyImmediate(panel2);
             Object.DestroyImmediate(groupGo);
         }
+
+        [Test]
+        public void CenterXYIfOutsideGroup_WhenInsideGroup_DoesNotCenter()
+        {
+            var groupGo = new GameObject("PopupGroup");
+            var groupRect = groupGo.AddComponent<RectTransform>();
+            groupRect.sizeDelta = new Vector2(100.0f, 100.0f);
+            groupRect.pivot = new Vector2(0.5f, 0.5f);
+
+            var popupGo = new GameObject("Popup");
+            var popupRect = popupGo.AddComponent<RectTransform>();
+            popupRect.sizeDelta = new Vector2(10.0f, 10.0f);
+            popupRect.pivot = new Vector2(0.5f, 0.5f);
+            popupRect.SetParent(groupRect, false);
+            popupRect.localPosition = new Vector3(10.0f, 20.0f, 3.0f);
+
+            var didCenter = Popup.IsOutsideGroup(popupGo, groupGo);
+
+            Assert.IsFalse(didCenter);
+            Assert.AreEqual(new Vector3(10.0f, 20.0f, 3.0f), popupRect.localPosition);
+
+            Object.DestroyImmediate(popupGo);
+            Object.DestroyImmediate(groupGo);
+        }
+
+        [Test]
+        public void CenterXYIfOutsideGroup_WhenOutsideGroup_CentersXYAndPreservesZ()
+        {
+            var groupGo = new GameObject("PopupGroup");
+            var groupRect = groupGo.AddComponent<RectTransform>();
+            groupRect.sizeDelta = new Vector2(100.0f, 100.0f);
+            groupRect.pivot = new Vector2(0.5f, 0.5f);
+
+            var popupGo = new GameObject("Popup");
+            var popupRect = popupGo.AddComponent<RectTransform>();
+            popupRect.sizeDelta = new Vector2(10.0f, 10.0f);
+            popupRect.pivot = new Vector2(0.5f, 0.5f);
+            popupRect.SetParent(groupRect, false);
+            popupRect.localPosition = new Vector3(100.0f, 0.0f, 3.0f);
+
+            var didCenter = Popup.IsOutsideGroup(popupGo, groupGo);
+
+            Assert.IsTrue(didCenter);
+            Assert.AreEqual(new Vector3(0.0f, 0.0f, 3.0f), popupRect.localPosition);
+
+            Object.DestroyImmediate(popupGo);
+            Object.DestroyImmediate(groupGo);
+        }
+
+        [Test]
+        public void ToggleButton_WhenNoGroupAssigned_TogglesPanelWithoutThrowing()
+        {
+            var panel = new GameObject("Panel");
+            panel.SetActive(false);
+
+            var buttonGo = new GameObject("Button");
+            var button = buttonGo.AddComponent<Button>();
+
+            var popupGo = new GameObject("Popup");
+            popupGo.SetActive(false);
+            var popup = popupGo.AddComponent<Popup>();
+            popup.toggleButton = button;
+            popup.panel = panel;
+            popupGo.SetActive(true);
+
+            Assert.IsFalse(panel.activeSelf);
+
+            button.onClick.Invoke();
+            Assert.IsTrue(panel.activeSelf);
+
+            button.onClick.Invoke();
+            Assert.IsFalse(panel.activeSelf);
+
+            Object.DestroyImmediate(popupGo);
+            Object.DestroyImmediate(buttonGo);
+            Object.DestroyImmediate(panel);
+        }
     }
 }
