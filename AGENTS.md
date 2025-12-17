@@ -43,6 +43,6 @@
 
 ## Agent Script Rules
 
-- All script files should be under "AgentScript" namespace
+- All script files should be under "HMD.Editor.AgentScript" namespace
 - If a Script file for the task exists, use it instead of writing a new one
 - All Unity Editor menu entries added by script should be under "Tools/Agent Scripts" menu
