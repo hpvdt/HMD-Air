@@ -40,7 +40,7 @@ namespace HMD.Scripts
                 ToggleDashUIVisibility();
         }
 
-        private void ToggleDashUIVisibility()
+        public void ToggleDashUIVisibility()
         {
             dashUI.SetActive(!dashUI.activeSelf);
         }
