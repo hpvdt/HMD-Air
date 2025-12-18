@@ -7,7 +7,7 @@ using ArgsT = HMD.Scripts.Streaming.VCap.VCapFeed.ArgsT;
 
 namespace HMD.Scripts.Streaming
 {
-    public class NewFeedController : MonoBehaviour
+    public class NewPlayerController : MonoBehaviour
     {
         private static readonly Yaml Pickler = new();
 
