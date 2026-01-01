@@ -53,13 +53,13 @@ namespace HMD.Scripts.Streaming
         private Renderer _morphLeftRenderer;
         private Renderer _morphRightRenderer;
 
-        private float _sphereScale;
-        private float Pitch;
-        private float Roll;
+        // private float _sphereScale;
+        // private float Pitch;
+        // private float Roll;
+        // private float Yaw;
 
         public TextureView Texture = null!;
 
-        private float Yaw;
 
         protected abstract FeedLike Feed { get; }
 
