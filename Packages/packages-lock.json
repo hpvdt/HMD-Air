@@ -288,11 +288,11 @@
       "url": "https://package.openupm.com"
     },
     "com.yasirkula.ingamedebugconsole": {
-      "version": "https://github.com/yasirkula/UnityIngameDebugConsole.git",
+      "version": "1.8.4",
       "depth": 0,
-      "source": "git",
+      "source": "registry",
       "dependencies": {},
-      "hash": "faa3b5978cc979c7454a4c29438ac050545455f9"
+      "url": "https://package.openupm.com"
     },
     "com.yasirkula.texttotmp": {
       "version": "1.2.0",
