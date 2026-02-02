@@ -15,7 +15,7 @@
       }
     },
     "com.coplaydev.unity-mcp": {
-      "version": "9.2.0",
+      "version": "9.3.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {

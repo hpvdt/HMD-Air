@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.coplaydev.unity-mcp": "9.2.0",
+    "com.coplaydev.unity-mcp": "9.3.1",
     "com.ecasillas.missingrefsfinder": "https://github.com/tribbloid/unity-missing-references-finder.git",
     "com.tayx.graphy": "3.0.5",
     "com.unity.2d.sprite": "1.0.0",

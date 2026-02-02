@@ -36,7 +36,7 @@
       "command": "uvx",
       "args": [
         "--from",
-        "git+https://github.com/CoplayDev/unity-mcp@v9.2.0#subdirectory=Server",
+        "git+https://github.com/CoplayDev/unity-mcp@v9.3.1#subdirectory=Server",
         "mcp-for-unity"
       ]
     }
