@@ -15,11 +15,12 @@
       }
     },
     "com.coplaydev.unity-mcp": {
-      "version": "9.4.0",
+      "version": "9.6.6",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.nuget.newtonsoft-json": "3.0.2"
+        "com.unity.nuget.newtonsoft-json": "3.0.2",
+        "com.unity.test-framework": "1.1.31"
       },
       "url": "https://package.openupm.com"
     },
@@ -79,7 +80,7 @@
       }
     },
     "com.unity.ide.rider": {
-      "version": "3.0.39",
+      "version": "3.0.40",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -240,7 +241,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.visualscripting": {
-      "version": "1.9.9",
+      "version": "1.9.11",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -288,14 +289,14 @@
       "url": "https://package.openupm.com"
     },
     "com.yasirkula.ingamedebugconsole": {
-      "version": "1.8.4",
+      "version": "1.8.6",
       "depth": 0,
       "source": "registry",
       "dependencies": {},
       "url": "https://package.openupm.com"
     },
     "com.yasirkula.texttotmp": {
-      "version": "1.2.0",
+      "version": "1.2.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {},

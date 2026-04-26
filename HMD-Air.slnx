@@ -1,0 +1,9 @@
+﻿<Solution>
+  <Project Path="ca.hpvdt.mavlinkapi.Tests.csproj" />
+  <Project Path="ca.hpvdt.mavlinkapi.Runtime.csproj" />
+  <Project Path="HMD.Scripts.csproj" />
+  <Project Path="ca.hpvdt.mavlinkapi.Editor.csproj" />
+  <Project Path="Assembly-CSharp-Editor.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="HMD.Tests.csproj" />
+</Solution>
