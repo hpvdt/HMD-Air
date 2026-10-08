@@ -3,7 +3,7 @@
   "rootNamespace": "",
   "references": [
     "HMD.Scripts",
-    "ca.hpvdt.mavlinkapi.Runtime"
+    "ca.hpvdt.MAVLinkSDK.Runtime"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

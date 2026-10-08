@@ -1,5 +1,5 @@
 using HMD.Scripts.Util;
-using MAVLinkAPI.Util.NullSafety;
+using MAVLinkSDK.Util.NullSafety;
 using UnityEngine;
 using UnityEngine.UI;
 

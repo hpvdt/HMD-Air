@@ -1,5 +1,5 @@
 using System;
-using MAVLinkAPI.Util;
+using MAVLinkSDK.Util;
 using UnityEngine;
 
 namespace HMD.Scripts.Util

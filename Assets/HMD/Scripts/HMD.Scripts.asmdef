@@ -8,7 +8,7 @@
     "StandaloneFileBrowser",
     "Unity.VisualScripting.Core",
     "Autofill.Runtime",
-    "ca.hpvdt.mavlinkapi.Runtime"
+    "ca.hpvdt.MAVLinkSDK.Runtime"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

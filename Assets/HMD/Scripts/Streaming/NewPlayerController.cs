@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using MAVLinkAPI.Routing;
-using MAVLinkAPI.Util.NullSafety;
+using MAVLinkSDK.Routing;
+using MAVLinkSDK.Util.NullSafety;
 using UnityEngine;
 using ArgsT = HMD.Scripts.Streaming.VCap.VCapFeed.ArgsT;
 

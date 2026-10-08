@@ -32,7 +32,7 @@
 - **Core Components**: Assets/HMD/ (main app), Assets/NRSDK/ (AR), Assets/VLCUnity/ (video streaming)
 - **MAVLink API**: Packages/MAVLinkAPI/ (drone telemetry communication)
 - **Key Namespaces**: HMD.Scripts (main), HMD.Scripts.Streaming (video), MAVLinkAPI (telemetry)
-- **Assemblies**: HMD.Scripts.asmdef, ca.hpvdt.mavlinkapi.Runtime.asmdef
+- **Assemblies**: HMD.Scripts.asmdef, ca.hpvdt.MAVLinkSDK.Runtime.asmdef
 
 ## Code Style (.editorconfig)
 
