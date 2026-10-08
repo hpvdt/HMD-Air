@@ -13262,7 +13262,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: MAVLinkAPI.UI.Controller.ToggleDetail, ca.hpvdt.mavlinkapi
+        m_TargetAssemblyTypeName: MAVLinkSDK.UI.Controller.ToggleDetail, ca.hpvdt.MAVLinkSDK
         m_MethodName: Toggle
         m_Mode: 1
         m_Arguments:
@@ -14641,7 +14641,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: MAVLinkAPI.UI.Controller.ToggleDetail, ca.hpvdt.mavlinkapi
+        m_TargetAssemblyTypeName: MAVLinkSDK.UI.Controller.ToggleDetail, ca.hpvdt.MAVLinkSDK
         m_MethodName: Toggle
         m_Mode: 1
         m_Arguments:
@@ -21796,7 +21796,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 22400762, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 50.000072
+      value: 0.00006484985
       objectReference: {fileID: 0}
     - target: {fileID: 22426080, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_AnchorMax.x
@@ -23564,7 +23564,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: MAVLinkAPI.UI.Controller.ToggleDetail, ca.hpvdt.mavlinkapi
+        m_TargetAssemblyTypeName: MAVLinkSDK.UI.Controller.ToggleDetail, ca.hpvdt.MAVLinkSDK
         m_MethodName: Toggle
         m_Mode: 1
         m_Arguments:
