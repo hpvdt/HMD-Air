@@ -1,5 +1,13 @@
 {
   "dependencies": {
+    "ca.hpvdt.arglassessdk": {
+      "version": "file:ARGlassesSDK",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.xr.management": "4.5.1"
+      }
+    },
     "ca.hpvdt.mavlinksdk": {
       "version": "file:MAVLinkAPI",
       "depth": 0,
@@ -23,13 +31,6 @@
         "com.unity.test-framework": "1.1.31"
       },
       "url": "https://package.openupm.com"
-    },
-    "com.ecasillas.missingrefsfinder": {
-      "version": "https://github.com/tribbloid/unity-missing-references-finder.git",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "0c2024efe13f648dd0efc4f70d86ec028f9e8bb6"
     },
     "com.jonagill.autofill": {
       "version": "1.0.7",

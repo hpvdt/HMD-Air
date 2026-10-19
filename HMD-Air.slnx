@@ -1,9 +1,11 @@
 ﻿<Solution>
   <Project Path="ca.hpvdt.MAVLinkSDK.Tests.csproj" />
   <Project Path="ca.hpvdt.MAVLinkSDK.Runtime.csproj" />
-  <Project Path="HMD.Scripts.csproj" />
   <Project Path="ca.hpvdt.MAVLinkSDK.Editor.csproj" />
+  <Project Path="HMD.Scripts.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
   <Project Path="HMD.Tests.csproj" />
+  <Project Path="ca.hpvdt.ArGlassesSDK.Tests.csproj" />
+  <Project Path="ca.hpvdt.ArGlassesSDK.Runtime.csproj" />
 </Solution>
