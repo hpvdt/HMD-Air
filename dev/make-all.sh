@@ -3,12 +3,6 @@
 #CRDIR="$(cd "`dirname "$0"`"; pwd)"
 FWDIR="$(cd "`dirname "$0"`"/..; pwd)"
 
-cd $FWDIR/ar-drivers-rs && \
-cargo build --release
-
-TARGET="$FWDIR/Assets/AirAPI/Plugins/libar_drivers.so"
-cp $FWDIR/ar-drivers-rs/target/release/libar_drivers.* $TARGET && \
-echo "Copied to $TARGET"
-
-source "$FWDIR/ar-drivers-rs/before.sh"
-
+# ar-drivers-rs was promoted to a full package (Packages/ARGlassesSDK, gitmodule),
+# the driver now builds from its embedded crate and installs into the package Plugins folder
+exec "$FWDIR/Packages/ARGlassesSDK/dev/make-all.sh"

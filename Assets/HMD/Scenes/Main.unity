@@ -2065,7 +2065,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: AirPoseProvider, Assembly-CSharp
+        m_TargetAssemblyTypeName: ArGlassesSDK.UI.ARPoseProvider, ca.hpvdt.ArGlassesSDK.Runtime
         m_MethodName: ZeroY
         m_Mode: 1
         m_Arguments:
@@ -5259,7 +5259,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 6284135010548558380}
-        m_TargetAssemblyTypeName: XRPoseAPI.Scripts.AirPoseProvider, Assembly-CSharp
+        m_TargetAssemblyTypeName: ArGlassesSDK.UI.ARPoseProvider, ca.hpvdt.ArGlassesSDK.Runtime
         m_MethodName: ZeroY
         m_Mode: 1
         m_Arguments:
@@ -6623,7 +6623,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 6284135010548558380}
-        m_TargetAssemblyTypeName: XRPoseAPI.Scripts.AirPoseProvider, Assembly-CSharp
+        m_TargetAssemblyTypeName: ArGlassesSDK.UI.ARPoseProvider, ca.hpvdt.ArGlassesSDK.Runtime
         m_MethodName: TryDisconnect
         m_Mode: 1
         m_Arguments:
@@ -11017,7 +11017,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 6284135010548558380}
-        m_TargetAssemblyTypeName: XRPoseAPI.Scripts.AirPoseProvider, Assembly-CSharp
+        m_TargetAssemblyTypeName: ArGlassesSDK.UI.ARPoseProvider, ca.hpvdt.ArGlassesSDK.Runtime
         m_MethodName: TryConnect
         m_Mode: 1
         m_Arguments:
@@ -15518,7 +15518,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: AirPoseProvider, Assembly-CSharp
+        m_TargetAssemblyTypeName: ArGlassesSDK.UI.ARPoseProvider, ca.hpvdt.ArGlassesSDK.Runtime
         m_MethodName: TryDisconnect
         m_Mode: 1
         m_Arguments:
@@ -19611,7 +19611,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: AirPoseProvider, Assembly-CSharp
+        m_TargetAssemblyTypeName: ArGlassesSDK.UI.ARPoseProvider, ca.hpvdt.ArGlassesSDK.Runtime
         m_MethodName: TryConnect
         m_Mode: 1
         m_Arguments:
@@ -24125,7 +24125,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 6284135010548558380}
-        m_TargetAssemblyTypeName: XRPoseAPI.Scripts.AirPoseProvider, Assembly-CSharp
+        m_TargetAssemblyTypeName: ArGlassesSDK.UI.ARPoseProvider, ca.hpvdt.ArGlassesSDK.Runtime
         m_MethodName: ZeroXY
         m_Mode: 1
         m_Arguments:
@@ -28668,7 +28668,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: XRPoseAPI.Scripts.AirPoseProvider, Assembly-CSharp
+        m_TargetAssemblyTypeName: ArGlassesSDK.UI.ARPoseProvider, ca.hpvdt.ArGlassesSDK.Runtime
         m_MethodName: ZeroXY
         m_Mode: 1
         m_Arguments:
@@ -33935,10 +33935,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7611551585389154193, guid: a70f855a8b5b24aee8d157df7d3469cf, type: 3}
-      propertyPath: reference
-      value: 
-      objectReference: {fileID: 1673614943}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -33999,7 +33995,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0625980342fb472fa7a2c128fa9793db, type: 3}
+  m_Script: {fileID: 11500000, guid: 2287e3bbd4df40f479f67e897063d994, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!4 &6656334163933161574
