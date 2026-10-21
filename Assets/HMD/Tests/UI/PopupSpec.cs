@@ -105,6 +105,9 @@ namespace HMD.Tests.UI
             var didCenter = Popup.IsOutsideGroup(popupGo, groupGo);
 
             Assert.IsTrue(didCenter);
+
+            Popup.CenterXY(popupGo);
+
             Assert.AreEqual(new Vector3(0.0f, 0.0f, 3.0f), popupRect.localPosition);
 
             Object.DestroyImmediate(popupGo);

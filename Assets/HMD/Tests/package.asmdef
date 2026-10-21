@@ -3,7 +3,8 @@
   "rootNamespace": "",
   "references": [
     "HMD.Scripts",
-    "ca.hpvdt.MAVLinkSDK.Runtime"
+    "ca.hpvdt.MAVLinkSDK.Runtime",
+    "UnityEngine.TestRunner"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
