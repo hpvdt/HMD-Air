@@ -1,15 +1,9 @@
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using HMD.Scripts.Streaming;
 using HMD.Scripts.Util;
-using MAVLinkSDK.Util;
-using MAVLinkSDK.Util.NullSafety;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace HMD.Scripts
 {

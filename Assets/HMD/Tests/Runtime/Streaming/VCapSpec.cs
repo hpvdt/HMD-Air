@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using HMD.Scripts.Streaming.VCap;
 using MAVLinkSDK.Routing;

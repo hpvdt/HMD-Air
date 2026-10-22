@@ -8,7 +8,6 @@ using LibVLCSharp;
 using MAVLinkSDK.Util.NullSafety;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Serialization;
 using Application = UnityEngine.Device.Application;
 
 namespace HMD.Scripts.Streaming.VLC
